@@ -9,7 +9,7 @@
 
     <style>
         body {
-            background-image: url('LOGO.png');
+            background-image: url('{{ url_for('static', filename='LOGO.png') }}'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
