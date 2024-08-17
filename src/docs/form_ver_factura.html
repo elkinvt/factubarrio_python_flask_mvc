@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>factubarrio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-image: url('LOGO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px; 
+        }
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;  
+        }
+        .form-control-sm {
+            width: 100%;
+            max-width: 300px; /* Puedes ajustar el tamaño máximo según tus necesidades */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+    <style>
+        .factubarrio {
+            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px; /* Margen negativo para ajustar la posición */
+        }
+    
+        /* Ajustes para tablets */
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px; /* Tamaño de fuente más pequeño */
+                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+            }
+        }
+    
+        /* Ajustes para teléfonos móviles */
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px; /* Tamaño de fuente aún más pequeño */
+                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="factubarrio">
+        factubarrio
+    </div>
+    
+  <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
+                <li><a class="dropdown-item" href="form_ver_cliente.html">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="form_crear_cliente.html">crear Cliente</a></li>
+                <li><a class="dropdown-item" href="form_editar_cliente.html">Editar Cliente</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
+                <li><a class="dropdown-item" href="form_ver_vendedor.html">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="form_crear_vendedor.html">crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="form_editar_vendedor.html">editar Vendedor</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
+                <li><a class="dropdown-item" href="form_ver_producto.html">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="form_crear_producto.html">crear Producto</a></li>
+                <li><a class="dropdown-item" href="form_editar_producto.html">editar producto</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_factura.html">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="form_generacion_factura.html">generar Factura</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_usuario.html">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="form_crear_usuario.html">crear usuario</a></li>
+                <li><a class="dropdown-item" href="form_editar_usuario.html">editar usuario</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="container mt-5">
+        <h2>Consultar Facturas por Fecha</h2>
+        <input type="date" id="fechaConsulta" class="form-control mb-3 form-control-sm">
+        <button class="btn btn-primary form-control-sm" onclick="buscarFacturasPorFecha()">Buscar Facturas</button>
+        <table class="table table-striped mt-3 fo">
+            <thead>
+                <tr>
+                    <th>ID Factura</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th> <!-- Encabezado para el nombre del cliente -->
+                    <th>Total</th>
+                     <th>Detalles</th>
+                 </tr>
+            </thead>
+    
+            <tbody id="listaFacturas">
+                <!-- Las facturas filtradas se mostrarán aquí -->
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal para mostrar detalles de factura -->
+    <div class="modal fade" id="facturaModal" tabindex="-1" aria-labelledby="facturaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="facturaModalLabel">Detalles de Factura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Los detalles de la factura se cargarán aquí -->
+                    <div id="detalleFacturaContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function buscarFacturasPorFecha() {
+            let fechaIngresada = document.getElementById('fechaConsulta').value;
+            let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
+            let contenedor = document.getElementById('listaFacturas');
+            contenedor.innerHTML = ''; // Limpia contenido anterior
+
+            // Asegúrate de comparar solo la parte de la fecha de cada factura
+            let facturasFiltradas = facturas.filter(factura => factura.fecha.split(' ')[0] === fechaIngresada);
+
+            if (facturasFiltradas.length > 0) {
+            facturasFiltradas.forEach(factura => {
+                contenedor.innerHTML += `
+                    <tr>
+                        <td>${factura.id}</td>
+                        <td>${factura.fecha}</td>
+                        <td>${factura.cliente}</td>
+                        <td>$${factura.total}</td>
+                        <td><button class="btn btn-info btn-sm" onclick="mostrarDetallesFactura('${factura.id}')">Ver Detalles</button></td>
+                    </tr>
+                `;
+            });
+            } else {
+                contenedor.innerHTML = '<tr><td colspan="5" class="text-center">No se encontraron facturas para la fecha seleccionada.</td></tr>';
+            }
+        }
+
+
+        function mostrarDetallesFactura(idFactura) {
+            let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
+            let facturaEncontrada = facturas.find(factura => factura.id === idFactura);
+
+            if (facturaEncontrada) {
+                let detalleHtml = `
+                    <p><strong>ID:</strong> ${facturaEncontrada.id}</p>
+                    <p><strong>Fecha:</strong> ${facturaEncontrada.fecha} ${facturaEncontrada.hora}</p>
+                    <p><strong>Cliente:</strong> ${facturaEncontrada.cliente}</p>
+                    <p><strong>Vendedor:</strong> ${facturaEncontrada.vendedor}</p> <!-- Muestra el vendedor aquí -->
+                    <p><strong>Total:</strong> $${facturaEncontrada.total}</p>
+                    <p><strong>Monto Pagado:</strong> $${facturaEncontrada.montoPagado.toFixed(2)}</p>
+                    <p><strong>Cambio:</strong> $${facturaEncontrada.cambio.toFixed(2)}</p>
+                    <div><strong>Items:</strong></div>
+                    <ul>
+                        ${facturaEncontrada.items.map(item => `<li>${item.producto} - ${item.cantidad} x $${item.precioUnitario} = $${item.subtotal}</li>`).join('')}
+                    </ul>
+                `;
+
+                document.getElementById('detalleFacturaContent').innerHTML = detalleHtml;
+                var myModal = new bootstrap.Modal(document.getElementById('facturaModal'));
+                myModal.show();
+            } else {
+                alert("Detalles de factura no encontrados.");
+            }
+        }
+
+    </script>
+    <script>
+        function cargarFacturas() {
+            let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
+            console.log(facturas);  // Verifica qué se está cargando realmente
+            let contenedor = document.getElementById('listaFacturas');
+            contenedor.innerHTML = ''; // Limpia contenido anterior
+            facturas.forEach((factura, index) => {
+            contenedor.innerHTML += `<div>Factura ${factura.id} - ${factura.fecha} - Total: $${factura.total}</div>`;
+            });
+        }
+
+    </script>
+    <footer>
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer>
+    <script>
+        function cerrarSesion() {
+            localStorage.clear();  
+            sessionStorage.clear(); 
+            window.location.href = 'index.html';
+        }
+    </script>
+  
+        
+</body>
+</html>
+
+  

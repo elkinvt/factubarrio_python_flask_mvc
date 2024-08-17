@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>factubarrio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-image: url('LOGO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px; 
+        }
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;  
+        }
+        .hidden {
+            display: none;
+        }
+        .form-control-sm {
+            width: 100%;
+            max-width: 300px; /* Puedes ajustar el tamaño máximo según tus necesidades */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+    <style>
+        .factubarrio {
+            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px; /* Margen negativo para ajustar la posición */
+        }
+    
+        /* Ajustes para tablets */
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px; /* Tamaño de fuente más pequeño */
+                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+            }
+        }
+    
+        /* Ajustes para teléfonos móviles */
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px; /* Tamaño de fuente aún más pequeño */
+                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="factubarrio">
+        factubarrio
+    </div>
+
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
+                <li><a class="dropdown-item" href="form_ver_cliente.html">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="form_crear_cliente.html">crear Cliente</a></li>
+                <li><a class="dropdown-item" href="form_editar_cliente.html">Editar Cliente</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
+                <li><a class="dropdown-item" href="form_ver_vendedor.html">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="form_crear_vendedor.html">crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="form_editar_vendedor.html">editar Vendedor</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
+                <li><a class="dropdown-item" href="form_ver_producto.html">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="form_crear_producto.html">crear Producto</a></li>
+                <li><a class="dropdown-item" href="form_editar_producto.html">editar producto</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_factura.html">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="form_generacion_factura.html">generar Factura</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_usuario.html">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="form_crear_usuario.html">crear usuario</a></li>
+                <li><a class="dropdown-item" href="form_editar_usuario.html">editar usuario</a></li>
+            </ul>
+        </li>
+    
+    </ul>
+    <div class="container mt-5">
+        <h2>Buscar Producto</h2>
+        <input type="text" id="buscarCodigoProducto" class="form-control mt-2 form-control-sm" placeholder="Ingrese código del producto y/o" onkeypress="handleKeyPress(event)">
+        <input type="text" id="buscarNombreProducto" class="form-control mt-2 form-control-sm" placeholder="Ingrese nombre del producto" onkeypress="handleKeyPress(event)">
+        <button onclick="buscarProducto()" class="btn btn-primary mt-3">Buscar</button>
+        <div id="listaProductos" class="list-group mt-3"></div>
+    </div>
+    <div id="datosProducto" class="container mt-5 ">
+        <!-- Formulario para mostrar y editar detalles del producto -->
+        <h2>Editar producto</h2>
+        <form id="formeditarProducto" onsubmit="guardarProductoEditado(event)">
+            <div class="mb-3">
+                <label for="codigoProducto" class="form-label">Código</label>
+                <input type="text" class="form-control form-control-sm" id="codigoProducto" required>
+            </div>
+            <div class="mb-3">
+                <label for="nombreProducto" class="form-label">Nombre</label>
+                <input type="text" class="form-control form-control-sm" id="nombreProducto" required>
+            </div>
+            <div class="mb-3">
+                <label for="descripcionProducto" class="form-label">Descripción</label>
+                <textarea class="form-control form-control-sm" id="descripcionProducto" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="categoriaProducto" class="form-label">Categoría</label>
+                <select class="form-select form-control-sm"  id="categoriaProducto" required>
+                    <option value="">Seleccione una categoría</option>
+                    <!-- Opciones de categorías aquí -->
+                    <option value="Abarrotes">Abarrotes</option>
+                    <option value="Productos Frescos">Productos Frescos</option>
+                    <option value="Carnes y Aves">Carnes y Aves</option>
+                    <option value="Pescados y Mariscos">Pescados y Mariscos</option>
+                    <option value="Lácteos y Huevos">Lácteos y Huevos</option>
+                    <option value="Panadería y Pastelería">Panadería y Pastelería</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Congelados">Congelados</option>
+                    <option value="Snacks y Golosinas">Snacks y Golosinas</option>
+                    <option value="Productos de Despensa">Productos de Despensa</option>
+                    <option value="Productos para Bebés">Productos para Bebés</option>
+                    <option value="Salud y Belleza">Salud y Belleza</option>
+                    <option value="Limpieza y Hogar">Limpieza y Hogar</option>
+                    <option value="Mascotas">Mascotas</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="precioProducto" class="form-label">Precio</label>
+                <input type="number" class="form-control form-control-sm" id="precioProducto" required step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
+                <select class="form-select form-control-sm" id="unidadMedidaProducto" required>
+                    <option value="">Seleccione una unidad</option>
+                    <!-- Opciones de unidad de medida aquí -->
+                    <optgroup label="Peso">
+                        <option value="kg">Kilogramos (kg)</option>
+                        <option value="g">Gramos (g)</option>
+                        <option value="mg">Miligramos (mg)</option>
+                    </optgroup>
+                    <optgroup label="Volumen">
+                        <option value="lt">Litros (lt)</option>
+                        <option value="ml">Mililitros (ml)</option> <!-- Confirma que esta opción está correctamente escrita y seleccionable -->
+                        <option value="m3">Metros cúbicos (m³)</option>
+                    </optgroup>
+                    <optgroup label="Longitud">
+                        <option value="m">Metros (m)</option>
+                        <option value="cm">Centímetros (cm)</option>
+                        <option value="mm">Milímetros (mm)</option>
+                    </optgroup>
+                    <optgroup label="Unidades">
+                        <option value="un">Unidades (un)</option>
+                        <option value="paq">Paquetes (paq)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="presentacionProducto" class="form-label">Presentación</label>
+                <input type="text" class="form-control form-control-sm" id="presentacionProducto" required>
+            </div>
+            <div class="mb-3">
+                <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
+                <input type="number" class="form-control form-control-sm" id="cantidadStockProducto" required>
+            </div>
+            <div class="mb-3">
+                <label for="estadoProducto" class="form-label">Estado</label>
+                <input type="text" class="form-control form-control-sm" id="estadoProducto" required readonly>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+        
+        <form>
+            <div class="container mt-5">
+                <h2>Detalles del Producto</h2>
+                <div id="productoDetalles" class="hidden">
+                    <!-- Campos del producto aquí... -->
+                </div>
+                <!-- Botones para controlar el estado del producto -->
+                <button type="button" class="btn btn-warning mb-2" onclick="toggleEstadoProducto()">Habilitar/Deshabilitar Producto</button>
+                <button type="button" class="btn btn-danger" onclick="eliminarProducto()">Eliminar Producto</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();  // Previene que el formulario se envíe
+                buscarProducto();  // Llama a la función que ejecuta la búsqueda
+            }
+        }
+    </script>
+    
+   
+    
+    <script>
+
+        function buscarProducto() {
+            productoActual = null; // Resetea el producto actual al iniciar una búsqueda
+
+            var codigo = document.getElementById('buscarCodigoProducto').value.trim().toLowerCase();
+            var nombre = document.getElementById('buscarNombreProducto').value.trim().toLowerCase();
+            var productos = JSON.parse(localStorage.getItem('Productos')) || [];
+
+            var resultados = productos.filter(producto =>
+                ((codigo && producto.codigo.toLowerCase().includes(codigo)) ||
+                (nombre && producto.nombre.toLowerCase().includes(nombre))) &&
+                !producto.isDeleted // Solo incluye productos que no están eliminados
+            );
+
+            var listaProductos = document.getElementById('listaProductos');
+            listaProductos.innerHTML = ''; // Limpiar lista anterior
+
+            if (resultados.length === 0) {
+                listaProductos.innerHTML = '<div class="list-group-item">No se encontraron productos.</div>';
+            } else {
+                    resultados.forEach(producto => {
+                    var item = document.createElement('button');
+                    item.classList.add('list-group-item', 'list-group-item-action');
+                    item.textContent = `${producto.nombre} - ${producto.codigo}`;
+                    item.onclick = () => cargarProductoEnFormulario(producto);
+                    listaProductos.appendChild(item);
+                });
+            }
+
+            document.getElementById('buscarCodigoProducto').value = '';
+            document.getElementById('buscarNombreProducto').value = '';
+        }
+
+        function cargarProductoEnFormulario(producto) {
+            // Establece el producto actual a este producto
+            productoActual = producto;
+
+            // Muestra la sección de datos del producto si está oculta
+            document.getElementById('datosProducto').classList.remove('hidden');
+
+            // Carga los datos del producto en los campos del formulario
+            document.getElementById('codigoProducto').value = producto.codigo;
+            document.getElementById('nombreProducto').value = producto.nombre;
+            document.getElementById('descripcionProducto').value = producto.descripcion;
+            document.getElementById('categoriaProducto').value = producto.categoria;
+            document.getElementById('precioProducto').value = producto.precio;
+            document.getElementById('unidadMedidaProducto').value = producto.unidadMedida;
+            document.getElementById('presentacionProducto').value = producto.presentacion;
+            document.getElementById('cantidadStockProducto').value = producto.cantidadStock;
+            document.getElementById('estadoProducto').value = producto.isActive ? "Habilitado" : "Deshabilitado";
+        }
+
+    </script>
+
+    <script>
+
+        function guardarProductoEditado(event) {
+            event.preventDefault();
+            
+            if (productoActual) {
+                var productos = JSON.parse(localStorage.getItem('Productos')) || [];
+                var index = productos.findIndex(p => p.codigo === productoActual.codigo);
+
+                if (index !== -1) {
+                    productos[index] = {
+                        codigo: document.getElementById('codigoProducto').value,
+                        nombre: document.getElementById('nombreProducto').value,
+                        descripcion: document.getElementById('descripcionProducto').value,
+                        categoria: document.getElementById('categoriaProducto').value,
+                        precio: parseFloat(document.getElementById('precioProducto').value),
+                        unidadMedida: document.getElementById('unidadMedidaProducto').value,
+                        presentacion: document.getElementById('presentacionProducto').value,
+                        cantidadStock: parseInt(document.getElementById('cantidadStockProducto').value),
+                        isActive: productoActual.isActive  // Asegúrate de mantener el estado del producto
+                    };
+
+                    localStorage.setItem('Productos', JSON.stringify(productos));
+                    alert('Producto actualizado correctamente.');
+                    limpiarFormularioProducto();  // Limpia el formulario después de actualizar el producto
+                    limpiarListaProductos();
+                } else {
+                    alert('Error: Producto no encontrado.');
+                }
+            } else {
+                alert('No hay ningún producto cargado para editar.');
+            }
+        }
+
+    </script>
+
+    <script>
+
+        function toggleEstadoProducto() {
+            if (productoActual) {
+                productoActual.isActive = !productoActual.isActive; // Cambia el estado de activo a inactivo y viceversa
+                var productos = JSON.parse(localStorage.getItem('Productos')) || [];
+                var index = productos.findIndex(p => p.codigo === productoActual.codigo);
+
+                if (index !== -1) {
+                    productos[index] = productoActual;
+                    localStorage.setItem('Productos', JSON.stringify(productos));
+                    alert(productoActual.isActive ? 'Producto habilitado.' : 'Producto deshabilitado.');
+                    document.getElementById('estadoProducto').value = productoActual.isActive ? "Habilitado" : "Deshabilitado";  // Asegura que el input muestra el estado actualizado
+                } else {
+                    alert('Error: Producto no encontrado.');
+                }
+            } else {
+                alert('No hay ningún producto cargado para cambiar su estado.');
+            }
+        }
+
+        function actualizarEstadoVisual(isActive) {
+            var checkbox = document.getElementById('clienteActivo');  // Asegúrate de que este ID exista o ajusta según tu HTML
+                if (checkbox) {
+                checkbox.checked = isActive;
+            }
+        }
+
+    
+    </script>
+
+<script>
+    function eliminarProducto() {
+        if (productoActual) {
+            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.");
+            if (!confirmacion) {
+                return;
+            }
+
+            var productos = JSON.parse(localStorage.getItem('Productos')) || [];
+            var facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
+            var historialVentas = JSON.parse(localStorage.getItem('historial_ventas')) || [];
+            var index = productos.findIndex(p => p.codigo === productoActual.codigo);
+
+            if (index !== -1) {
+                // Filtrar facturas que contienen este producto
+                var facturasDelProducto = facturas.filter(factura =>
+                    factura.items.some(item => item.codigo === productos[index].codigo));
+
+                // Agregar estas facturas al historial antes de eliminar el producto
+                if (facturasDelProducto.length > 0) {
+                    historialVentas.push(...facturasDelProducto);
+                    localStorage.setItem('historial_ventas', JSON.stringify(historialVentas));
+                }
+
+                // Marcar el producto como eliminado
+                productos[index].isDeleted = true;
+                localStorage.setItem('Productos', JSON.stringify(productos));
+                alert('Producto marcado como eliminado y ventas asociadas archivadas.');
+
+                limpiarFormularioProducto();  // Limpia el formulario después de eliminar el producto
+                limpiarListaProductos(); // Asegúrate de que esta función esté definida para actualizar la lista de productos
+                productoActual = null;  // Resetear la variable productoActual
+            } else {
+                alert('Error: Producto no encontrado.');
+            }
+        } else {
+            alert('No hay ningún producto cargado para eliminar.');
+        }
+    }
+
+    function limpiarFormularioProducto() {
+        // Implementación específica para limpiar el formulario de productos
+    }
+
+    function limpiarListaProductos() {
+        // Implementación específica para actualizar la lista de productos
+    }
+</script>
+
+    <script>
+       function limpiarFormularioProducto() {
+            document.getElementById('codigoProducto').value = '';
+            document.getElementById('nombreProducto').value = '';
+            document.getElementById('descripcionProducto').value = '';
+            document.getElementById('categoriaProducto').value = '';
+            document.getElementById('precioProducto').value = '';
+            document.getElementById('unidadMedidaProducto').value = '';
+            document.getElementById('presentacionProducto').value = '';
+            document.getElementById('cantidadStockProducto').value = '';
+            document.getElementById('estadoProducto').value = '';  // Asegúrate de limpiar también el estado
+
+            productoActual = null;  // Restablece el producto actual a null para evitar referencias erróneas
+        }
+    </script>
+    <script>
+        function limpiarListaProductos() {
+            var listaProductos = document.getElementById('listaProductos');
+            listaProductos.innerHTML = ''; // Limpia el contenido de la lista
+        }
+
+    </script>
+
+    <script>
+        function cerrarSesion() {
+            localStorage.clear();  
+            sessionStorage.clear(); 
+            window.location.href = 'index.html';
+        }
+    </script>
+    
+    <footer>
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer> 
+</body>
+</html>

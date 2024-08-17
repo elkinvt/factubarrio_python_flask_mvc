@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>factubarrio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-image: url('LOGO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px; 
+        }
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;  
+        }
+        .form-control-sm {
+            width: 100%;
+            max-width: 300px; /* Puedes ajustar el tamaño máximo según tus necesidades */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+    <style>
+        .factubarrio {
+            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px; /* Margen negativo para ajustar la posición */
+        }
+    
+        /* Ajustes para tablets */
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px; /* Tamaño de fuente más pequeño */
+                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+            }
+        }
+    
+        /* Ajustes para teléfonos móviles */
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px; /* Tamaño de fuente aún más pequeño */
+                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="factubarrio">
+        factubarrio
+    </div>
+    
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
+                <li><a class="dropdown-item" href="form_ver_cliente.html">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="form_crear_cliente.html">crear Cliente</a></li>
+                <li><a class="dropdown-item" href="form_editar_cliente.html">Editar Cliente</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
+                <li><a class="dropdown-item" href="form_ver_vendedor.html">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="form_crear_vendedor.html">crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="form_editar_vendedor.html
+                ">editar Vendedor</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
+                <li><a class="dropdown-item" href="form_ver_producto.html">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="form_crear_producto.html">crear Producto</a></li>
+                <li><a class="dropdown-item" href="form_editar_producto.html">editar producto</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_factura.html">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="form_generacion_factura.html">generar Factura</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_usuario.html">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="form_crear_usuario.html">crear usuario</a></li>
+                <li><a class="dropdown-item" href="form_editar_usuario.html">editar usuario</a></li>
+            </ul>
+        </li>
+    </ul>
+  
+
+    <div class="container mt-5">
+        <h2>Crear Usuario de Vendedor</h2>
+        <form id="formCrearUsuario" onsubmit="guardarUsuario(event)">
+            <div class="mb-3">
+                <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                <select id="tipoDocumento" class="form-control form-control-sm mb-2" required>
+                    <option value="">Seleccione</option>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="PAS">Pasaporte</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="cedulaVendedor" class="form-label">Número de Documento</label>
+                <input type="text" placeholder="Ingrese número de documento y presione enter"  class="form-control form-control-sm mb-2" id="cedulaVendedor" required onkeypress="cargarDatosVendedor(event, true)">
+                <button type="button" class="btn btn-primary form-control-sm" onclick="cargarDatosVendedor()">Buscar</button>
+            </div>
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control form-control-sm" id="nombre" disabled>
+            </div>
+            <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control form-control-sm" id="apellido" disabled>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control form-control-sm" id="email" disabled>
+            </div>
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control form-control-sm" id="nombreUsuario" required>
+            </div>
+            <div class="mb-3">
+                <label for="contrasenaUsuario" class="form-label">Contraseña</label>
+                <input type="password" class="form-control form-control-sm" id="contrasenaUsuario" required>
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="guardarUsuario()">Guardar Usuario</button>
+        </form>
+    </div>
+
+    <script>
+        function cargarDatosVendedor(event, isKeyPress) {
+            if (isKeyPress && event.key !== 'Enter') {
+                return;
+            }
+
+            event?.preventDefault();  // Previene el comportamiento por defecto si es un evento
+            var tipoDocumento = document.getElementById('tipoDocumento').value;
+            var numeroDocumento = document.getElementById('cedulaVendedor').value;
+            var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
+            var vendedor = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento);
+
+            if (vendedor) {
+                document.getElementById('nombre').value = vendedor.nombre;
+                document.getElementById('apellido').value = vendedor.apellido;
+                document.getElementById('email').value = vendedor.email;
+                document.getElementById('nombre').disabled = false;
+                document.getElementById('apellido').disabled = false;
+                document.getElementById('email').disabled = false;
+            } else {
+                alert('No se encontró un vendedor con esos datos');
+                document.getElementById('nombre').value = '';
+                document.getElementById('apellido').value = '';
+                document.getElementById('email').value = '';
+            }
+        }
+
+    </script>
+    <script>
+        function guardarUsuario(event) {
+            event.preventDefault(); // Previene el envío automático del formulario
+
+            var nombreUsuario = document.getElementById('nombreUsuario').value.trim();
+            var contrasenaUsuario = document.getElementById('contrasenaUsuario').value.trim();
+            var tipoDocumento = document.getElementById('tipoDocumento').value;
+            var numeroDocumento = document.getElementById('cedulaVendedor').value.trim();
+
+            if (!nombreUsuario || !contrasenaUsuario || !tipoDocumento || !numeroDocumento) {
+                alert('Por favor, complete todos los campos requeridos, incluyendo tipo y número de documento.');
+                return; // Detener la función si los campos están vacíos
+            }
+
+            var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
+            var vendedor = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento);
+
+            if (vendedor && vendedor.username) {
+                alert('Este vendedor ya tiene un usuario asignado.');
+                return; // Detiene la función si el vendedor ya tiene usuario
+            }
+
+            if (vendedor) {
+                vendedor.username = nombreUsuario;
+                vendedor.password = contrasenaUsuario;
+                localStorage.setItem('Vendedores', JSON.stringify(vendedores));
+                alert('Usuario guardado con éxito!');
+                document.getElementById('formCrearUsuario').reset(); // Limpia el formulario después de guardar exitosamente
+            } else {
+                alert('No se encontró un vendedor con los datos de identificación proporcionados.');
+            }
+        }
+    </script>
+
+    <script>
+        function limpiarFormulario(idFormulario) {
+            var formulario = document.getElementById(idFormulario);
+            var inputs = formulario.getElementsByTagName('input');
+            for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === 'text' || inputs[i].type === 'password' || inputs[i].type === 'email') {
+                    inputs[i].value = '';
+                }
+            }
+        }
+
+    </script>
+
+    <footer>
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer> 
+    
+</body>
+</html>

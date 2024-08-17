@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>factubarrio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-image: url('LOGO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px; 
+        }
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;  
+        }
+    
+        .form-control-sm {
+            width: 100%;
+            max-width: 300px; /* Puedes ajustar el tamaño máximo según tus necesidades */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+
+
+    </style>
+    <style>
+        .factubarrio {
+            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px; /* Margen negativo para ajustar la posición */
+        }
+    
+        /* Ajustes para tablets */
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px; /* Tamaño de fuente más pequeño */
+                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+            }
+        }
+    
+        /* Ajustes para teléfonos móviles */
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px; /* Tamaño de fuente aún más pequeño */
+                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="factubarrio">
+        factubarrio
+    </div>
+    
+     <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
+                <li><a class="dropdown-item" href="form_ver_cliente.html">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="form_crear_cliente.html">crear Cliente</a></li>
+                <li><a class="dropdown-item" href="form_editar_cliente.html">Editar Cliente</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
+                <li><a class="dropdown-item" href="form_ver_vendedor.html">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="form_crear_vendedor.html">crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="form_editar_vendedor.html">editar Vendedor</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
+                <li><a class="dropdown-item" href="form_ver_producto.html">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="form_crear_producto.html">crear Producto</a></li>
+                <li><a class="dropdown-item" href="form_editar_producto.html">editar producto</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_factura.html">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="form_generacion_factura.html">generar Factura</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_usuario.html">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="form_crear_usuario.html">crear usuario</a></li>
+                <li><a class="dropdown-item" href="form_editar_usuario.html">editar usuario</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="container mt-5">
+        <h2>Registrar Cliente</h2>
+        <form id="formCliente">
+            <div class="mb-3">
+                <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                <select class="form-control form-control-sm" id="tipoDocumento" name="tipoDocumento" required>
+                    <option value="">Seleccione tipo de documento</option>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="PS">Pasaporte</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="numeroDocumento" class="form-label">Número de Documento</label>
+                <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="numeroDocumento" required>
+            </div>
+            <div class="mb-3">
+                <label for="nombreCliente" class="form-label">Nombre</label>
+                <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" required>
+            </div>
+            <div class="mb-3">
+                <label for="apellidoCliente" class="form-label">Apellidos</label>
+                <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefonoCliente" class="form-label">Teléfono</label>
+                <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente" required>
+            </div>
+            <div class="mb-3">
+                <label for="direccionCliente" class="form-label">Dirección</label>
+                <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente" required>
+            </div>
+            <div class="mb-3">
+                <label for="emailCliente" class="form-label">Email</label>
+                <input type="email" class="form-control form-control-sm" id="emailCliente" name="emailCliente" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="guardarCliente()">Guardar Cliente</button>
+        </form>
+    </div>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var emailInput = document.getElementById('emailCliente');
+        
+            emailInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();  // Previene la acción por defecto de enviar el formulario
+                    guardarCliente();  // Llama a la función que maneja la lógica de guardar
+                }
+            });
+        });
+    
+        function guardarCliente() {
+            var tipoDocumento = document.getElementById('tipoDocumento').value;
+            var numeroDocumento = document.getElementById('numeroDocumento').value;
+            var nombre = document.getElementById('nombreCliente').value;
+            var apellido = document.getElementById('apellidoCliente').value;
+            var telefono = document.getElementById('telefonoCliente').value;
+            var direccion = document.getElementById('direccionCliente').value;
+            var email = document.getElementById('emailCliente').value;
+            var isActive = true;  // Valor predeterminado al crear un nuevo cliente
+    
+            if (!tipoDocumento || !numeroDocumento || !nombre || !apellido || !telefono || !direccion || !email) {
+                alert('Por favor, complete todos los campos antes de guardar.');
+                return;  // Detiene la función si algún campo está vacío
+            }
+    
+            var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            var clienteExistente = clientes.find(cliente => cliente.numeroDocumento === numeroDocumento && cliente.tipoDocumento === tipoDocumento);
+    
+            // Verificar si ya existe un cliente con el mismo tipo y número de documento
+            if (clienteExistente) {
+                alert('Ya existe un cliente con el tipo de documento ' + tipoDocumento + ' y número ' + numeroDocumento);
+                return;  // Detiene la función si ya existe un cliente con ese documento
+            }
+    
+            var cliente = {
+                tipoDocumento: tipoDocumento,
+                numeroDocumento: numeroDocumento,
+                nombre: nombre,
+                apellido: apellido,
+                telefono: telefono,
+                direccion: direccion,
+                email: email,
+                isActive: isActive,
+                isDeleted: false  // Nuevo campo para manejar la eliminación lógica
+            };
+    
+            clientes.push(cliente);
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+    
+            limpiarFormulario();  // Función que limpia el formulario después de guardar
+            alert('Cliente guardado con éxito!');
+        }
+    
+        function limpiarFormulario() {
+            document.getElementById('tipoDocumento').selectedIndex = 0;
+            document.getElementById('numeroDocumento').value = '';
+            document.getElementById('nombreCliente').value = '';
+            document.getElementById('apellidoCliente').value = '';
+            document.getElementById('telefonoCliente').value = '';
+            document.getElementById('direccionCliente').value = '';
+            document.getElementById('emailCliente').value = '';
+        }
+    </script>
+    
+    <script>
+        function cerrarSesion() {
+            localStorage.clear();  
+            sessionStorage.clear(); 
+            window.location.href = 'index.html';
+        }
+    </script>  
+
+    <footer>
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer> 
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>factubarrio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-image: url('LOGO.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px; 
+        }
+        
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;  
+        }
+        .hidden {
+            display: none;
+        }
+        
+        .form-control-sm {
+            width: 100%;        /* Utiliza todo el ancho del contenedor */
+            max-width: 300px;   /* Mantiene un ancho máximo para evitar estiramiento */
+            margin: auto;       /* Centra el control dentro de su contenedor */
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0 auto; /* Centrado horizontal */
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease-in-out; /* Suaviza la transición de visibilidad */
+        }
+
+        /* Para controlar la visibilidad sin alterar el layout */
+        .info-vendedor {
+            visibility: hidden; /* Inicialmente oculto */
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+
+        .info-vendedor.visible {
+            visibility: visible;
+            opacity: 1;
+            transition: visibility 0s 0s, opacity 0.3s linear;
+        }
+
+    </style>
+    <style>
+        .factubarrio {
+            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px; /* Margen negativo para ajustar la posición */
+        }
+    
+        /* Ajustes para tablets */
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px; /* Tamaño de fuente más pequeño */
+                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+            }
+        }
+    
+        /* Ajustes para teléfonos móviles */
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px; /* Tamaño de fuente aún más pequeño */
+                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <div class="factubarrio">
+        factubarrio
+    </div>
+    
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedorClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
+                <li><a class="dropdown-item" href="form_ver_cliente.html">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="form_crear_cliente.html">crear Cliente</a></li>
+             <li><a class="dropdown-item" href="form_editar_cliente.html">Editar Cliente</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
+                <li><a class="dropdown-item" href="form_ver_vendedor.html">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="form_crear_vendedor.html">crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="form_editar_vendedor.html">editar Vendedor</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
+                <li><a class="dropdown-item" href="form_ver_producto.html">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="form_crear_producto.html">crear Producto</a></li>
+                <li><a class="dropdown-item" href="form_editar_producto.html">editar producto</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_factura.html">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="form_generacion_factura.html">generar Factura</a></li>
+            </ul>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
+                <li><a class="dropdown-item" href="form_ver_usuario.html">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="form_crear_usuario.html">crear usuario</a></li>
+                <li><a class="dropdown-item" href="form_editar_usuario.html">editar usuario</a></li>
+            </ul>
+        </li>
+   
+    </ul>  
+  
+    <div class="container mt-5">
+        <h2>Buscar vendedor por Documento</h2>
+        <label for="tipoDocumentoBuscar" class="form-label">Tipo de Documento:</label>
+        <select class="form-control form-control-sm" id="tipoDocumentoBuscar">
+            <option value="CC">Cédula de Ciudadanía</option>
+            <option value="TI">Tarjeta de Identidad</option>
+            <option value="CE">Cédula de Extranjería</option>
+            <option value="PA">Pasaporte</option>
+            <option value="RC">Registro Civil</option>
+            <option value="NIT">NIT</option>
+        </select>
+        <label for="cedulaBuscar" class="form-label">Número de Documento:</label>
+        <input type="text" id="cedulaBuscar" placeholder="Ingrese número del documento" class="form-control form-control-sm" onkeypress="handleKeyPress(event)">
+        <button type="button" class="btn btn-primary mt-3 form-control-sm" onclick="buscarVendedor()">Buscar</button>
+    </div>
+    
+
+    <div  id="infoVendedor" class="container mt-5">
+        <h3>Información del Vendedor</h3>
+        <form>
+            <div class="mb-3">
+                <label>Nombre</label>
+                <input type="text" class="form-control form-control-sm" id="nombreVendedor" readonly> <!-- ID añadido aquí -->
+            </div>
+            <div class="mb-3">
+                <label>Apellidos</label>
+                <input type="text" class="form-control form-control-sm" id="apellidoVendedor" readonly> <!-- ID añadido aquí -->
+            </div>
+            <div class="mb-3">
+                <label>Cédula</label>
+                <input type="text" class="form-control form-control-sm" id="cedulaVendedor" readonly > <!-- ID añadido aquí -->
+            </div>
+            <div class="mb-3">
+                <label>Teléfono</label>
+                <input type="text" class="form-control form-control-sm" id="telefonoVendedor" readonly> <!-- ID añadido aquí -->
+            </div>
+            <div class="mb-3">
+                <label>Dirección</label>
+                <input type="text" class="form-control form-control-sm" id="direccionVendedor" readonly> <!-- ID añadido aquí -->
+            </div>
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" class="form-control form-control-sm" id="emailVendedor" readonly> <!-- ID añadido aquí -->
+            </div>
+        </form>
+    </div>
+   
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();  // Previene que el formulario se envíe
+                buscarVendedor();  // Llama a la función que ejecuta la búsqueda
+            }
+        }
+    
+        function buscarVendedor() {
+            var tipoDocumento = document.getElementById('tipoDocumentoBuscar').value;
+            var numeroDocumento = document.getElementById('cedulaBuscar').value.trim();
+            if (!tipoDocumento || !numeroDocumento) {
+                alert("Por favor, seleccione el tipo y número de documento antes de buscar.");
+                return;
+            }
+
+            var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
+            var vendedorEncontrado = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento && !v.isDeleted);
+
+            if (vendedorEncontrado) {
+                document.getElementById('nombreVendedor').value = vendedorEncontrado.nombre;
+                document.getElementById('apellidoVendedor').value = vendedorEncontrado.apellido;
+                document.getElementById('cedulaVendedor').value = vendedorEncontrado.numeroDocumento;
+                document.getElementById('telefonoVendedor').value = vendedorEncontrado.telefono;
+                document.getElementById('direccionVendedor').value = vendedorEncontrado.direccion;
+                document.getElementById('emailVendedor').value = vendedorEncontrado.email;
+                document.getElementById('infoVendedor').classList.add('visible');
+            } else {
+                document.getElementById('infoVendedor').classList.remove('visible');
+                alert("No se encontró un vendedor con ese tipo y número de documento.");
+            }
+        }
+    </script>
+    
+    <script>
+        function cerrarSesion() {
+            localStorage.clear();  
+            sessionStorage.clear(); 
+            window.location.href = 'index.html';
+        }
+    </script>
+     
+    <footer>
+     <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer> 
+    
+</body>
+</html>
