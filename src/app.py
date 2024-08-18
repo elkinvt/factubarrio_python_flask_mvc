@@ -26,6 +26,30 @@ def clientes_ver():
 def clientes_editar():
     return render_template('form_editar_cliente.html')
 
+@app.route('/vendedores_crear')
+def vendedores_crear():
+    return render_template('form_crear_vendedor.html')
+
+@app.route('/vendedores_ver')
+def vendedores_ver():
+    return render_template('form_ver_vendedor.html')
+
+@app.route('/vendedores_editar')
+def vendedores_editar():
+    return render_template('form_editar_vendedor.html')
+
+@app.route('/productos_crear')
+def productos_crear():
+    return render_template('form_crear_producto.html')
+
+@app.route('/productos_ver')
+def productos_ver():
+    return render_template('form_ver_producto.html')
+
+@app.route('/productos_editar')
+def productos_editar():
+    return render_template('form_editar_producto.html')
+
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
