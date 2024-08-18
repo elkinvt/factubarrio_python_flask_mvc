@@ -62,6 +62,14 @@ def usuarios_ver():
 def usuarios_editar():
     return render_template('form_editar_usuario.html')
 
+@app.route('/generar_factura')
+def generar_factura():
+    return render_template('form_generacion_factura.html')
+
+@app.route('/ver_factura')
+def ver_factura():
+    return render_template('form_ver_factura.html')
+
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
