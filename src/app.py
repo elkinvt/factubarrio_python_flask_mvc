@@ -50,6 +50,18 @@ def productos_ver():
 def productos_editar():
     return render_template('form_editar_producto.html')
 
+@app.route('/usuarios_crear')
+def usuarios_crear():
+    return render_template('form_crear_usuario.html')
+
+@app.route('/usuarios_ver')
+def usuarios_ver():
+    return render_template('form_ver_usuario.html')
+
+@app.route('/usuarios_editar')
+def usuarios_editar():
+    return render_template('form_editar_usuario.html')
+
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
