@@ -10,7 +10,7 @@ if __name__ == '__main__':
 def index():
     return render_template('index.html')
 
-@app.route('/pagina_pricipal')
+@app.route('/pagina_principal')
 def pagina_principal():
     return render_template('pgprincipal.html')
 
