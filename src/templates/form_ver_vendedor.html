@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <style>
         body {
-            background-image: url('{{ url_for('static', filename='LOGO.png') }}'); 
+            background-image: url("{{ url_for('static', filename='LOGO.png') }}"); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -18,13 +18,14 @@
             flex-direction: column;
             padding-top: 5px; 
         }
-        
+    
         .cerrar-sesion {
             position: fixed;
             top: 5px;
             right: 10px;
             z-index: 1000;
         }
+    
         footer {
             margin-top: auto;
             width: 100%;
@@ -33,72 +34,51 @@
             padding: 5px 0;
             text-align: right;
         }
+    
         .mx-auto {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
             margin-top: -20px;  
         }
-        .hidden {
-            display: none;
-        }
-        
+    
         .form-control-sm {
-            width: 100%;        /* Utiliza todo el ancho del contenedor */
-            max-width: 300px;   /* Mantiene un ancho máximo para evitar estiramiento */
-            margin: auto;       /* Centra el control dentro de su contenedor */
+            width: 100%;
+            max-width: 300px;
         }
-        
+    
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            margin: 0 auto; /* Centrado horizontal */
+            margin-top: 20px;
             width: 100%;
             max-width: 600px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease-in-out; /* Suaviza la transición de visibilidad */
-        }
-
-        /* Para controlar la visibilidad sin alterar el layout */
-        .info-vendedor {
-            visibility: hidden; /* Inicialmente oculto */
-            opacity: 0;
-            transition: visibility 0s, opacity 0.3s linear;
-        }
-
-        .info-vendedor.visible {
-            visibility: visible;
-            opacity: 1;
-            transition: visibility 0s 0s, opacity 0.3s linear;
-        }
-
-    </style>
-    <style>
-        .factubarrio {
-            font-size: 100px; /* Tamaño grande para pantallas grandes */
-            font-weight: bold;
-            text-align: center;
-            margin-top: -20px; /* Margen negativo para ajustar la posición */
         }
     
-        /* Ajustes para tablets */
+        .factubarrio {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;
+        }
+    
         @media (max-width: 768px) {
             .factubarrio {
-                font-size: 50px; /* Tamaño de fuente más pequeño */
-                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+                font-size: 50px;
+                margin-top: 10px;
             }
         }
     
-        /* Ajustes para teléfonos móviles */
         @media (max-width: 480px) {
             .factubarrio {
-                font-size: 30px; /* Tamaño de fuente aún más pequeño */
-                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+                font-size: 30px;
+                margin-top: 20px;
             }
         }
     </style>

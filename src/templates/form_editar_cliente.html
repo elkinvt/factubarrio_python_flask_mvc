@@ -9,7 +9,7 @@
 
     <style>
         body {
-            background-image: url('{{ url_for('static', filename='LOGO.png') }}'); 
+            background-image: url("{{ url_for('static', filename='LOGO.png') }}"); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -19,12 +19,14 @@
             flex-direction: column;
             padding-top: 5px; 
         }
+    
         .cerrar-sesion {
             position: fixed;
             top: 5px;
             right: 10px;
             z-index: 1000;
         }
+    
         footer {
             margin-top: auto;
             width: 100%;
@@ -33,26 +35,19 @@
             padding: 5px 0;
             text-align: right;
         }
+    
         .mx-auto {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
             margin-top: -20px;  
         }
-        .hidden {
-            display: none;
-        }
-        .form-label {
-            display: block; /* Asegura que la etiqueta ocupe su propia línea */
-            width: 100%;    /* Alinea las etiquetas consistentemente */
-            text-align: center; /* Asegura que el texto de las etiquetas esté alineado a la izquierda */
-        }
-
+    
         .form-control-sm {
-            width: 100%;        /* Utiliza todo el ancho del contenedor */
-            max-width: 300px;   /* Mantiene un ancho máximo para evitar estiramiento */
-            margin: auto;       /* Centra el control dentro de su contenedor */
+            width: 100%;
+            max-width: 300px;
         }
+    
         .container {
             display: flex;
             flex-direction: column;
@@ -66,34 +61,25 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .container h2 {
-            text-align: center;  /* Asegura que el título esté siempre centrado. */
-            width: 100%;         /* Ocupa todo el ancho del contenedor para evitar movimientos horizontales. */
-            margin-top: 10px;    /* Espacio uniforme en la parte superior. */
-            margin-bottom: 20px; /* Espacio uniforme debajo antes de los formularios o contenido. */
-        }
-    </style>
-    <style>
+    
         .factubarrio {
-            font-size: 100px; /* Tamaño grande para pantallas grandes */
+            font-size: 100px;
             font-weight: bold;
             text-align: center;
-            margin-top: -20px; /* Margen negativo para ajustar la posición */
+            margin-top: -20px;
         }
     
-        /* Ajustes para tablets */
         @media (max-width: 768px) {
             .factubarrio {
-                font-size: 50px; /* Tamaño de fuente más pequeño */
-                margin-top: 10px; /* Ajustar el margen para pantallas más pequeñas */
+                font-size: 50px;
+                margin-top: 10px;
             }
         }
     
-        /* Ajustes para teléfonos móviles */
         @media (max-width: 480px) {
             .factubarrio {
-                font-size: 30px; /* Tamaño de fuente aún más pequeño */
-                margin-top: 20px; /* Aumentar el margen para centrar mejor el texto */
+                font-size: 30px;
+                margin-top: 20px;
             }
         }
     </style>
