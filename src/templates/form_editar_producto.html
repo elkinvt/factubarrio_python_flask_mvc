@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>factubarrio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <style>
         body {
-            background-image: url("{{ url_for('static', filename='LOGO.png') }}"); 
+            background-image: url("{{ url_for('static', filename='LOGO.png') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -16,16 +20,16 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-top: 5px; 
+            padding-top: 5px;
         }
-    
+
         .cerrar-sesion {
             position: fixed;
             top: 5px;
             right: 10px;
             z-index: 1000;
         }
-    
+
         footer {
             margin-top: auto;
             width: 100%;
@@ -34,19 +38,19 @@
             padding: 5px 0;
             text-align: right;
         }
-    
+
         .mx-auto {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
-            margin-top: -20px;  
+            margin-top: -20px;
         }
-    
+
         .form-control-sm {
             width: 100%;
             max-width: 300px;
         }
-    
+
         .container {
             display: flex;
             flex-direction: column;
@@ -58,23 +62,23 @@
             max-width: 600px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-    
+
         .factubarrio {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
             margin-top: -20px;
         }
-    
+
         @media (max-width: 768px) {
             .factubarrio {
                 font-size: 50px;
                 margin-top: 10px;
             }
         }
-    
+
         @media (max-width: 480px) {
             .factubarrio {
                 font-size: 30px;
@@ -83,14 +87,17 @@
         }
     </style>
 </head>
+
 <body>
     <div class="factubarrio">
         factubarrio
     </div>
 
-    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist"
+        style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Clientes</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
                 <li><a class="dropdown-item" href="clientes_ver">Ver Clientes</a></li>
                 <li><a class="dropdown-item" href="clientes_crear">crear Cliente</a></li>
@@ -98,7 +105,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Vendedores</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
                 <li><a class="dropdown-item" href="vendedores_ver">Ver Vendedores</a></li>
                 <li><a class="dropdown-item" href="vendedores_crear">crear Vendedor</a></li>
@@ -106,7 +114,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Productos</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
                 <li><a class="dropdown-item" href="productos_ver">Ver Productos</a></li>
                 <li><a class="dropdown-item" href="productos_crear">crear Producto</a></li>
@@ -114,14 +123,16 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Facturas</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="ver_factura">Ver Facturas</a></li>
                 <li><a class="dropdown-item" href="generar_factura">generar Factura</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">usuario</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="usuarios_ver">Ver usuarios</a></li>
                 <li><a class="dropdown-item" href="usuarios_crear">crear usuario</a></li>
@@ -131,8 +142,10 @@
     </ul>
     <div class="container mt-5">
         <h2>Buscar Producto</h2>
-        <input type="text" id="buscarCodigoProducto" class="form-control mt-2 form-control-sm" placeholder="Ingrese código del producto y/o" onkeypress="handleKeyPress(event)">
-        <input type="text" id="buscarNombreProducto" class="form-control mt-2 form-control-sm" placeholder="Ingrese nombre del producto" onkeypress="handleKeyPress(event)">
+        <input type="text" id="buscarCodigoProducto" class="form-control mt-2 form-control-sm"
+            placeholder="Ingrese código del producto y/o" onkeypress="handleKeyPress(event)">
+        <input type="text" id="buscarNombreProducto" class="form-control mt-2 form-control-sm"
+            placeholder="Ingrese nombre del producto" onkeypress="handleKeyPress(event)">
         <button onclick="buscarProducto()" class="btn btn-primary mt-3">Buscar</button>
         <div id="listaProductos" class="list-group mt-3"></div>
     </div>
@@ -154,7 +167,7 @@
             </div>
             <div class="mb-3">
                 <label for="categoriaProducto" class="form-label">Categoría</label>
-                <select class="form-select form-control-sm"  id="categoriaProducto" required>
+                <select class="form-select form-control-sm" id="categoriaProducto" required>
                     <option value="">Seleccione una categoría</option>
                     <!-- Opciones de categorías aquí -->
                     <option value="Abarrotes">Abarrotes</option>
@@ -189,7 +202,8 @@
                     </optgroup>
                     <optgroup label="Volumen">
                         <option value="lt">Litros (lt)</option>
-                        <option value="ml">Mililitros (ml)</option> <!-- Confirma que esta opción está correctamente escrita y seleccionable -->
+                        <option value="ml">Mililitros (ml)</option>
+                        <!-- Confirma que esta opción está correctamente escrita y seleccionable -->
                         <option value="m3">Metros cúbicos (m³)</option>
                     </optgroup>
                     <optgroup label="Longitud">
@@ -219,7 +233,7 @@
                 <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
             </div>
         </form>
-        
+
         <form>
             <div class="container mt-5">
                 <h2>Detalles del Producto</h2>
@@ -227,7 +241,8 @@
                     <!-- Campos del producto aquí... -->
                 </div>
                 <!-- Botones para controlar el estado del producto -->
-                <button type="button" class="btn btn-warning mb-2" onclick="toggleEstadoProducto()">Habilitar/Deshabilitar Producto</button>
+                <button type="button" class="btn btn-warning mb-2"
+                    onclick="toggleEstadoProducto()">Habilitar/Deshabilitar Producto</button>
                 <button type="button" class="btn btn-danger" onclick="eliminarProducto()">Eliminar Producto</button>
             </div>
         </form>
@@ -240,9 +255,9 @@
             }
         }
     </script>
-    
-   
-    
+
+
+
     <script>
 
         function buscarProducto() {
@@ -254,7 +269,7 @@
 
             var resultados = productos.filter(producto =>
                 ((codigo && producto.codigo.toLowerCase().includes(codigo)) ||
-                (nombre && producto.nombre.toLowerCase().includes(nombre))) &&
+                    (nombre && producto.nombre.toLowerCase().includes(nombre))) &&
                 !producto.isDeleted // Solo incluye productos que no están eliminados
             );
 
@@ -264,7 +279,7 @@
             if (resultados.length === 0) {
                 listaProductos.innerHTML = '<div class="list-group-item">No se encontraron productos.</div>';
             } else {
-                    resultados.forEach(producto => {
+                resultados.forEach(producto => {
                     var item = document.createElement('button');
                     item.classList.add('list-group-item', 'list-group-item-action');
                     item.textContent = `${producto.nombre} - ${producto.codigo}`;
@@ -302,7 +317,7 @@
 
         function guardarProductoEditado(event) {
             event.preventDefault();
-            
+
             if (productoActual) {
                 var productos = JSON.parse(localStorage.getItem('Productos')) || [];
                 var index = productos.findIndex(p => p.codigo === productoActual.codigo);
@@ -357,65 +372,65 @@
 
         function actualizarEstadoVisual(isActive) {
             var checkbox = document.getElementById('clienteActivo');  // Asegúrate de que este ID exista o ajusta según tu HTML
-                if (checkbox) {
+            if (checkbox) {
                 checkbox.checked = isActive;
             }
         }
 
-    
+
     </script>
 
-<script>
-    function eliminarProducto() {
-        if (productoActual) {
-            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.");
-            if (!confirmacion) {
-                return;
-            }
-
-            var productos = JSON.parse(localStorage.getItem('Productos')) || [];
-            var facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
-            var historialVentas = JSON.parse(localStorage.getItem('historial_ventas')) || [];
-            var index = productos.findIndex(p => p.codigo === productoActual.codigo);
-
-            if (index !== -1) {
-                // Filtrar facturas que contienen este producto
-                var facturasDelProducto = facturas.filter(factura =>
-                    factura.items.some(item => item.codigo === productos[index].codigo));
-
-                // Agregar estas facturas al historial antes de eliminar el producto
-                if (facturasDelProducto.length > 0) {
-                    historialVentas.push(...facturasDelProducto);
-                    localStorage.setItem('historial_ventas', JSON.stringify(historialVentas));
+    <script>
+        function eliminarProducto() {
+            if (productoActual) {
+                var confirmacion = confirm("¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.");
+                if (!confirmacion) {
+                    return;
                 }
 
-                // Marcar el producto como eliminado
-                productos[index].isDeleted = true;
-                localStorage.setItem('Productos', JSON.stringify(productos));
-                alert('Producto marcado como eliminado y ventas asociadas archivadas.');
+                var productos = JSON.parse(localStorage.getItem('Productos')) || [];
+                var facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
+                var historialVentas = JSON.parse(localStorage.getItem('historial_ventas')) || [];
+                var index = productos.findIndex(p => p.codigo === productoActual.codigo);
 
-                limpiarFormularioProducto();  // Limpia el formulario después de eliminar el producto
-                limpiarListaProductos(); // Asegúrate de que esta función esté definida para actualizar la lista de productos
-                productoActual = null;  // Resetear la variable productoActual
+                if (index !== -1) {
+                    // Filtrar facturas que contienen este producto
+                    var facturasDelProducto = facturas.filter(factura =>
+                        factura.items.some(item => item.codigo === productos[index].codigo));
+
+                    // Agregar estas facturas al historial antes de eliminar el producto
+                    if (facturasDelProducto.length > 0) {
+                        historialVentas.push(...facturasDelProducto);
+                        localStorage.setItem('historial_ventas', JSON.stringify(historialVentas));
+                    }
+
+                    // Marcar el producto como eliminado
+                    productos[index].isDeleted = true;
+                    localStorage.setItem('Productos', JSON.stringify(productos));
+                    alert('Producto marcado como eliminado y ventas asociadas archivadas.');
+
+                    limpiarFormularioProducto();  // Limpia el formulario después de eliminar el producto
+                    limpiarListaProductos(); // Asegúrate de que esta función esté definida para actualizar la lista de productos
+                    productoActual = null;  // Resetear la variable productoActual
+                } else {
+                    alert('Error: Producto no encontrado.');
+                }
             } else {
-                alert('Error: Producto no encontrado.');
+                alert('No hay ningún producto cargado para eliminar.');
             }
-        } else {
-            alert('No hay ningún producto cargado para eliminar.');
         }
-    }
 
-    function limpiarFormularioProducto() {
-        // Implementación específica para limpiar el formulario de productos
-    }
+        function limpiarFormularioProducto() {
+            // Implementación específica para limpiar el formulario de productos
+        }
 
-    function limpiarListaProductos() {
-        // Implementación específica para actualizar la lista de productos
-    }
-</script>
+        function limpiarListaProductos() {
+            // Implementación específica para actualizar la lista de productos
+        }
+    </script>
 
     <script>
-       function limpiarFormularioProducto() {
+        function limpiarFormularioProducto() {
             document.getElementById('codigoProducto').value = '';
             document.getElementById('nombreProducto').value = '';
             document.getElementById('descripcionProducto').value = '';
@@ -439,14 +454,15 @@
 
     <script>
         function cerrarSesion() {
-            localStorage.clear();  
-            sessionStorage.clear(); 
+            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = 'cerrar_sesion';
         }
     </script>
-    
+
     <footer>
         <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </footer> 
+    </footer>
 </body>
+
 </html>

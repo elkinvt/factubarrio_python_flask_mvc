@@ -1,97 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>factubarrio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <style>
-    body {
-        background-image: url("{{ url_for('static', filename='LOGO.png') }}"); 
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        padding-top: 5px; 
-    }
-
-    .cerrar-sesion {
-        position: fixed;
-        top: 5px;
-        right: 10px;
-        z-index: 1000;
-    }
-
-    footer {
-        margin-top: auto;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.0);
-        color: white;
-        padding: 5px 0;
-        text-align: right;
-    }
-
-    .mx-auto {
-        font-size: 100px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: -20px;  
-    }
-
-    .form-control-sm {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        margin-top: 20px;
-        width: 100%;
-        max-width: 600px;
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .factubarrio {
-        font-size: 100px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: -20px;
-    }
-
-    @media (max-width: 768px) {
-        .factubarrio {
-            font-size: 50px;
-            margin-top: 10px;
+        body {
+            background-image: url("{{ url_for('static', filename='LOGO.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 5px;
         }
-    }
 
-    @media (max-width: 480px) {
-        .factubarrio {
-            font-size: 30px;
+        .cerrar-sesion {
+            position: fixed;
+            top: 5px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        footer {
+            margin-top: auto;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            color: white;
+            padding: 5px 0;
+            text-align: right;
+        }
+
+        .mx-auto {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;
+        }
+
+        .form-control-sm {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-    }
-</style>
+
+        .factubarrio {
+            font-size: 100px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: -20px;
+        }
+
+        @media (max-width: 768px) {
+            .factubarrio {
+                font-size: 50px;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .factubarrio {
+                font-size: 30px;
+                margin-top: 20px;
+            }
+        }
+    </style>
 
 </head>
+
 <body>
     <div class="factubarrio">
         factubarrio
     </div>
-    
-    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist"
+        style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Clientes</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
                 <li><a class="dropdown-item" href="clientes_ver">Ver Clientes</a></li>
                 <li><a class="dropdown-item" href="clientes_crear">crear Cliente</a></li>
@@ -99,7 +106,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Vendedores</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
                 <li><a class="dropdown-item" href="vendedores_ver">Ver Vendedores</a></li>
                 <li><a class="dropdown-item" href="vendedores_crear">crear Vendedor</a></li>
@@ -107,7 +115,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Productos</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
                 <li><a class="dropdown-item" href="productos_ver">Ver Productos</a></li>
                 <li><a class="dropdown-item" href="productos_crear">crear Producto</a></li>
@@ -115,14 +124,16 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Facturas</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="ver_factura">Ver Facturas</a></li>
                 <li><a class="dropdown-item" href="generar_factura">generar Factura</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">usuario</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="usuarios_ver">Ver usuarios</a></li>
                 <li><a class="dropdown-item" href="usuarios_crear">crear usuario</a></li>
@@ -145,45 +156,51 @@
             </div>
             <div class="mb-3">
                 <label for="numeroDocumento" class="form-label">Número de Documento</label>
-                <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="numeroDocumento" required>
+                <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="numeroDocumento"
+                    required>
             </div>
             <div class="mb-3">
                 <label for="nombreCliente" class="form-label">Nombre</label>
-                <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" required>
+                <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente"
+                    required>
             </div>
             <div class="mb-3">
                 <label for="apellidoCliente" class="form-label">Apellidos</label>
-                <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente" required>
+                <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente"
+                    required>
             </div>
             <div class="mb-3">
                 <label for="telefonoCliente" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente" required>
+                <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente"
+                    required>
             </div>
             <div class="mb-3">
                 <label for="direccionCliente" class="form-label">Dirección</label>
-                <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente" required>
+                <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente"
+                    required>
             </div>
             <div class="mb-3">
                 <label for="emailCliente" class="form-label">Email</label>
                 <input type="email" class="form-control form-control-sm" id="emailCliente" name="emailCliente" required>
             </div>
-            <button type="button" class="btn btn-primary form-control-sm" onclick="guardarCliente()">Guardar Cliente</button>
+            <button type="button" class="btn btn-primary form-control-sm" onclick="guardarCliente()">Guardar
+                Cliente</button>
         </form>
     </div>
-    
+
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var emailInput = document.getElementById('emailCliente');
-        
-            emailInput.addEventListener('keypress', function(event) {
+
+            emailInput.addEventListener('keypress', function (event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();  // Previene la acción por defecto de enviar el formulario
                     guardarCliente();  // Llama a la función que maneja la lógica de guardar
                 }
             });
         });
-    
+
         function guardarCliente() {
             var tipoDocumento = document.getElementById('tipoDocumento').value;
             var numeroDocumento = document.getElementById('numeroDocumento').value;
@@ -193,21 +210,21 @@
             var direccion = document.getElementById('direccionCliente').value;
             var email = document.getElementById('emailCliente').value;
             var isActive = true;  // Valor predeterminado al crear un nuevo cliente
-    
+
             if (!tipoDocumento || !numeroDocumento || !nombre || !apellido || !telefono || !direccion || !email) {
                 alert('Por favor, complete todos los campos antes de guardar.');
                 return;  // Detiene la función si algún campo está vacío
             }
-    
+
             var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
             var clienteExistente = clientes.find(cliente => cliente.numeroDocumento === numeroDocumento && cliente.tipoDocumento === tipoDocumento);
-    
+
             // Verificar si ya existe un cliente con el mismo tipo y número de documento
             if (clienteExistente) {
                 alert('Ya existe un cliente con el tipo de documento ' + tipoDocumento + ' y número ' + numeroDocumento);
                 return;  // Detiene la función si ya existe un cliente con ese documento
             }
-    
+
             var cliente = {
                 tipoDocumento: tipoDocumento,
                 numeroDocumento: numeroDocumento,
@@ -219,14 +236,14 @@
                 isActive: isActive,
                 isDeleted: false  // Nuevo campo para manejar la eliminación lógica
             };
-    
+
             clientes.push(cliente);
             localStorage.setItem('clientes', JSON.stringify(clientes));
-    
+
             limpiarFormulario();  // Función que limpia el formulario después de guardar
             alert('Cliente guardado con éxito!');
         }
-    
+
         function limpiarFormulario() {
             document.getElementById('tipoDocumento').selectedIndex = 0;
             document.getElementById('numeroDocumento').value = '';
@@ -237,17 +254,18 @@
             document.getElementById('emailCliente').value = '';
         }
     </script>
-    
+
     <script>
         function cerrarSesion() {
-            localStorage.clear();  
-            sessionStorage.clear(); 
+            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = 'cerrar_sesion';
         }
-    </script>  
+    </script>
 
     <footer>
         <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </footer> 
+    </footer>
 </body>
+
 </html>

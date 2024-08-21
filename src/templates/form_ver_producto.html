@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>factubarrio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 
     <style>
         body {
-            background-image: url("{{ url_for('static', filename='LOGO.png') }}"); 
+            background-image: url("{{ url_for('static', filename='LOGO.png') }}");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -17,16 +21,16 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-top: 5px; 
+            padding-top: 5px;
         }
-    
+
         .cerrar-sesion {
             position: fixed;
             top: 5px;
             right: 10px;
             z-index: 1000;
         }
-    
+
         footer {
             margin-top: auto;
             width: 100%;
@@ -35,19 +39,19 @@
             padding: 5px 0;
             text-align: right;
         }
-    
+
         .mx-auto {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
-            margin-top: -20px;  
+            margin-top: -20px;
         }
-    
+
         .form-control-sm {
             width: 100%;
             max-width: 300px;
         }
-    
+
         .container {
             display: flex;
             flex-direction: column;
@@ -59,23 +63,23 @@
             max-width: 600px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-    
+
         .factubarrio {
             font-size: 100px;
             font-weight: bold;
             text-align: center;
             margin-top: -20px;
         }
-    
+
         @media (max-width: 768px) {
             .factubarrio {
                 font-size: 50px;
                 margin-top: 10px;
             }
         }
-    
+
         @media (max-width: 480px) {
             .factubarrio {
                 font-size: 30px;
@@ -85,14 +89,17 @@
     </style>
 
 </head>
+
 <body>
     <div class="factubarrio">
         factubarrio
     </div>
-    
-    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
+
+    <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist"
+        style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Clientes</a>
+            <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Clientes</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
                 <li><a class="dropdown-item" href="clientes_ver">Ver Clientes</a></li>
                 <li><a class="dropdown-item" href="clientes_crear">crear Cliente</a></li>
@@ -100,7 +107,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Vendedores</a>
+            <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Vendedores</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
                 <li><a class="dropdown-item" href="vendedores_ver">Ver Vendedores</a></li>
                 <li><a class="dropdown-item" href="vendedores_crear">crear Vendedor</a></li>
@@ -108,7 +116,8 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Productos</a>
+            <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Productos</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
                 <li><a class="dropdown-item" href="productos_ver">Ver Productos</a></li>
                 <li><a class="dropdown-item" href="productos_crear">crear Producto</a></li>
@@ -116,14 +125,16 @@
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Facturas</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">Facturas</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="ver_factura">Ver Facturas</a></li>
                 <li><a class="dropdown-item" href="generar_factura">generar Factura</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">usuario</a>
+            <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
+                aria-expanded="false">usuario</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
                 <li><a class="dropdown-item" href="usuarios_ver">Ver usuarios</a></li>
                 <li><a class="dropdown-item" href="usuarios_crear">crear usuario</a></li>
@@ -131,15 +142,16 @@
             </ul>
         </li>
     </ul>
-  
+
     <div class="container mt-5">
         <h2>Buscar producto por Código o Nombre</h2>
-        <input type="text" id="buscarProductoInput" placeholder="Ingrese código o nombre del producto" class="form-control mt-2 form-control-sm" onkeypress="handleKeyPress(event)">
+        <input type="text" id="buscarProductoInput" placeholder="Ingrese código o nombre del producto"
+            class="form-control mt-2 form-control-sm" onkeypress="handleKeyPress(event)">
         <button type="button" class="btn btn-primary mt-3" onclick="buscarProducto()">Buscar</button>
         <div id="listaProductos" class="list-group mt-3"></div>
     </div>
 
-    <div  id="infoProducto" class="container mt-5">
+    <div id="infoProducto" class="container mt-5">
         <h2>Informacion del producto</h2>
         <form id="formCrearProducto">
             <div class="mb-3">
@@ -152,7 +164,8 @@
             </div>
             <div class="mb-3">
                 <label for="descripcionProducto" class="form-label">Descripción</label>
-                <textarea class="form-control form-control-sm" id="descripcionProducto" rows="3" required readonly></textarea>
+                <textarea class="form-control form-control-sm" id="descripcionProducto" rows="3" required
+                    readonly></textarea>
             </div>
             <div class="mb-3">
                 <label for="categoriaProducto" class="form-label">Categoría</label>
@@ -166,7 +179,7 @@
                 <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
                 <input type="text" class="form-control form-control-sm" id="unidadMedidaProducto" required readonly>
             </div>
-            
+
             <div class="mb-3">
                 <label for="presentacionProducto" class="form-label">Presentación</label>
                 <input type="text" class="form-control form-control-sm" id="presentacionProducto" required readonly>
@@ -179,7 +192,7 @@
                 <label for="estadoProducto" class="form-label">Estado</label>
                 <input type="text" class="form-control form-control-sm" id="estadoProducto" required readonly>
             </div>
-    
+
         </form>
 
     </div>
@@ -197,15 +210,15 @@
             var textoBusqueda = document.getElementById('buscarProductoInput').value.trim().toLowerCase();
             document.getElementById('buscarProductoInput').value = '';
             var productos = JSON.parse(localStorage.getItem('Productos')) || [];
-            var productosFiltrados = productos.filter(producto => 
-            (producto.codigo.toLowerCase().includes(textoBusqueda) || 
-            producto.nombre.toLowerCase().includes(textoBusqueda)) &&
-            !producto.isDeleted);
- 
+            var productosFiltrados = productos.filter(producto =>
+                (producto.codigo.toLowerCase().includes(textoBusqueda) ||
+                    producto.nombre.toLowerCase().includes(textoBusqueda)) &&
+                !producto.isDeleted);
+
             var listaProductos = document.getElementById('listaProductos');
             listaProductos.innerHTML = '';
             listaProductos.style.visibility = productosFiltrados.length > 0 ? 'visible' : 'hidden';
- 
+
             if (productosFiltrados.length === 0) {
                 listaProductos.innerHTML = '<div class="list-group-item">No se encontraron productos con el término buscado.</div>';
                 listaProductos.style.visibility = 'visible';  // Asegura que el mensaje sea visible
@@ -220,7 +233,7 @@
                 listaProductos.style.visibility = 'visible';  // Asegura que la lista sea visible
             }
         }
- 
+
         function cargarProducto(producto) {
             document.getElementById('codigoProducto').value = producto.codigo;
             document.getElementById('nombreProducto').value = producto.nombre;
@@ -231,23 +244,24 @@
             document.getElementById('cantidadStockProducto').value = producto.cantidadStock;
             document.getElementById('estadoProducto').value = producto.isActive ? "Habilitado" : "Deshabilitado";
             document.getElementById('unidadMedidaProducto').value = producto.unidadMedida;
- 
+
             // Mostrar los detalles del producto si está presente
             document.getElementById('infoProducto').style.visibility = 'visible';
         }
     </script>
- 
-    
+
+
     <script>
         function cerrarSesion() {
-            localStorage.clear();  
-            sessionStorage.clear(); 
+            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = 'cerrar_sesion';
         }
     </script>
-     
+
     <footer>
-     <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </footer> 
+        <button class="btn btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </footer>
 </body>
+
 </html>
