@@ -73,3 +73,13 @@ def ver_factura():
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
+
+class Productos:
+    descripcion = 'Carne'
+    valor_unitario = 1000
+    cantidad_stock = 10
+    unidad_medida = 'GRS'
+    
+    def crear_producto(descripcion, valor_unitario, cantidad_stock, unidad_medida):
+        return 'Producto creado correctamente'
+    
