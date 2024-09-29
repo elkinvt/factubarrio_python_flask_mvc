@@ -1,7 +1,19 @@
 from flask import Flask, render_template
+from models.clientes import clientes_bp  # Importa el blueprint de clientes
+from models.data_base import Base, engine  # Importar la base y el engine para crear las tablas
+
 
 
 app = Flask(__name__)
+
+app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
+
+# Crear las tablas en la base de datos
+Base.metadata.create_all(bind=engine)
+
+# Registrar el blueprint de clientes
+app.register_blueprint(clientes_bp)
+
 
 if __name__ == '__main__':
     app.run(debug = True)
@@ -14,17 +26,6 @@ def index():
 def pagina_principal():
     return render_template('pgprincipal.html', titulo_pagina ="Pagina principal")
 
-@app.route('/clientes_crear')
-def clientes_crear():
-    return render_template('form_crear_cliente.html', titulo_pagina = "Crear cliente")
-
-@app.route('/clientes_ver')
-def clientes_ver():
-    return render_template('form_ver_cliente.html', titulo_pagina = "Ver cliente")
-
-@app.route('/clientes_editar')
-def clientes_editar():
-    return render_template('form_editar_cliente.html', titulo_pagina = "Editar cliente")
 
 @app.route('/vendedores_crear')
 def vendedores_crear():
