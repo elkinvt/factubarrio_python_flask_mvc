@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-    <label for="tipoDocumento" class="form-label">Tipo de Documento:</label>
-    <select class="form-control form-control-sm" id="tipoDocumento">
+    <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
+    <select class="form-control form-control-sm" id="buscarTipoDocumento" name="buscartipoDocumento">
         <option value="">Seleccione tipo de documento</option>
         <option value="CC">Cédula de Ciudadanía</option>
         <option value="TI">Tarjeta de Identidad</option>
@@ -11,29 +11,43 @@
         <option value="RC">Registro Civil</option>
         <option value="NIT">NIT</option>
     </select>
+
     <label for="buscarCedula" class="form-label">Número de Documento:</label>
     <input type="text" placeholder="Ingrese número del documento para mostrar" class="form-control form-control-sm"
         id="buscarCedula" onkeypress="handleKeyPress(event)">
-    <button onclick="buscarYEditarCliente()" class="btn btn-primary mt-2">Buscar</button>
+
+    <button onclick="buscarYEditarCliente()" class="btn btn-primary mt-2">Buscar Cliente</button>
 </div>
 
-<div id="datosCliente" class="container mt-5 ">
+<div id="datosCliente" class="container mt-5" style="display:none;">
     <h2>Editar Cliente</h2>
-    <form id="formCrearProducto" onsubmit="guardarCambios(event)">
+    <form id="formCrearProducto" action="/clientes_actualizar" method="POST" onsubmit="guardarCambios(event)">
+        <input type="hidden" id="clienteId" name="clienteId">
+        
+        <div class="mb-3">
+            <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
+            <select class="form-control form-control-sm" id="tipoDocumentoEditar" name="tipoDocumento">
+                <option value="">Seleccione tipo de documento</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="PA">Pasaporte</option>
+                <option value="RC">Registro Civil</option>
+                <option value="NIT">NIT</option>
+            </select>
+        </div>
+        
         <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente"
-                required>
+            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" required>
         </div>
         <div class="mb-3">
             <label for="apellidoCliente" class="form-label">Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente"
-                required>
+            <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente" required>
         </div>
         <div class="mb-3">
             <label for="cedulaCliente" class="form-label">Numero documento</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="cedulaCliente"
-                readonly>
+            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="cedulaCliente" readonly>
         </div>
         <div class="mb-3">
             <label for="telefonoCliente" class="form-label">Teléfono</label>
@@ -41,8 +55,7 @@
         </div>
         <div class="mb-3">
             <label for="direccionCliente" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente"
-                required>
+            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente" required>
         </div>
         <div class="mb-3">
             <label for="emailCliente" class="form-label">Email</label>
@@ -50,29 +63,14 @@
         </div>
         <div class="mb-3">
             <label for="estadoCliente" class="form-label">Estado del Cliente</label>
-            <input type="text" class="form-control form-control-sm" id="estadoCliente" name="estadoCliente"
-                readonly>
+            <input type="text" class="form-control form-control-sm" id="estadoCliente" name="estadoCliente" readonly>
         </div>
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
-
-    </form>
-    <form>
-        <div class="container mt-5">
-            <h2>Detalles del Cliente</h2>
-            <div id="clienteDetalles" class="hidden">
-                <!-- Campos existentes... -->
-            </div>
-            <!-- Botones para controlar el estado del cliente -->
-            <button type="button" class="btn btn-warning mb-2" onclick="toggleEstadoCliente()">Bloquear/Desbloquear
-                Cliente</button>
-            <button type="button" class="btn btn-danger" onclick="eliminarCliente()">Eliminar Cliente</button>
-
-        </div>
-
     </form>
 </div>
+
 <script>
     function handleKeyPress(event) {
         if (event.key === "Enter") {
@@ -83,58 +81,101 @@
 </script>
 
 <script>
-    function buscarYEditarCliente() {
-        var tipoDocumento = document.getElementById('tipoDocumento').value;
-        var numeroDocumento = document.getElementById('buscarCedula').value.trim();
+   function buscarYEditarCliente() {
+    const tipoDocumento = document.getElementById('buscarTipoDocumento').value;
+    const numeroDocumento = document.getElementById('buscarCedula').value.trim();
 
-        if (!numeroDocumento) {
-            alert("Por favor, ingrese el número de documento.");
-            return;
-        }
+    if (!tipoDocumento || !numeroDocumento) {
+        alert("Por favor, complete el tipo y número de documento antes de buscar.");
+        return;
+    }
 
-        var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-        var cliente = clientes.find(cliente => cliente.tipoDocumento === tipoDocumento && cliente.numeroDocumento === numeroDocumento);
+    // Realiza la petición para obtener los datos del cliente
+    fetch(`/clientes_buscar?tipoDocumento=${tipoDocumento}&numeroDocumento=${numeroDocumento}`)
+        .then(response => response.json())
+        .then(cliente => {
+            if (cliente.error) {
+                alert('Cliente no encontrado');
+                return;
+            }
 
-        if (cliente) {
+            // Rellena los campos del formulario con los datos del cliente
+            document.getElementById('clienteId').value = cliente.id;
             document.getElementById('nombreCliente').value = cliente.nombre;
             document.getElementById('apellidoCliente').value = cliente.apellido;
-            document.getElementById('cedulaCliente').value = cliente.numeroDocumento; // Asegúrate de que 'cedulaCliente' ahora maneje 'numeroDocumento'
+            document.getElementById('cedulaCliente').value = cliente.numero_documento;
             document.getElementById('telefonoCliente').value = cliente.telefono;
             document.getElementById('direccionCliente').value = cliente.direccion;
             document.getElementById('emailCliente').value = cliente.email;
-            document.getElementById('estadoCliente').value = cliente.isActive ? "Activo" : "Inactivo";
+            document.getElementById('estadoCliente').value = cliente.is_active ? 'Activo' : 'Inactivo';
+
+            // Seleccionar la opción correcta en el select de tipo de documento para edición
+            const selectTipoDocumentoEditar = document.getElementById('tipoDocumentoEditar');
+            for (let i = 0; i < selectTipoDocumentoEditar.options.length; i++) {
+                if (selectTipoDocumentoEditar.options[i].value === cliente.tipo_documento) {
+                    selectTipoDocumentoEditar.selectedIndex = i;
+                    break;
+                }
+            }
+
             document.getElementById('datosCliente').style.display = 'flex';
-        } else {
-            alert('Cliente no encontrado');
-            document.getElementById('buscarCedula').value = '';
-        }
+        })
+        .catch(error => console.error('Error al buscar el cliente:', error));
+}
+
+</script>
+
+
+<script>
+   function guardarCambios(event) {
+    event.preventDefault();
+
+     // Obtener los valores del formulario
+     const clienteId = document.getElementById('clienteId').value;
+    const tipoDocumento = document.getElementById('tipoDocumentoEditar').value;
+    const cedulaCliente = document.getElementById('cedulaCliente').value; // <-- Asegúrate de obtener el valor correcto
+    const nombreCliente = document.getElementById('nombreCliente').value;
+    const apellidoCliente = document.getElementById('apellidoCliente').value;
+    const telefonoCliente = document.getElementById('telefonoCliente').value;
+    const direccionCliente = document.getElementById('direccionCliente').value;
+    const emailCliente = document.getElementById('emailCliente').value;
+    const estadoCliente = document.getElementById('estadoCliente').value; // 
+    
+
+    // Verifica que todos los campos necesarios estén llenos
+    if (!nombreCliente || !apellidoCliente || !telefonoCliente || !direccionCliente || !emailCliente) {
+        alert('Por favor, complete todos los campos.');
+        return;
     }
 
-
-
-    function guardarCambios(event) {
-        event.preventDefault();
-
-        var tipoDocumento = document.getElementById('tipoDocumento').value;
-        var numeroDocumento = document.getElementById('buscarCedula').value;
-        var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-        var cliente = clientes.find(cliente => cliente.tipoDocumento === tipoDocumento && cliente.numeroDocumento === numeroDocumento);
-
-        if (cliente) {
-            cliente.nombre = document.getElementById('nombreCliente').value;
-            cliente.apellido = document.getElementById('apellidoCliente').value;
-            cliente.telefono = document.getElementById('telefonoCliente').value;
-            cliente.direccion = document.getElementById('direccionCliente').value;
-            cliente.email = document.getElementById('emailCliente').value;
-
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            alert('Cambios guardados correctamente');
-            limpiarformulario();
-            document.getElementById('buscarCedula').value = ''; // Limpiar campo de búsqueda
+     // Realiza la solicitud de actualización (POST) al servidor
+     fetch('/clientes_actualizar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            clienteId: clienteId,
+            tipoDocumento: tipoDocumento,
+            cedulaCliente: cedulaCliente,
+            nombreCliente: nombreCliente,
+            apellidoCliente: apellidoCliente,
+            telefonoCliente: telefonoCliente,
+            direccionCliente: direccionCliente,
+            emailCliente: emailCliente,
+            estadoCliente: estadoCliente  // <-- Asegúrate de enviar el estado del cliente
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Cambios guardados correctamente.');
+            window.location.href = '/clientes_ver';
         } else {
-            alert('Error al guardar los cambios');
+            alert('Error al guardar los cambios.');
         }
-    }
+    })
+    .catch(error => console.error('Error al actualizar el cliente:', error));
+}
 
 
 </script>
