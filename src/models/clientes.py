@@ -1,3 +1,4 @@
+#crear la tabla de la base de datos!!!
 from sqlalchemy import Column, Integer, String, Boolean
 from .data_base import Base
 
@@ -14,6 +15,8 @@ class Clientes(Base):
     email = Column(String(100), nullable=False)  # Email del Cliente
     is_active = Column(Boolean, default=True)  # Cliente activo por defecto
     is_deleted = Column(Boolean, default=False)  # Eliminación lógica (false por defecto)
+
+#crear cliente!!!
 
 from flask import Blueprint, request, redirect, url_for, flash, render_template
 from models.data_base import SessionLocal
@@ -66,3 +69,15 @@ def crear_cliente():
 
     # Redirigir al formulario después de crear el cliente
     return redirect(url_for('clientes.mostrar_formulario_crear_cliente'))  # Redirige a la misma página
+
+#ver cliente!!
+@clientes_bp.route('/clientes_ver', methods=['GET'])
+def ver_clientes():
+    db = SessionLocal()
+    clientes = db.query(Clientes).all()  # Consultar todos los clientes de la base de datos
+    db.close()
+
+    # Renderizar la plantilla con la lista de clientes
+    return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
+
+
