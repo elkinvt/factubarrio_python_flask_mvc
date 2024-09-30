@@ -74,7 +74,8 @@ def crear_cliente():
 @clientes_bp.route('/clientes_ver', methods=['GET'])
 def ver_clientes():
     db = SessionLocal()
-    clientes = db.query(Clientes).all()  # Consultar todos los clientes de la base de datos
+    clientes = db.query(Clientes).filter_by(is_deleted=False).all()  # Solo clientes que no están eliminados
+ # Consultar todos los clientes de la base de datos
     db.close()
 
     # Renderizar la plantilla con la lista de clientes
@@ -83,10 +84,11 @@ def ver_clientes():
 
 #editar el cliente!!!
 
-# Ruta para mostrar el formulario de edición de cliente (GET)
 @clientes_bp.route('/clientes_editar', methods=['GET'])
 def mostrar_formulario_editar_cliente():
     return render_template('form_editar_cliente.html', titulo_pagina="Editar Cliente")
+
+
 
 # Ruta para buscar un cliente según su tipo y número de documento (GET)
 @clientes_bp.route('/clientes_buscar', methods=['GET'])
@@ -118,7 +120,7 @@ def buscar_cliente():
 def actualizar_cliente():
     db = SessionLocal()
 
-     # Recibe los datos del formulario, incluido el estado del cliente
+    # Recibe los datos del formulario
     cliente_id = request.form['clienteId']
     tipo_documento = request.form['tipoDocumento']
     numero_documento = request.form['cedulaCliente']
@@ -127,10 +129,7 @@ def actualizar_cliente():
     telefono = request.form['telefonoCliente']
     direccion = request.form['direccionCliente']
     email = request.form['emailCliente']
-    estado_cliente = request.form['estadoCliente']  # <-- Asegúrate de recibir el estado del cliente
-
-    # Imprime los datos recibidos para verificar
-    print(f'Datos recibidos: {cliente_id}, {tipo_documento}, {numero_documento}, {nombre}, {apellido}, {telefono}, {direccion}, {email}')
+    estado_cliente = request.form['estadoCliente']  # Asegúrate de recibir el estado del cliente
 
     # Busca al cliente en la base de datos
     cliente = db.query(Clientes).filter_by(id=cliente_id).first()
@@ -143,14 +142,81 @@ def actualizar_cliente():
         cliente.telefono = telefono
         cliente.direccion = direccion
         cliente.email = email
-        cliente.is_active = estado_cliente.lower() == 'activo'  # Actualiza el estado (Activo o Inactivo)
-        # Guardar los cambios
-        db.commit()
-        flash('Cambios guardados correctamente', 'success')
+        cliente.is_active = estado_cliente.lower() == 'activo'
+
+        try:
+            db.commit()
+            flash('Cambios guardados correctamente', 'success')  # Mensaje de éxito
+
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
     else:
-        flash('Error al guardar los cambios', 'danger')
+        flash('Cliente no encontrado', 'danger')
 
     db.close()
 
-    # Redirigir al formulario de edición
-    return redirect(url_for('clientes.mostrar_formulario_editar_cliente'))
+    # Redirigir a la misma página de edición con los datos del cliente actual
+    return redirect(url_for('clientes.mostrar_formulario_editar_cliente', cliente_id=cliente_id))
+
+
+# Ruta para cambiar el estado de un cliente (activar/desactivar)
+@clientes_bp.route('/clientes_toggle_estado', methods=['POST'])
+def toggle_estado_cliente():
+    data = request.get_json()
+    numero_documento = data.get('numeroDocumento')
+    tipo_documento = data.get('tipoDocumento')
+
+    db = SessionLocal()
+
+    try:
+        # Buscar al cliente en la base de datos
+        cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
+
+        if cliente:
+            # Cambiar el estado de activo a inactivo y viceversa
+            cliente.is_active = not cliente.is_active
+
+            try:
+                db.commit()
+                return jsonify({
+                    'success': True,
+                    'message': 'Cliente activado.' if cliente.is_active else 'Cliente bloqueado.',
+                    'isActive': cliente.is_active
+                })
+            except Exception as e:
+                db.rollback()
+                return jsonify({'success': False, 'message': f'Error al actualizar el estado: {str(e)}'})
+        else:
+            return jsonify({'success': False, 'message': 'Cliente no encontrado'}), 404
+    finally:
+        db.close()  # Asegurarse de que la conexión a la base de datos siempre se cierre
+
+# Ruta para eliminar (lógicamente) un cliente
+@clientes_bp.route('/clientes_eliminar', methods=['POST'])
+def eliminar_cliente():
+    data = request.get_json()  # Recibir los datos como JSON desde el frontend
+    numero_documento = data.get('numeroDocumento')
+    tipo_documento = data.get('tipoDocumento')
+
+    db = SessionLocal()
+
+    try:
+        # Buscar al cliente en la base de datos
+        cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
+
+        if cliente and not cliente.is_deleted:
+            cliente.is_deleted = True  # Eliminación lógica
+
+            try:
+                db.commit()
+                return jsonify({'success': True, 'message': 'Cliente eliminado correctamente.'})
+            except Exception as e:
+                db.rollback()
+                return jsonify({'success': False, 'message': f'Error al eliminar el cliente: {str(e)}'})
+        else:
+            return jsonify({'success': False, 'message': 'Cliente no encontrado o ya eliminado.'}), 404
+    finally:
+        db.close()
+
+

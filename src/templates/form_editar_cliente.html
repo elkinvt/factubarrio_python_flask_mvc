@@ -69,6 +69,20 @@
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
+    <form>
+        <div class="container mt-5">
+            <h2>Detalles del Cliente</h2>
+            <div id="clienteDetalles" class="hidden">
+                <!-- Campos existentes... -->
+            </div>
+            <!-- Botones para controlar el estado del cliente -->
+            <button type="button" class="btn btn-warning mb-2" onclick="toggleEstadoCliente()">Bloquear/Desbloquear
+                Cliente</button>
+            <button type="button" class="btn btn-danger" onclick="eliminarCliente()">Eliminar Cliente</button>
+
+        </div>
+
+    </form>
 </div>
 
 <script>
@@ -167,53 +181,52 @@
         })
     })
     .then(response => {
-        if (response.ok) {
-            alert('Cambios guardados correctamente.');
-            window.location.href = '/clientes_ver';
-        } else {
-            alert('Error al guardar los cambios.');
-        }
-    })
-    .catch(error => console.error('Error al actualizar el cliente:', error));
+    if (response.ok) {
+        // No necesitamos procesar la respuesta como JSON si estamos redirigiendo.
+        window.location.href = '/clientes_ver';  // Redirigimos a la vista de clientes donde se mostrará el mensaje flash.
+    } else {
+        alert('Error al guardar los cambios.');
+    }
+})
+.catch(error => console.error('Error al actualizar el cliente:', error));
+
+
 }
 
 
 </script>
-<script>
-    function limpiarformulario() {
-        document.getElementById('nombreCliente').value = '';
-        document.getElementById('apellidoCliente').value = '';
-        document.getElementById('cedulaCliente').value = ''; // Este campo podría cambiar de nombre si decides usar "numeroDocumento"
-        document.getElementById('telefonoCliente').value = '';
-        document.getElementById('direccionCliente').value = '';
-        document.getElementById('emailCliente').value = '';
-        document.getElementById('tipoDocumento').value = 'CC'; // Restablece a 'Cédula de Ciudadanía' como predeterminado, ajusta según necesidad
-    }
-</script>
+
 
 <script>
     function toggleEstadoCliente() {
-        var numeroDocumento = document.getElementById('buscarCedula').value; // Asegúrate de que este campo obtiene el número de documento correctamente.
-        var tipoDocumento = document.getElementById('tipoDocumento').value; // Asegúrate de que este campo obtiene el tipo de documento correctamente.
+        var numeroDocumento = document.getElementById('cedulaCliente').value; // Asegúrate de que este campo obtiene el número de documento correctamente.
+        var tipoDocumento = document.getElementById('tipoDocumentoEditar').value; // Asegúrate de que este campo obtiene el tipo de documento correctamente.
         if (!numeroDocumento || !tipoDocumento) {
             alert('Por favor, ingrese el número y tipo de documento para buscar el cliente.');
             return;
         }
 
-        var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-        var cliente = clientes.find(cliente => cliente.numeroDocumento === numeroDocumento && cliente.tipoDocumento === tipoDocumento);
-
-        if (cliente) {
-            var confirmacion = confirm(`Está a punto de ${cliente.isActive ? 'bloquear' : 'activar'} al cliente. ¿Desea continuar?`);
-            if (confirmacion) {
-                cliente.isActive = !cliente.isActive; // Cambia el estado de activo a inactivo y viceversa.
-                localStorage.setItem('clientes', JSON.stringify(clientes));
-                alert(cliente.isActive ? 'Cliente activado.' : 'Cliente bloqueado.');
-                actualizarEstadoVisual(cliente.isActive); // Actualiza la interfaz para reflejar el cambio de estado.
+        // Hacer una solicitud al servidor para cambiar el estado del cliente
+        fetch('/clientes_toggle_estado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                numeroDocumento: numeroDocumento,
+                tipoDocumento: tipoDocumento
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message); // Mensaje desde Flask, cliente activado/bloqueado
+                actualizarEstadoVisual(data.isActive); // Actualizar la interfaz con el nuevo estado
+            } else {
+                alert('Error al cambiar el estado del cliente.');
             }
-        } else {
-            alert('Cliente no encontrado con el número y tipo de documento especificados.');
-        }
+        })
+        .catch(error => console.error('Error al cambiar el estado del cliente:', error));
     }
 
     function actualizarEstadoVisual(isActive) {
@@ -222,48 +235,54 @@
             estadoVisual.value = isActive ? 'Activo' : 'Inactivo'; // Cambia el valor mostrado en la interfaz
         }
     }
-
 </script>
+
 
 
 <script>
     function eliminarCliente() {
-        var numeroDocumento = document.getElementById('buscarCedula').value; // Asegúrate de que este es el campo correcto para el número de documento.
-        var tipoDocumento = document.getElementById('tipoDocumento').value; // Asegúrate de que este es el campo correcto para el tipo de documento.
+    var numeroDocumento = document.getElementById('cedulaCliente').value;  // Asegúrate de que este es el campo correcto
+    var tipoDocumento = document.getElementById('tipoDocumentoEditar').value;  // Asegúrate de que este es el campo correcto
 
-        if (!numeroDocumento || !tipoDocumento) {
-            alert("Por favor ingrese el tipo y número de documento del cliente que desea eliminar.");
-            return;
-        }
-
-        var confirmacion = confirm("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.");
-        if (confirmacion) {
-            var clientes = JSON.parse(localStorage.getItem('clientes')) || [];
-            var encontrado = false;
-
-            var historial = JSON.parse(localStorage.getItem('historial_clientes')) || [];
-
-            clientes = clientes.map(cliente => {
-                if (cliente.numeroDocumento === numeroDocumento && cliente.tipoDocumento === tipoDocumento && !cliente.isDeleted) {
-                    encontrado = true;
-                    historial.push({ ...cliente, fecha_eliminacion: new Date().toISOString() });
-                    return { ...cliente, isDeleted: true }; // Marcar como eliminado en lugar de eliminar completamente
-                }
-                return cliente;
-            });
-
-            if (encontrado) {
-                localStorage.setItem('clientes', JSON.stringify(clientes));
-                localStorage.setItem('historial_clientes', JSON.stringify(historial));
-                alert('Cliente eliminado.');
-                limpiarformulario();
-                document.getElementById('buscarCedula').value = ''; // Limpiar campo de búsqueda
-            } else {
-                alert('No se encontró un cliente activo con ese tipo y número de documento.');
-            }
-        }
+    if (!numeroDocumento || !tipoDocumento) {
+        alert("Por favor ingrese el tipo y número de documento del cliente que desea eliminar.");
+        return;
     }
+
+    var confirmacion = confirm("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.");
+    if (confirmacion) {
+        // Realiza una solicitud POST a Flask para eliminar el cliente
+        fetch('/clientes_eliminar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                numeroDocumento: numeroDocumento,
+                tipoDocumento: tipoDocumento
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                limpiarFormulario();  // Limpiar el formulario después de la eliminación
+                location.reload();  // Recargar la página o redirigir según necesidad
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error al eliminar el cliente:', error));
+    }
+}
+
+function limpiarFormulario() {
+    document.getElementById('cedulaCliente').value = '';
+    document.getElementById('tipoDocumentoEditar').value = '';
+}
+
 </script>
+
 {% endblock %}
     
 
