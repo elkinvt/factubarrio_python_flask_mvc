@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-    <label for="tipoDocumentoBusqueda" class="form-label">Tipo de Documento:</label>
-    <select class="form-control form-control-sm" id="tipoDocumentoBusqueda">
+    <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
+    <select class="form-control form-control-sm" id="buscarTipoDocumento" name="buscartipoDocumento">
         <option value="">Seleccione tipo de documento</option>
         <option value="CC">Cédula de Ciudadanía</option>
         <option value="TI">Tarjeta de Identidad</option>
@@ -11,30 +11,42 @@
         <option value="RC">Registro Civil</option>
         <option value="NIT">NIT</option>
     </select>
-    <label for="numeroDocumentoBusqueda" class="form-label">Número de Documento:</label>
-    <input type="text" placeholder="Ingrese número del documento para mostrar" class="form-control form-control-sm"
-        id="numeroDocumentoBusqueda" onkeypress="handleKeyPress(event)">
-    <button onclick="buscarYEditarVendedor()" class="btn btn-primary mt-2">Buscar</button>
+
+    <label for="buscarCedula" class="form-label">Número de Documento:</label>
+    <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm" id="buscarCedula" onkeypress="handleKeyPress(event)">
+
+    <button onclick="buscarYEditarVendedor()" class="btn btn-primary mt-2">Buscar Vendedor</button>
 </div>
 
-
-<div id="datosVendedor" class="container mt-5 ">
+<div id="datosVendedor" class="container mt-5" style="display:none;">
     <h2>Editar Vendedor</h2>
-    <form action="/update-Vendedor" method="post" onsubmit="guardarCambios(event)">
+    <form id="formEditarVendedor" action="/vendedores_actualizar" method="POST">
+        <input type="hidden" id="vendedorId" name="vendedorId">
+        
+        <div class="mb-3">
+            <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
+            <select class="form-control form-control-sm" id="tipoDocumentoEditar" name="tipoDocumento">
+                <option value="">Seleccione tipo de documento</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="PA">Pasaporte</option>
+                <option value="RC">Registro Civil</option>
+                <option value="NIT">NIT</option>
+            </select>
+        </div>
+        
         <div class="mb-3">
             <label for="nombreVendedor" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor"
-                required>
+            <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor" required>
         </div>
         <div class="mb-3">
             <label for="apellidoVendedor" class="form-label">Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoVendedor" name="apellidoVendedor"
-                required>
+            <input type="text" class="form-control form-control-sm" id="apellidoVendedor" name="apellidoVendedor" required>
         </div>
         <div class="mb-3">
-            <label for="cedulaVendedor" class="form-label">numero documentos</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaVendedor" name="cedulaVendedor"
-                readonly>
+            <label for="cedulaVendedor" class="form-label">Número de Documento</label>
+            <input type="text" class="form-control form-control-sm" id="cedulaVendedor" name="numeroDocumento" readonly>
         </div>
         <div class="mb-3">
             <label for="telefonoVendedor" class="form-label">Teléfono</label>
@@ -42,164 +54,67 @@
         </div>
         <div class="mb-3">
             <label for="direccionVendedor" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor"
-                required>
+            <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor" required>
         </div>
         <div class="mb-3">
             <label for="emailVendedor" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor"
-                required>
+            <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor" required>
         </div>
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
-
-    <form>
-        <div class="container mt-5">
-            <h2>Detalles del Vendedor</h2>
-            <div id="vendedorDetalles" class="hidden">
-                <!-- Campos existentes... -->
-            </div>
-            <!-- Botones para controlar el estado del Vendedor -->
-            <button type="button" class="btn btn-danger" onclick="eliminarVendedor()">Eliminar Vendedor</button>
-        </div>
-
-    </form>
 </div>
+
 <script>
     function handleKeyPress(event) {
         if (event.key === "Enter") {
-            event.preventDefault();  // Previene que el formulario se envíe
-            buscarYEditarVendedor();  // Llama a la función que ejecuta la búsqueda
+            event.preventDefault();
+            buscarYEditarVendedor();
         }
     }
-</script>
 
-
-
-<script>
     function buscarYEditarVendedor() {
-        var tipoDocumento = document.getElementById('tipoDocumentoBusqueda').value;
-        var numeroDocumento = document.getElementById('numeroDocumentoBusqueda').value.trim();
+        const tipoDocumento = document.getElementById('buscarTipoDocumento').value;
+        const numeroDocumento = document.getElementById('buscarCedula').value.trim();
+
         if (!tipoDocumento || !numeroDocumento) {
-            alert('Por favor, seleccione el tipo y número de documento antes de buscar.');
+            alert("Por favor, complete el tipo y número de documento antes de buscar.");
             return;
         }
 
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var vendedor = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento && !v.isDeleted);
+        fetch(`/vendedores_buscar?tipoDocumento=${tipoDocumento}&numeroDocumento=${numeroDocumento}`)
+            .then(response => response.json())
+            .then(vendedor => {
+                if (vendedor.error) {
+                    alert('Vendedor no encontrado');
+                    return;
+                }
 
-        if (vendedor) {
-            cargarDatosVendedorEnFormulario(vendedor);
-        } else {
-            alert('No se encontró un vendedor con el tipo y número de documento proporcionados.');
-        }
-    }
+                document.getElementById('vendedorId').value = vendedor.id;
+                document.getElementById('nombreVendedor').value = vendedor.nombre;
+                document.getElementById('apellidoVendedor').value = vendedor.apellido;
+                document.getElementById('cedulaVendedor').value = vendedor.numero_documento;
+                document.getElementById('telefonoVendedor').value = vendedor.telefono;
+                document.getElementById('direccionVendedor').value = vendedor.direccion;
+                document.getElementById('emailVendedor').value = vendedor.email;
 
-    function cargarDatosVendedorEnFormulario(vendedor) {
-        document.getElementById('nombreVendedor').value = vendedor.nombre;
-        document.getElementById('apellidoVendedor').value = vendedor.apellido;
-        document.getElementById('cedulaVendedor').value = vendedor.numeroDocumento;  // Usando 'numeroDocumento' para ser consistente
-        document.getElementById('telefonoVendedor').value = vendedor.telefono;
-        document.getElementById('direccionVendedor').value = vendedor.direccion;
-        document.getElementById('emailVendedor').value = vendedor.email;
-    }
-
-</script>
-
-
-<script>
-    function guardarCambios(event) {
-        event.preventDefault();
-
-        // Obtener el número y tipo de documento desde el formulario de búsqueda.
-        var tipoDocumento = document.getElementById('tipoDocumentoBusqueda').value;
-        var numeroDocumento = document.getElementById('numeroDocumentoBusqueda').value;
-
-        // Obtener la lista de vendedores y encontrar el índice del vendedor específico.
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var indice = vendedores.findIndex(vendedor => vendedor.tipoDocumento === tipoDocumento && vendedor.numeroDocumento === numeroDocumento);
-
-        if (indice !== -1) {
-            // Actualizar la información del vendedor en el array.
-            vendedores[indice].nombre = document.getElementById('nombreVendedor').value;
-            vendedores[indice].apellido = document.getElementById('apellidoVendedor').value;
-            vendedores[indice].telefono = document.getElementById('telefonoVendedor').value;
-            vendedores[indice].direccion = document.getElementById('direccionVendedor').value;
-            vendedores[indice].email = document.getElementById('emailVendedor').value;
-
-            // Guardar los cambios en localStorage.
-            localStorage.setItem('Vendedores', JSON.stringify(vendedores));
-            alert('Cambios guardados correctamente');
-
-            // Limpiar formulario tras guardar cambios.
-            limpiarFormulario();
-        } else {
-            alert('Error al guardar los cambios: Vendedor no encontrado.');
-        }
-    }
-
-
-</script>
-
-<script>
-    function eliminarVendedor() {
-        var tipoDocumento = document.getElementById('tipoDocumentoBusqueda').value;
-        var numeroDocumento = document.getElementById('numeroDocumentoBusqueda').value;
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var index = vendedores.findIndex(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento && !v.isDeleted);
-
-        if (index !== -1) {
-            var nombreCompleto = vendedores[index].nombre + " " + vendedores[index].apellido;
-
-            archivarVentasVendedor(nombreCompleto);
-
-            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se puede deshacer, pero las ventas históricas se mantendrán.");
-            if (confirmacion) {
-                vendedores[index].isDeleted = true;
-                localStorage.setItem('Vendedores', JSON.stringify(vendedores));
-                alert('Vendedor marcado como eliminado, pero su historial de ventas ha sido archivado.');
-                limpiarFormulario();
+                // Selecciona la opción correcta en el select del tipo de documento
+            var selectTipoDocumento = document.getElementById('tipoDocumentoEditar');
+            for (let i = 0; i < selectTipoDocumento.options.length; i++) {
+                if (selectTipoDocumento.options[i].value === vendedor.tipo_documento) {
+                    selectTipoDocumento.selectedIndex = i;
+                    break;
+                }
             }
-        } else {
-            alert('Vendedor no encontrado.');
-        }
-    }
 
-    function archivarVentasVendedor(nombreVendedor) {
-        var facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
-        var historialVentas = JSON.parse(localStorage.getItem('HistorialVentas')) || [];
-
-        var ventasDelVendedor = facturas.filter(factura => factura.vendedor === nombreVendedor);
-
-        if (ventasDelVendedor.length > 0) {
-            historialVentas.push(...ventasDelVendedor);
-            localStorage.setItem('HistorialVentas', JSON.stringify(historialVentas));
-
-            var facturasActualizadas = facturas.filter(factura => factura.vendedor !== nombreVendedor);
-            localStorage.setItem('Facturas', JSON.stringify(facturasActualizadas));
-        } else {
-            alert("No se encontraron ventas para este vendedor.");
-        }
-    }
-
-</script>
-
-<script>
-    function limpiarFormulario() {
-        document.getElementById('nombreVendedor').value = '';
-        document.getElementById('apellidoVendedor').value = '';
-        document.getElementById('cedulaVendedor').value = '';
-        document.getElementById('telefonoVendedor').value = '';
-        document.getElementById('direccionVendedor').value = '';
-        document.getElementById('emailVendedor').value = '';
-        // Limpiar los campos de búsqueda también.
-        document.getElementById('tipoDocumentoBusqueda').value = '';
-        document.getElementById('numeroDocumentoBusqueda').value = '';
+                document.getElementById('datosVendedor').style.display = 'flex';
+            })
+            .catch(error => console.error('Error al buscar el vendedor:', error));
     }
 </script>
 {% endblock %}
-    
+
+
 
     

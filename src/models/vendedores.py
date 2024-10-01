@@ -74,4 +74,78 @@ def ver_vendedores():
     # Renderizar la plantilla con la lista de vendedores
     return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
 
+#editar el vendedor!!!
 
+
+
+# Ruta para buscar un vendedor por su tipo y número de documento
+@vendedores_bp.route('/vendedores_buscar', methods=['GET'])
+def buscar_vendedor():
+    tipo_documento = request.args.get('tipoDocumento').strip().upper()
+    numero_documento = request.args.get('numeroDocumento').strip()
+
+    print(f"Buscando vendedor con tipo_documento={tipo_documento} y numero_documento={numero_documento}")
+
+    db = SessionLocal()
+    vendedor = db.query(Vendedores).filter(
+        Vendedores.tipo_documento == tipo_documento,
+        Vendedores.numero_documento == numero_documento
+    ).first()
+    db.close()
+
+    if vendedor:
+        return jsonify({
+            'id': vendedor.id,
+            'tipo_documento': vendedor.tipo_documento,
+            'numero_documento': vendedor.numero_documento,
+            'nombre': vendedor.nombre,
+            'apellido': vendedor.apellido,
+            'telefono': vendedor.telefono,
+            'direccion': vendedor.direccion,
+            'email': vendedor.email
+        })
+    else:
+        return jsonify({'error': 'Vendedor no encontrado'}), 404
+
+
+
+# Ruta para actualizar un vendedor (POST)
+@vendedores_bp.route('/vendedores_actualizar', methods=['POST'])
+def actualizar_vendedor():
+    db = SessionLocal()
+
+    # Recibe los datos del formulario
+    vendedor_id = request.form['vendedorId']
+    tipo_documento = request.form['tipoDocumento']
+    numero_documento = request.form['numeroDocumento']
+    nombre = request.form['nombreVendedor']
+    apellido = request.form['apellidoVendedor']
+    telefono = request.form['telefonoVendedor']
+    direccion = request.form['direccionVendedor']
+    email = request.form['emailVendedor']
+
+    # Busca al vendedor en la base de datos
+    vendedor = db.query(Vendedores).filter_by(id=vendedor_id).first()
+
+    if vendedor:
+        vendedor.tipo_documento = tipo_documento
+        vendedor.numero_documento = numero_documento
+        vendedor.nombre = nombre
+        vendedor.apellido = apellido
+        vendedor.telefono = telefono
+        vendedor.direccion = direccion
+        vendedor.email = email
+
+        try:
+            db.commit()
+            flash('Cambios guardados correctamente', 'success')
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
+    else:
+        flash('Vendedor no encontrado', 'danger')
+
+    db.close()
+
+    # Redirigir a la vista de vendedores para mostrar la lista
+    return redirect(url_for('vendedores.ver_vendedores'))
