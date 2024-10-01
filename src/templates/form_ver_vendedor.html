@@ -1,94 +1,46 @@
 {% extends 'layout.html' %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Buscar vendedor por Documento</h2>
-    <label for="tipoDocumentoBuscar" class="form-label">Tipo de Documento:</label>
-    <select class="form-control form-control-sm" id="tipoDocumentoBuscar">
-        <option value="">Seleccione tipo de documento</option>
-        <option value="CC">Cédula de Ciudadanía</option>
-        <option value="TI">Tarjeta de Identidad</option>
-        <option value="CE">Cédula de Extranjería</option>
-        <option value="PA">Pasaporte</option>
-        <option value="RC">Registro Civil</option>
-        <option value="NIT">NIT</option>
-    </select>
-    <label for="cedulaBuscar" class="form-label">Número de Documento:</label>
-    <input type="text" id="cedulaBuscar" placeholder="Ingrese número del documento"
-        class="form-control form-control-sm" onkeypress="handleKeyPress(event)">
-    <button type="button" class="btn btn-primary mt-2 " onclick="buscarVendedor()">Buscar</button>
-</div>
 
+    <!-- Mostrar la tabla de todos los vendedores -->
+    <div class="container mt-5">
+        <h3>Lista de Vendedores</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo de Documento</th>
+                    <th>Número de Documento</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendedor in vendedores %}
+                <tr>
+                    <td>{{ vendedor.id }}</td>
+                    <td>{{ vendedor.tipo_documento }}</td>
+                    <td>{{ vendedor.numero_documento }}</td>
+                    <td>{{ vendedor.nombre }}</td>
+                    <td>{{ vendedor.apellido }}</td>
+                    <td>{{ vendedor.telefono }}</td>
+                    <td>{{ vendedor.direccion }}</td>
+                    <td>{{ vendedor.email }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">No hay vendedores registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<div id="infoVendedor" class="container mt-5">
-    <h3>Información del Vendedor</h3>
-    <form>
-        <div class="mb-3">
-            <label>Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-        <div class="mb-3">
-            <label>Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-        <div class="mb-3">
-            <label>Cédula</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-        <div class="mb-3">
-            <label>Teléfono</label>
-            <input type="text" class="form-control form-control-sm" id="telefonoVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-        <div class="mb-3">
-            <label>Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" class="form-control form-control-sm" id="emailVendedor" readonly>
-            <!-- ID añadido aquí -->
-        </div>
-    </form>
-</div>
-
-<script>
-    function handleKeyPress(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();  // Previene que el formulario se envíe
-            buscarVendedor();  // Llama a la función que ejecuta la búsqueda
-        }
-    }
-
-    function buscarVendedor() {
-        var tipoDocumento = document.getElementById('tipoDocumentoBuscar').value;
-        var numeroDocumento = document.getElementById('cedulaBuscar').value.trim();
-        if (!tipoDocumento || !numeroDocumento) {
-            alert("Por favor, seleccione el tipo y número de documento antes de buscar.");
-            return;
-        }
-
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var vendedorEncontrado = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento && !v.isDeleted);
-
-        if (vendedorEncontrado) {
-            document.getElementById('nombreVendedor').value = vendedorEncontrado.nombre;
-            document.getElementById('apellidoVendedor').value = vendedorEncontrado.apellido;
-            document.getElementById('cedulaVendedor').value = vendedorEncontrado.numeroDocumento;
-            document.getElementById('telefonoVendedor').value = vendedorEncontrado.telefono;
-            document.getElementById('direccionVendedor').value = vendedorEncontrado.direccion;
-            document.getElementById('emailVendedor').value = vendedorEncontrado.email;
-            document.getElementById('infoVendedor').classList.add('visible');
-        } else {
-            document.getElementById('infoVendedor').classList.remove('visible');
-            alert("No se encontró un vendedor con ese tipo y número de documento.");
-        }
-    }
-</script>
 {% endblock %}
+
 
     
 

@@ -64,3 +64,14 @@ def crear_vendedor():
     return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
 
 
+#ver vendedor!!
+@vendedores_bp.route('/vendedores_ver', methods=['GET'])
+def ver_vendedores():
+    db = SessionLocal()
+    vendedores = db.query(Vendedores).filter_by(is_deleted=False).all()  # Solo vendedores que no están eliminados
+    db.close()
+
+    # Renderizar la plantilla con la lista de vendedores
+    return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
+
+
