@@ -2,106 +2,48 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Registrar vendedor</h2>
-    <form id="formCrearVendedor" onsubmit="guardarVendedor(event)">
-        <div class="mb-3">
-            <label for="tipoDocumentoVendedor" class="form-label">Tipo de Documento:</label>
-            <select class="form-control form-control-sm" id="tipoDocumentoVendedor" required>
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC">Cédula de Ciudadanía</option>
-                <option value="TI">Tarjeta de Identidad</option>
-                <option value="CE">Cédula de Extranjería</option>
-                <option value="PA">Pasaporte</option>
-                <option value="NIT">NIT</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="numeroDocumentoVendedor" class="form-label">Número de Documento:</label>
-            <input type="text" class="form-control form-control-sm" id="numeroDocumentoVendedor"
-                name="numeroDocumentoVendedor" required>
-        </div>
+    <form action="/vendedores_crear" method="POST" id="formCrearVendedor">
 
-        <div class="mb-3">
-            <label for="nombreVendedor" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor"
-                required>
-        </div>
-        <div class="mb-3">
-            <label for="apellidoVendedor" class="form-label">Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoVendedor" name="apellidoVendedor"
-                required>
-        </div>
-        <div class="mb-3">
-            <label for="telefonoVendedor" class="form-label">Teléfono</label>
-            <input type="tel" class="form-control form-control-sm" id="telefonoVendedor" name="telefonoVendedor"
-                required>
-        </div>
-        <div class="mb-3">
-            <label for="direccionVendedor" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor"
-                required>
-        </div>
-        <div class="mb-3">
-            <label for="emailVendedor" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor"
-                required>
-        </div>
-        <button type="submit" class="btn btn-primary form-control-sm">Guardar vendedor</button>
-    </form>
+    <div class="mb-3">
+        <label for="tipoDocumentoVendedor" class="form-label">Tipo de Documento:</label>
+        <select class="form-control form-control-sm" id="tipoDocumentoVendedor" name="tipoDocumento" required>
+            <option value="">Seleccione tipo de documento</option>
+            <option value="CC">Cédula de Ciudadanía</option>
+            <option value="TI">Tarjeta de Identidad</option>
+            <option value="CE">Cédula de Extranjería</option>
+            <option value="PA">Pasaporte</option>
+            <option value="NIT">NIT</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="numeroDocumentoVendedor" class="form-label">Número de Documento:</label>
+        <input type="text" class="form-control form-control-sm" id="numeroDocumentoVendedor" name="numeroDocumento" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="nombreVendedor" class="form-label">Nombre</label>
+        <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor" required>
+    </div>
+    <div class="mb-3">
+        <label for="apellidoVendedor" class="form-label">Apellidos</label>
+        <input type="text" class="form-control form-control-sm" id="apellidoVendedor" name="apellidoVendedor" required>
+    </div>
+    <div class="mb-3">
+        <label for="telefonoVendedor" class="form-label">Teléfono</label>
+        <input type="tel" class="form-control form-control-sm" id="telefonoVendedor" name="telefonoVendedor" required>
+    </div>
+    <div class="mb-3">
+        <label for="direccionVendedor" class="form-label">Dirección</label>
+        <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor" required>
+    </div>
+    <div class="mb-3">
+        <label for="emailVendedor" class="form-label">Email</label>
+        <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor" required>
+    </div>
+    <button type="submit" class="btn btn-primary form-control-sm">Guardar vendedor</button>
+</form>
 </div>
-<script>
-    function guardarVendedor(event) {
-        event.preventDefault();
 
-        var tipoDocumento = document.getElementById('tipoDocumentoVendedor').value;
-        var numeroDocumento = document.getElementById('numeroDocumentoVendedor').value; // Actualizado a numeroDocumentoVendedor
-        var nombre = document.getElementById('nombreVendedor').value;
-        var apellido = document.getElementById('apellidoVendedor').value;
-        var telefono = document.getElementById('telefonoVendedor').value;
-        var direccion = document.getElementById('direccionVendedor').value;
-        var email = document.getElementById('emailVendedor').value;
-
-        if (!tipoDocumento || !numeroDocumento || !nombre || !apellido || !telefono || !direccion || !email) {
-            alert('Por favor, complete todos los campos antes de guardar.');
-            return;
-        }
-
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var vendedorExistente = vendedores.find(v => v.numeroDocumento === numeroDocumento && v.tipoDocumento === tipoDocumento);
-
-        if (vendedorExistente) {
-            alert('Ya existe un vendedor con el documento ' + tipoDocumento + ' ' + numeroDocumento + '.');
-            return;
-        }
-
-        var nuevoVendedor = {
-            tipoDocumento: tipoDocumento,
-            numeroDocumento: numeroDocumento, // Actualizado para usar el campo correcto
-            nombre: nombre,
-            apellido: apellido,
-            telefono: telefono,
-            direccion: direccion,
-            email: email,
-            isDeleted: false
-        };
-
-        vendedores.push(nuevoVendedor);
-        localStorage.setItem('Vendedores', JSON.stringify(vendedores));
-        alert('Vendedor guardado con éxito!');
-
-        limpiarFormulario();
-    }
-
-    function limpiarFormulario() {
-        document.getElementById('tipoDocumentoVendedor').selectedIndex = 0;
-        document.getElementById('numeroDocumentoVendedor').value = ''; // Actualizado a numeroDocumentoVendedor
-        document.getElementById('nombreVendedor').value = '';
-        document.getElementById('apellidoVendedor').value = '';
-        document.getElementById('telefonoVendedor').value = '';
-        document.getElementById('direccionVendedor').value = '';
-        document.getElementById('emailVendedor').value = '';
-    }
-
-</script>
 {% endblock %}
     
 

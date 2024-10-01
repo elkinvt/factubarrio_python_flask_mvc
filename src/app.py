@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from models.clientes import clientes_bp  # Importa el blueprint de clientes
+from models.vendedores import vendedores_bp # Importa el blueprint de vendedores
 from models.data_base import Base, engine  # Importar la base y el engine para crear las tablas
 
 
@@ -11,7 +12,9 @@ app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 # Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Registrar el blueprint de clientes
+
+# Registrar blueprints
+app.register_blueprint(vendedores_bp)
 app.register_blueprint(clientes_bp)
 
 
