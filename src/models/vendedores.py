@@ -75,9 +75,6 @@ def ver_vendedores():
     return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
 
 #editar el vendedor!!!
-
-
-
 # Ruta para buscar un vendedor por su tipo y número de documento
 @vendedores_bp.route('/vendedores_buscar', methods=['GET'])
 def buscar_vendedor():
@@ -149,3 +146,31 @@ def actualizar_vendedor():
 
     # Redirigir a la vista de vendedores para mostrar la lista
     return redirect(url_for('vendedores.ver_vendedores'))
+
+# Ruta para eliminar (lógicamente) un vendedor
+@vendedores_bp.route('/vendedores_eliminar', methods=['POST'])
+def eliminar_vendedor():
+    data = request.get_json()  # Recibir los datos como JSON desde el frontend
+    numero_documento = data.get('numeroDocumento')
+    tipo_documento = data.get('tipoDocumento')
+
+    db = SessionLocal()
+
+    try:
+        # Buscar al vendedor en la base de datos
+        vendedor = db.query(Vendedores).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
+
+        if vendedor and not vendedor.is_deleted:
+            vendedor.is_deleted = True  # Eliminación lógica
+
+            try:
+                db.commit()
+                return jsonify({'success': True, 'message': 'Vendedor eliminado correctamente.'})
+            except Exception as e:
+                db.rollback()
+                return jsonify({'success': False, 'message': f'Error al eliminar el vendedor: {str(e)}'})
+        else:
+            return jsonify({'success': False, 'message': 'Vendedor no encontrado o ya eliminado.'}), 404
+    finally:
+        db.close()
+

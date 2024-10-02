@@ -64,6 +64,19 @@
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
+
+    <form>
+        <div class="container mt-5">
+            <h2>Detalles del Vendedor</h2>
+            <div id="vendedorDetalles" class="hidden">
+                <!-- Campos existentes... -->
+            </div>
+            <!-- Botones para controlar el estado del Vendedor -->
+            <button type="button" class="btn btn-danger" onclick="eliminarVendedor()">Eliminar Vendedor</button>
+        </div>
+
+    </form>
+
 </div>
 
 <script>
@@ -112,6 +125,41 @@
             })
             .catch(error => console.error('Error al buscar el vendedor:', error));
     }
+
+    function eliminarVendedor() {
+    var numeroDocumento = document.getElementById('buscarCedula').value;
+    var tipoDocumento = document.getElementById('buscarTipoDocumento').value;
+
+    if (!numeroDocumento || !tipoDocumento) {
+        alert("Por favor ingrese el tipo y número de documento del vendedor que desea eliminar.");
+        return;
+    }
+
+    var confirmacion = confirm("¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se puede deshacer.");
+    if (confirmacion) {
+        fetch('/vendedores_eliminar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                numeroDocumento: numeroDocumento,
+                tipoDocumento: tipoDocumento
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                // Limpiar formulario o redirigir según sea necesario
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error al eliminar el vendedor:', error));
+    }
+}
+
 </script>
 {% endblock %}
 
