@@ -128,7 +128,7 @@
 
     function eliminarVendedor() {
     var numeroDocumento = document.getElementById('buscarCedula').value;
-    var tipoDocumento = document.getElementById('buscarTipoDocumento').value;
+    var tipoDocumento = document.getElementById('tipoDocumentoEditar').value;
 
     if (!numeroDocumento || !tipoDocumento) {
         alert("Por favor ingrese el tipo y número de documento del vendedor que desea eliminar.");
@@ -151,7 +151,9 @@
         .then(data => {
             if (data.success) {
                 alert(data.message);
-                // Limpiar formulario o redirigir según sea necesario
+                limpiarFormulario();  // Limpiar el formulario después de la eliminación
+                console.log("Recargando la página...");  // Agrega este log para verificar
+                location.reload();  // Recargar la página
             } else {
                 alert(data.message);
             }
@@ -159,6 +161,13 @@
         .catch(error => console.error('Error al eliminar el vendedor:', error));
     }
 }
+
+
+function limpiarFormulario() {
+    document.getElementById('buscarCedula').value = '';
+    document.getElementById('tipoDocumentoEditar').value = '';
+}
+
 
 </script>
 {% endblock %}
