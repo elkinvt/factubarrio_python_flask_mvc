@@ -20,7 +20,7 @@ def init_db():
     from .detalle_producto import DetalleProducto
     from .categorias import Categoria
     from .unidad_medida import UnidadMedida
-    from .clientes import Clientes  # Importa los modelos que necesites
+    from .clientes import Clientes  
     from .facturas import Factura
     from .vendedores import Vendedores
     from .productos import Productos

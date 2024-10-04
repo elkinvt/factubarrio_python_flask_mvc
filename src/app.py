@@ -4,6 +4,9 @@ from flask import Flask, render_template
 from models import Base, engine  # Importar la base y el engine para crear las tablas
 from models import init_db  # Importar la función init_db para crear las tablas
 
+# Importa las rutas con nombres únicos
+from rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
+from rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
 
 app = Flask(__name__)
 
@@ -14,11 +17,12 @@ app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 # Inicializar la base de datos
 init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 
-# Importa las rutas después de inicializar la app
-from rutas.clientes_rutas import registrar_rutas
+
 
 # Registra las rutas
-registrar_rutas(app)
+registrar_rutas_clientes(app)
+registrar_rutas_vendedores(app)
+
 
 
 
@@ -81,13 +85,3 @@ def ver_factura():
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
-
-class Productos:
-    descripcion = 'Carne'
-    valor_unitario = 1000
-    cantidad_stock = 10
-    unidad_medida = 'GRS'
-    
-    def crear_producto(descripcion, valor_unitario, cantidad_stock, unidad_medida):
-        return 'Producto creado correctamente'
-    
