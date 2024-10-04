@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from . import Base
 
 class Vendedores(Base):
@@ -11,6 +11,7 @@ class Vendedores(Base):
     telefono = Column(String(15))
     direccion_iddireccion = Column(Integer, ForeignKey('direccion.iddireccion'))  # Relación con la tabla Dirección
     email = Column(String(100))
+    is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
 
     def __init__(self, tipo_documento, numero_documento, nombres_vendedor, telefono, direccion_iddireccion, email):
         self.tipo_documento = tipo_documento

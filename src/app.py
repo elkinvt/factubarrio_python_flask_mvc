@@ -14,7 +14,11 @@ app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 # Inicializar la base de datos
 init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 
+# Importa las rutas después de inicializar la app
+from rutas.clientes_rutas import registrar_rutas
 
+# Registra las rutas
+registrar_rutas(app)
 
 
 

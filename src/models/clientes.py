@@ -1,5 +1,5 @@
 #crear la tabla de la base de datos!!!
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean,ForeignKey
 from . import Base
 
 class Clientes(Base):
@@ -12,6 +12,8 @@ class Clientes(Base):
     telefono = Column(String(15))
     direccion_iddireccion = Column(Integer, ForeignKey('direccion.iddireccion'))  # Relación con la tabla Dirección
     email = Column(String(100))
+    is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
+    is_active = Column(Boolean, default=True)  # Campo de activación
 
     def __init__(self, tipo_documento, numero_documento, nombres_cliente, telefono, direccion_iddireccion, email):
         self.tipo_documento = tipo_documento
