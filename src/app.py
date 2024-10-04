@@ -1,21 +1,21 @@
 from flask import Flask, render_template
-from models.clientes import clientes_bp  # Importa el blueprint de clientes
-from models.vendedores import vendedores_bp # Importa el blueprint de vendedores
-from models.data_base import Base, engine  # Importar la base y el engine para crear las tablas
 
+
+from models import Base, engine  # Importar la base y el engine para crear las tablas
+from models import init_db  # Importar la función init_db para crear las tablas
 
 
 app = Flask(__name__)
 
 app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 
-# Crear las tablas en la base de datos
-Base.metadata.create_all(bind=engine)
 
 
-# Registrar blueprints
-app.register_blueprint(vendedores_bp)
-app.register_blueprint(clientes_bp)
+# Inicializar la base de datos
+init_db()  # En lugar de hacer directamente create_all, llamas a tu función
+
+
+
 
 
 if __name__ == '__main__':

@@ -82,49 +82,52 @@
 
 <script>
     function guardarProducto(event) {
-        event.preventDefault(); // Previene el envío automático del formulario
+        event.preventDefault();  // Evita que el formulario se envíe de la manera tradicional
 
-        var codigo = document.getElementById('codigoProducto').value.trim();
-        var nombre = document.getElementById('nombreProducto').value.trim();
-        var descripcion = document.getElementById('descripcionProducto').value.trim();
-        var categoria = document.getElementById('categoriaProducto').value.trim();
-        var precio = parseFloat(document.getElementById('precioProducto').value);
-        var unidadMedida = document.getElementById('unidadMedidaProducto').value;
-        var presentacion = document.getElementById('presentacionProducto').value.trim();
-        var cantidadStock = parseInt(document.getElementById('cantidadStockProducto').value);
-        var isActive = true;
+        // Recoger los valores del formulario
+        var codigo = document.getElementById('codigoProducto').value;
+        var nombre = document.getElementById('nombreProducto').value;
+        var descripcion = document.getElementById('descripcionProducto').value;
+        var categoria = document.getElementById('categoriaProducto').value;
+        var precio = document.getElementById('precioProducto').value;
+        var unidad_medida = document.getElementById('unidadMedidaProducto').value;
+        var presentacion = document.getElementById('presentacionProducto').value;
+        var cantidad_stock = document.getElementById('cantidadStockProducto').value;
 
-        if (!codigo || !nombre || !descripcion || !categoria || isNaN(precio) || !unidadMedida || !presentacion || isNaN(cantidadStock)) {
-            alert("Por favor complete todos los campos correctamente.");
-            return;
-        }
-
-        var productos = JSON.parse(localStorage.getItem('Productos')) || [];
-
-        if (productos.some(producto => producto.codigo === codigo)) {
-            alert("Un producto con este código ya existe.");
-            return;
-        }
-
+        // Crear un objeto con los datos del formulario
         var producto = {
             codigo: codigo,
             nombre: nombre,
             descripcion: descripcion,
             categoria: categoria,
             precio: precio,
-            unidadMedida: unidadMedida,
+            unidad_medida: unidad_medida,
             presentacion: presentacion,
-            cantidadStock: cantidadStock,
-            isActive: isActive,
-            isDeleted: false  // Nuevo campo para la eliminación lógica
+            cantidad_stock: cantidad_stock
         };
 
-        productos.push(producto);
-        localStorage.setItem('Productos', JSON.stringify(productos));
-        alert("Producto guardado con éxito!");
-        document.getElementById('formCrearProducto').reset(); // Limpiar el formulario después de guardar
+        // Enviar los datos a Flask utilizando fetch
+        fetch('/productos_crear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(producto)  // Convertimos el objeto a JSON
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Producto guardado con éxito');
+                // Limpiar el formulario o redirigir a otra página
+                document.getElementById('formCrearProducto').reset();
+            } else {
+                alert('Error al guardar el producto: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
+
 {% endblock %}
     
 
