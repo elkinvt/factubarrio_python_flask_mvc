@@ -2,6 +2,8 @@ from flask import request, redirect, url_for, flash, render_template, jsonify
 from models import SessionLocal
 from models.clientes import Clientes
 
+
+
 # Función para registrar las rutas en la aplicación Flask
 def registrar_rutas(app):
     # Ruta para mostrar el formulario de creación de cliente (GET)
@@ -13,23 +15,24 @@ def registrar_rutas(app):
     @app.route('/clientes_crear', methods=['POST'])
     def crear_cliente():
         db = SessionLocal()
+
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['numeroDocumento']
-        nombre = request.form['nombreCliente']
-        apellido = request.form['apellidoCliente']
+        nombres_cliente = request.form['nombreCliente']
         telefono = request.form['telefonoCliente']
-        direccion = request.form['direccionCliente']
+        direccion = request.form['direccionCliente']  # Aquí se recibe la dirección como texto
         email = request.form['emailCliente']
 
+        # Crear el cliente con la dirección en texto
         nuevo_cliente = Clientes(
             tipo_documento=tipo_documento,
             numero_documento=numero_documento,
-            nombre=nombre,
-            apellido=apellido,
+            nombres_cliente=nombres_cliente,
             telefono=telefono,
-            direccion=direccion,
+            direccion=direccion,  # Ahora la dirección se almacena directamente como texto
             email=email,
-            is_active=True
+            is_active=True,
+            is_deleted=False
         )
 
         try:
@@ -43,6 +46,11 @@ def registrar_rutas(app):
             db.close()
 
         return redirect(url_for('mostrar_formulario_crear_cliente'))
+
+
+
+
+
 
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
@@ -87,7 +95,7 @@ def registrar_rutas(app):
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['cedulaCliente']
-        nombre = request.form['nombreCliente']
+        nombres_cliente=request.form['nombreCliente'],  # Cambia 'nombre' por 'nombres_cliente'
         apellido = request.form['apellidoCliente']
         telefono = request.form['telefonoCliente']
         direccion = request.form['direccionCliente']
@@ -117,7 +125,34 @@ def registrar_rutas(app):
 
         db.close()
         return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente_id))
+    
+    
+    
+    
+    # Ruta para activar o desactivar un Cliente
+    @app.route('/clientes_toggle_estado', methods=['POST'])
+    def toggle_estado_cliente():
+        db = SessionLocal()
+        numero_documento = request.form['numeroDocumento']
+        tipo_documento = request.form['tipoDocumento']
 
+        try:
+            cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
+            if cliente:
+                cliente.is_active = not cliente.is_active
+                db.commit()
+                estado = 'activado' if cliente.is_active else 'desactivado'
+                flash(f'Cliente {estado} con éxito.', 'success')
+            else:
+                flash('Cliente no encontrado.', 'danger')
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al cambiar el estado del cliente: {str(e)}', 'danger')
+        finally:
+            db.close()
+
+        return redirect(url_for('ver_clientes'))
+    
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])
     def eliminar_cliente():

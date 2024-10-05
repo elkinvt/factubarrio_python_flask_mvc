@@ -7,6 +7,7 @@ from models import init_db  # Importar la función init_db para crear las tablas
 # Importa las rutas con nombres únicos
 from rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
 from rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
+from rutas.productos_rutas import registrar_rutas as registrar_rutas_productos
 
 app = Flask(__name__)
 
@@ -22,6 +23,7 @@ init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 # Registra las rutas
 registrar_rutas_clientes(app)
 registrar_rutas_vendedores(app)
+registrar_rutas_productos(app)
 
 
 
