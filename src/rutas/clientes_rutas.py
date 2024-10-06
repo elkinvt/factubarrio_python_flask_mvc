@@ -63,7 +63,7 @@ def registrar_rutas(app):
 
         # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
-            return render_template('form_editar_cliente.html', mensaje="Faltan datos para la búsqueda", cliente=None, titulo_pagina="Editar Cliente")
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
         db = SessionLocal()
         cliente = db.query(Clientes).filter_by(

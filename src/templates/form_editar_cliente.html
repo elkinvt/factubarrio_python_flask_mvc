@@ -2,34 +2,36 @@
 {% block content %}
 
 <div class="container mt-5">
-    <form action="/clientes_buscar" method="GET" >
-        <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
-        <select class="form-control form-control-sm" id="buscarTipoDocumento" name="tipoDocumento">
-            <option value="">Seleccione tipo de documento</option>
-            <option value="CC">Cédula de Ciudadanía</option>
-            <option value="TI">Tarjeta de Identidad</option>
-            <option value="CE">Cédula de Extranjería</option>
-            <option value="PA">Pasaporte</option>
-            <option value="RC">Registro Civil</option>
-            <option value="NIT">NIT</option>
-        </select>
-    
-        <label for="buscarCedula" class="form-label">Número de Documento:</label>
-        <input type="text" placeholder="Ingrese número del documento para mostrar" class="form-control form-control-sm"
-            name="numeroDocumento">
-    
-        <button type="submit" class="btn btn-primary mt-2 form-control-sm">Buscar Cliente</button>
-        
-    </form>
-    
+    {% if not cliente %}
+        <h2>Buscar Cliente</h2>
+        <form action="/clientes_buscar" method="GET">
+            <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
+            <select class="form-control form-control-sm" id="buscarTipoDocumento" name="tipoDocumento">
+                <option value="">Seleccione tipo de documento</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="PA">Pasaporte</option>
+                <option value="RC">Registro Civil</option>
+                <option value="NIT">NIT</option>
+            </select>
+
+            <label for="buscarCedula" class="form-label">Número de Documento:</label>
+            <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm"
+                name="numeroDocumento">
+
+            <button type="submit" class="btn btn-primary mt-2 form-control-sm">Buscar Cliente</button>
+        </form>
+    {% endif %}
 </div>
 
-<<div class="container mt-5">
+{% if cliente %}
+<div class="container mt-5">
     <h2>Editar Cliente</h2>
-    <form id="formCrearProducto" action="/clientes_actualizar" method="POST">
+    <form id="formEditarCliente" action="/clientes_actualizar" method="POST">
         <!-- Incluye el ID del cliente como un campo oculto -->
         <input type="hidden" id="clienteId" name="clienteId" value="{{ cliente.idclientes }}">
-        
+
         <div class="mb-3">
             <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
             <select class="form-control form-control-sm" id="tipoDocumentoEditar" name="tipoDocumento">
@@ -42,64 +44,80 @@
                 <option value="NIT" {% if cliente.tipo_documento == 'NIT' %} selected {% endif %}>NIT</option>
             </select>
         </div>
-        
+
         <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" value="{{ cliente.nombres_cliente }}" required>
+            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente"
+                value="{{ cliente.nombres_cliente }}" required>
         </div>
-        
+
         <div class="mb-3">
             <label for="cedulaCliente" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="numeroDocumento" value="{{ cliente.numero_documento }}" readonly>
+            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="numeroDocumento"
+                value="{{ cliente.numero_documento }}" readonly>
         </div>
 
         <div class="mb-3">
             <label for="telefonoCliente" class="form-label">Teléfono</label>
-            <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente" value="{{ cliente.telefono }}">
+            <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente"
+                value="{{ cliente.telefono }}">
         </div>
 
         <div class="mb-3">
             <label for="direccionCliente" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente" value="{{ cliente.direccion }}" required>
+            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente"
+                value="{{ cliente.direccion }}" required>
         </div>
 
         <div class="mb-3">
             <label for="emailCliente" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-sm" id="emailCliente" name="emailCliente" value="{{ cliente.email }}" required>
+            <input type="email" class="form-control form-control-sm" id="emailCliente" name="emailCliente"
+                value="{{ cliente.email }}" required>
         </div>
 
         <div class="mb-3">
             <label for="estadoCliente" class="form-label">Estado del Cliente</label>
-            <input type="text" class="form-control form-control-sm" id="estadoCliente" name="estadoCliente" value="{{ 'Activo' if cliente.is_active else 'Inactivo' }}" readonly>
+            <input type="text" class="form-control form-control-sm" id="estadoCliente" name="estadoCliente"
+                value="{{ 'Activo' if cliente.is_active else 'Inactivo' }}" readonly>
         </div>
 
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
-    <div class="container mt-5">
-        <h2>Detalles del Cliente</h2>
-        
-        <!-- Formulario para bloquear/desbloquear cliente -->
-        <form action="/clientes_toggle_estado" method="POST">
-            <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
-            <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
-            <button type="submit" class="btn btn-warning mb-2">Bloquear/Desbloquear Cliente</button>
-        </form>
-    
-        <!-- Formulario para eliminar cliente -->
-        <form action="/clientes_eliminar" method="POST">
-            <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
-            <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
-            <button type="submit" class="btn btn-danger">Eliminar Cliente</button>
-        </form>
-    
-    </div>
-    
+
+    <!-- Bloquear/Desbloquear Cliente -->
+    <form action="/clientes_toggle_estado" method="POST" class="mt-3">
+        <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
+        <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
+        <button type="submit" class="btn btn-warning mb-2">Bloquear/Desbloquear Cliente</button>
+    </form>
+
+    <!-- Eliminar Cliente -->
+    <form id="eliminarClienteForm" action="/clientes_eliminar" method="POST" class="mt-2">
+        <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
+        <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
+        <button type="button" class="btn btn-danger" onclick="confirmarEliminarCliente()">Eliminar Cliente</button>
+    </form>
+
+    <script>
+        function confirmarEliminarCliente() {
+            // Mostrar la alerta de confirmación
+            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este cliente?");
+            
+            // Si el usuario confirma, enviar el formulario
+            if (confirmacion) {
+                document.getElementById("eliminarClienteForm").submit();
+            }
+        }
+    </script>
 
 </div>
+{% endif %}
+
 
 {% endblock %}
+
     
 
    
