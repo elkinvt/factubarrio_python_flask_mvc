@@ -77,22 +77,26 @@
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
-
-    <form>
-        <div class="container mt-5">
-            <h2>Detalles del Cliente</h2>
-            <div id="clienteDetalles" class="hidden">
-                <!-- Campos existentes... -->
-            </div>
-            <!-- Botones para controlar el estado del cliente -->
-            <button type="button" class="btn btn-warning mb-2" onclick="toggleEstadoCliente()">Bloquear/Desbloquear
-                Cliente</button>
-            <button type="button" class="btn btn-danger" onclick="eliminarCliente()">Eliminar Cliente</button>
-
-        </div>
-
-    </form>
+    <div class="container mt-5">
+        <h2>Detalles del Cliente</h2>
+        
+        <!-- Formulario para bloquear/desbloquear cliente -->
+        <form action="/clientes_toggle_estado" method="POST">
+            <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
+            <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
+            <button type="submit" class="btn btn-warning mb-2">Bloquear/Desbloquear Cliente</button>
+        </form>
     
+        <!-- Formulario para eliminar cliente -->
+        <form action="/clientes_eliminar" method="POST">
+            <input type="hidden" name="numeroDocumento" value="{{ cliente.numero_documento }}">
+            <input type="hidden" name="tipoDocumento" value="{{ cliente.tipo_documento }}">
+            <button type="submit" class="btn btn-danger">Eliminar Cliente</button>
+        </form>
+    
+    </div>
+    
+
 </div>
 
 {% endblock %}

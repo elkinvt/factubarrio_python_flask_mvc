@@ -85,23 +85,29 @@ def registrar_rutas(app):
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
 
-        # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
-            return render_template('error.html', mensaje="Faltan datos para la búsqueda")
+            flash("Faltan datos para la búsqueda", 'warning')
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Buscar Cliente")
 
         db = SessionLocal()
         cliente = db.query(Clientes).filter_by(
             tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            is_deleted=False  # Aseguramos que el cliente no esté marcado como eliminado
+            numero_documento=numero_documento
         ).first()
         db.close()
 
-        if cliente:
-            # Renderizar la plantilla de edición con los datos del cliente
-            return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina=f"Editar Cliente")
-        else:
-            return render_template('form_editar_cliente.html', mensaje="Cliente no encontrado", cliente=None)
+        if cliente and cliente.is_deleted:
+            flash("Este cliente ha sido eliminado y no puede ser editado.", 'warning')
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
+
+        elif not cliente:
+            flash("Cliente no encontrado.", 'warning')
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente No Encontrado")
+
+        return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
+
+
+        
 
         
         
@@ -146,12 +152,8 @@ def registrar_rutas(app):
         db.close()
         # Redirigir a la página de edición del cliente
         return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente_id))
-
     
-    
-    
-    
-    # Ruta para activar o desactivar un Cliente
+    #ruta para actualizar el esatdo de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
     def toggle_estado_cliente():
         db = SessionLocal()
@@ -159,8 +161,10 @@ def registrar_rutas(app):
         tipo_documento = request.form['tipoDocumento']
 
         try:
+            # Buscar el cliente usando el tipo y número de documento
             cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
             if cliente:
+                # Cambiar el estado (activo/inactivo)
                 cliente.is_active = not cliente.is_active
                 db.commit()
                 estado = 'activado' if cliente.is_active else 'desactivado'
@@ -173,14 +177,19 @@ def registrar_rutas(app):
         finally:
             db.close()
 
-        return redirect(url_for('ver_clientes'))
+        # Redirigir a la página donde corresponda
+        return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente.idclientes))
+
+
+    
+    
     
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])
     def eliminar_cliente():
-        data = request.get_json()
-        numero_documento = data.get('numeroDocumento')
-        tipo_documento = data.get('tipoDocumento')
+        numero_documento = request.form.get('numeroDocumento')
+        tipo_documento = request.form.get('tipoDocumento')
+        
         db = SessionLocal()
         cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
 
@@ -189,10 +198,14 @@ def registrar_rutas(app):
 
             try:
                 db.commit()
-                return jsonify({'success': True, 'message': 'Cliente eliminado correctamente.'})
+                flash('Cliente eliminado correctamente.', 'success')
             except Exception as e:
                 db.rollback()
-                return jsonify({'success': False, 'message': f'Error al eliminar el cliente: {str(e)}'})
+                flash(f'Error al eliminar el cliente: {str(e)}', 'danger')
         else:
-            return jsonify({'success': False, 'message': 'Cliente no encontrado o ya eliminado.'}), 404
+            flash('Cliente no encontrado o ya eliminado.', 'danger')
+        
         db.close()
+        # Redirigir a la página donde se ven todos los clientes
+        return redirect(url_for('ver_clientes'))
+
