@@ -1,4 +1,4 @@
-from flask import request, redirect, url_for, flash, render_template, jsonify
+from flask import request, redirect, url_for, flash, render_template
 from models import SessionLocal
 from models.vendedores import Vendedores
 
@@ -10,17 +10,16 @@ def registrar_rutas(app):
             db = SessionLocal()
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
-            nombre = request.form['nombreVendedor']
-            apellido = request.form['apellidoVendedor']
+            nombre_completo = request.form['nombreVendedor']  # Usamos un solo campo para el nombre completo
             telefono = request.form['telefonoVendedor']
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
 
+            # Creando el objeto del nuevo vendedor con el modelo que ya tienes en la base de datos
             nuevo_vendedor = Vendedores(
                 tipo_documento=tipo_documento,
                 numero_documento=numero_documento,
-                nombre=nombre,
-                apellido=apellido,
+                nombres_vendedor=nombre_completo,  # Insertamos el nombre completo
                 telefono=telefono,
                 direccion=direccion,
                 email=email
@@ -39,6 +38,7 @@ def registrar_rutas(app):
             return redirect(url_for('crear_vendedor'))
 
         return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
+
 
     # Ver vendedores
     @app.route('/vendedores_ver', methods=['GET'])

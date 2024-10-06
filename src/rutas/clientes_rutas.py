@@ -106,14 +106,6 @@ def registrar_rutas(app):
 
         return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
 
-
-        
-
-        
-        
-   
-
-
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
     def actualizar_cliente():
@@ -180,10 +172,6 @@ def registrar_rutas(app):
         # Redirigir a la página donde corresponda
         return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente.idclientes))
 
-
-    
-    
-    
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])
     def eliminar_cliente():
