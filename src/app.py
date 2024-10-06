@@ -25,12 +25,6 @@ registrar_rutas_clientes(app)
 registrar_rutas_vendedores(app)
 registrar_rutas_productos(app)
 
-
-
-
-if __name__ == '__main__':
-    app.run(debug = True)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -87,3 +81,7 @@ def ver_factura():
 @app.route('/cerrar_sesion')
 def cerrar_sesion():
     return render_template('index.html')
+
+# Punto de entrada de la aplicación
+if __name__ == '__main__':
+    app.run(debug=True)

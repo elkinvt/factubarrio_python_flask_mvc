@@ -46,12 +46,7 @@ def registrar_rutas(app):
             db.close()
 
         return redirect(url_for('mostrar_formulario_crear_cliente'))
-
-
-
-
-
-
+    
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
     def ver_clientes():
@@ -59,34 +54,59 @@ def registrar_rutas(app):
         clientes = db.query(Clientes).filter_by(is_deleted=False).all()
         db.close()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
-
+    
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/clientes_editar', methods=['GET'])
     def mostrar_formulario_editar_cliente():
-        return render_template('form_editar_cliente.html', titulo_pagina="Editar Cliente")
+        tipo_documento = request.args.get('tipoDocumento')
+        numero_documento = request.args.get('numeroDocumento')
+
+        # Verificar si se ingresan ambos campos
+        if not tipo_documento or not numero_documento:
+            return render_template('form_editar_cliente.html', mensaje="Faltan datos para la búsqueda", cliente=None, titulo_pagina="Editar Cliente")
+
+        db = SessionLocal()
+        cliente = db.query(Clientes).filter_by(
+            tipo_documento=tipo_documento,
+            numero_documento=numero_documento,
+            is_deleted=False
+        ).first()
+        db.close()
+
+        if cliente:
+            return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
+        else:
+            # Si no se encuentra el cliente, pasamos el mensaje de error
+            return render_template('form_editar_cliente.html', mensaje="Cliente no encontrado", cliente=None, titulo_pagina="Editar Cliente")
 
     # Ruta para buscar un cliente por documento
     @app.route('/clientes_buscar', methods=['GET'])
     def buscar_cliente():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
+
+        # Verificar si se ingresan ambos campos
+        if not tipo_documento or not numero_documento:
+            return render_template('error.html', mensaje="Faltan datos para la búsqueda")
+
         db = SessionLocal()
-        cliente = db.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
+        cliente = db.query(Clientes).filter_by(
+            tipo_documento=tipo_documento,
+            numero_documento=numero_documento,
+            is_deleted=False  # Aseguramos que el cliente no esté marcado como eliminado
+        ).first()
         db.close()
+
         if cliente:
-            return jsonify({
-                'id': cliente.id,
-                'tipo_documento': cliente.tipo_documento,
-                'numero_documento': cliente.numero_documento,
-                'nombre': cliente.nombre,
-                'apellido': cliente.apellido,
-                'telefono': cliente.telefono,
-                'direccion': cliente.direccion,
-                'email': cliente.email,
-                'is_active': cliente.is_active
-            })
+            # Renderizar la plantilla de edición con los datos del cliente
+            return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina=f"Editar Cliente")
         else:
-            return jsonify({'error': 'Cliente no encontrado'}), 404
+            return render_template('form_editar_cliente.html', mensaje="Cliente no encontrado", cliente=None)
+
+        
+        
+   
+
 
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
@@ -94,21 +114,21 @@ def registrar_rutas(app):
         db = SessionLocal()
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
-        numero_documento = request.form['cedulaCliente']
-        nombres_cliente=request.form['nombreCliente'],  # Cambia 'nombre' por 'nombres_cliente'
-        apellido = request.form['apellidoCliente']
+        numero_documento = request.form['numeroDocumento']  # Corregido
+        nombres_cliente = request.form['nombreCliente']  # Corrección: eliminar la coma al final
         telefono = request.form['telefonoCliente']
         direccion = request.form['direccionCliente']
         email = request.form['emailCliente']
         estado_cliente = request.form['estadoCliente']
 
-        cliente = db.query(Clientes).filter_by(id=cliente_id).first()
+        # Buscar cliente por idclientes, que es el nombre correcto del campo
+        cliente = db.query(Clientes).filter_by(idclientes=cliente_id).first()
 
         if cliente:
+            # Actualizamos los campos del cliente
             cliente.tipo_documento = tipo_documento
             cliente.numero_documento = numero_documento
-            cliente.nombre = nombre
-            cliente.apellido = apellido
+            cliente.nombres_cliente = nombres_cliente
             cliente.telefono = telefono
             cliente.direccion = direccion
             cliente.email = email
@@ -124,7 +144,9 @@ def registrar_rutas(app):
             flash('Cliente no encontrado', 'danger')
 
         db.close()
+        # Redirigir a la página de edición del cliente
         return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente_id))
+
     
     
     
