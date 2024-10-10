@@ -1,6 +1,6 @@
 #crear la tabla de la base de datos!!!
 from sqlalchemy import Column, Integer, String, Boolean,ForeignKey
-from . import Base
+from . import Base, SessionLocal
 
 class Clientes(Base):
     __tablename__ = 'clientes'
@@ -29,6 +29,14 @@ class Clientes(Base):
         return f'<Cliente {self.nombres_cliente}>'
     
     
-
+    # Método estático para obtener los clientes no eliminados
+    @staticmethod
+    def obtener_clientes():
+        session = SessionLocal()
+        try:
+            clientes = session.query(Clientes).filter_by(is_deleted=False).all()
+            return clientes
+        finally:
+            session.close()
 
 

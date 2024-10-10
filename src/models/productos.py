@@ -5,6 +5,7 @@ class Productos(Base):
     __tablename__ = 'productos'
     
     idproductos = Column(Integer, primary_key=True, autoincrement=True)
+    codigo = Column(String(50), unique=True, nullable=False)
     nombre = Column(String(100), nullable=False)
     descripcion = Column(String(255))
     categoria_idcategoria = Column(Integer, ForeignKey('categoria.idcategoria'), nullable=False)
@@ -15,7 +16,8 @@ class Productos(Base):
     is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
     is_active = Column(Boolean, default=True)  # Campo de activación
 
-    def __init__(self, nombre, descripcion, categoria_idcategoria, unidad_medida_idunidad_medida, presentacion, cantidad_stock, precio_unitario):
+    def __init__(self, codigo, nombre, descripcion, categoria_idcategoria, unidad_medida_idunidad_medida, presentacion, cantidad_stock, precio_unitario):
+        self.codigo = codigo
         self.nombre = nombre
         self.descripcion = descripcion
         self.categoria_idcategoria = categoria_idcategoria

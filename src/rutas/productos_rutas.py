@@ -6,12 +6,12 @@ from models.productos import Productos  # Importa el modelo de Productos
 # Función para registrar las rutas de productos en la aplicación Flask
 def registrar_rutas(app):
 
-    # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
+   # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
     def crear_producto():
-        if request.method == 'POST':
-            db = SessionLocal()
+        db = SessionLocal()
 
+        if request.method == 'POST':
             # Recibe los datos enviados desde el formulario
             codigo = request.form['codigoProducto']
             nombre = request.form['nombreProducto']
@@ -27,11 +27,11 @@ def registrar_rutas(app):
                 codigo=codigo,
                 nombre=nombre,
                 descripcion=descripcion,
-                categoria=categoria,
-                precio=precio,
-                unidad_medida=unidad_medida,
+                categoria_idcategoria=categoria,
+                unidad_medida_idunidad_medida=unidad_medida,
                 presentacion=presentacion,
-                cantidad_stock=cantidad_stock
+                cantidad_stock=cantidad_stock,
+                precio_unitario=precio
             )
 
             try:
@@ -44,10 +44,22 @@ def registrar_rutas(app):
             finally:
                 db.close()
 
-            return redirect(url_for('crear_producto'))  # Redirige al formulario después de crear el producto
+            return redirect(url_for('crear_producto'))
 
-        # Si es un GET, muestra el formulario
-        return render_template('form_crear_producto.html', titulo_pagina="Crear Producto")
+        # Cargar las categorías y unidades de medida desde la base de datos
+        categorias = db.query(Categoria).all()  # Obtener todas las categorías
+        unidades_padre = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()  # Obtener unidades padre
+        unidades_hijas = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()  # Obtener unidades hijas
+        db.close()
+
+        return render_template('form_crear_producto.html', categorias=categorias, unidades_padre=unidades_padre, unidades_hijas=unidades_hijas, titulo_pagina="Crear Producto")
+
+
+    
+    
+    
+    
+    
 
     # Ruta para ver productos
     @app.route('/productos_ver', methods=['GET'])

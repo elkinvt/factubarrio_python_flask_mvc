@@ -48,13 +48,13 @@ def registrar_rutas(app):
         return redirect(url_for('mostrar_formulario_crear_cliente'))
     
     # Ruta para ver todos los clientes
+    
     @app.route('/clientes_ver', methods=['GET'])
     def ver_clientes():
-        db = SessionLocal()
-        clientes = db.query(Clientes).filter_by(is_deleted=False).all()
-        db.close()
+        # Obtener los clientes desde el modelo Clientes
+        clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
-    
+        
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/clientes_editar', methods=['GET'])
     def mostrar_formulario_editar_cliente():
