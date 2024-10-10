@@ -6,55 +6,61 @@ from models.clientes import Clientes
 
 # Función para registrar las rutas en la aplicación Flask
 def registrar_rutas(app):
-    # Ruta para mostrar el formulario de creación de cliente (GET)
-    @app.route('/clientes_crear', methods=['GET'])
-    def mostrar_formulario_crear_cliente():
-        return render_template('form_crear_cliente.html', titulo_pagina="Crear cliente")
-
-    # Ruta para recibir los datos del formulario y crear un cliente (POST)
-    @app.route('/clientes_crear', methods=['POST'])
-    def crear_cliente():
-        db = SessionLocal()
-
-        tipo_documento = request.form['tipoDocumento']
-        numero_documento = request.form['numeroDocumento']
-        nombres_cliente = request.form['nombreCliente']
-        telefono = request.form['telefonoCliente']
-        direccion = request.form['direccionCliente']  # Aquí se recibe la dirección como texto
-        email = request.form['emailCliente']
-
-        # Crear el cliente con la dirección en texto
-        nuevo_cliente = Clientes(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            nombres_cliente=nombres_cliente,
-            telefono=telefono,
-            direccion=direccion,  # Ahora la dirección se almacena directamente como texto
-            email=email,
-            is_active=True,
-            is_deleted=False
-        )
-
-        try:
-            db.add(nuevo_cliente)
-            db.commit()
-            flash('Cliente creado con éxito', 'success')
-        except Exception as e:
-            db.rollback()
-            flash(f'Error al crear cliente: {str(e)}', 'danger')
-        finally:
-            db.close()
-
-        return redirect(url_for('mostrar_formulario_crear_cliente'))
     
     # Ruta para ver todos los clientes
-    
     @app.route('/clientes_ver', methods=['GET'])
     def ver_clientes():
         # Obtener los clientes desde el modelo Clientes
         clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
-        
+    
+    
+
+    
+    #Ruta para crear el cliente
+    @app.route('/clientes_crear', methods=['GET', 'POST'])
+    def crear_cliente():
+        if request.method == 'POST':
+            # Procesar el formulario enviado
+            db = SessionLocal()
+
+            # Obtener los datos del formulario
+            tipo_documento = request.form['tipoDocumento']
+            numero_documento = request.form['numeroDocumento']
+            nombres_cliente = request.form['nombreCliente']
+            telefono = request.form['telefonoCliente']
+            direccion = request.form['direccionCliente']
+            email = request.form['emailCliente']
+
+            # Crear el cliente con los datos recibidos
+            nuevo_cliente = Clientes(
+                tipo_documento=tipo_documento,
+                numero_documento=numero_documento,
+                nombres_cliente=nombres_cliente,
+                telefono=telefono,
+                direccion=direccion,
+                email=email,
+                is_active=True,
+                is_deleted=False
+            )
+
+            try:
+                Clientes.agregar_cliente(db, nuevo_cliente) 
+                flash('Cliente creado con éxito', 'success')
+                return redirect(url_for('crear_cliente'))  # Redirigir al formulario después de crear el cliente
+            except Exception as e:
+                db.rollback()  # Deshacer cambios si ocurre un error
+                flash(f'Error al crear cliente: {str(e)}', 'danger')
+            finally:
+                db.close()
+
+        # Si es GET, mostrar el formulario
+        return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
+    
+    
+      
+    
+
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/clientes_editar', methods=['GET'])
     def mostrar_formulario_editar_cliente():
@@ -63,89 +69,76 @@ def registrar_rutas(app):
 
         # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
+            flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
             return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
-        db = SessionLocal()
-        cliente = db.query(Clientes).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            is_deleted=False
-        ).first()
-        db.close()
+        cliente = Clientes.buscar_cliente_por_documento(tipo_documento, numero_documento)
 
         if cliente:
-            return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
+            print(f"Cliente encontrado: {cliente.nombres_cliente}, is_deleted: {cliente.is_deleted}")  # Depuración
+            if cliente.is_deleted:
+                flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
+                return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
+            else:
+                return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
         else:
-            # Si no se encuentra el cliente, pasamos el mensaje de error
-            return render_template('form_editar_cliente.html', mensaje="Cliente no encontrado", cliente=None, titulo_pagina="Editar Cliente")
+            flash('Cliente no encontrado. Verifique los datos ingresados.', 'danger')
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
-    # Ruta para buscar un cliente por documento
-    @app.route('/clientes_buscar', methods=['GET'])
-    def buscar_cliente():
-        tipo_documento = request.args.get('tipoDocumento')
-        numero_documento = request.args.get('numeroDocumento')
 
-        if not tipo_documento or not numero_documento:
-            flash("Faltan datos para la búsqueda", 'warning')
-            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Buscar Cliente")
 
-        db = SessionLocal()
-        cliente = db.query(Clientes).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento
-        ).first()
-        db.close()
-
-        if cliente and cliente.is_deleted:
-            flash("Este cliente ha sido eliminado y no puede ser editado.", 'warning')
-            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
-
-        elif not cliente:
-            flash("Cliente no encontrado.", 'warning')
-            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente No Encontrado")
-
-        return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
 
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
     def actualizar_cliente():
-        db = SessionLocal()
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
-        numero_documento = request.form['numeroDocumento']  # Corregido
-        nombres_cliente = request.form['nombreCliente']  # Corrección: eliminar la coma al final
+        numero_documento = request.form['numeroDocumento']
+        nombres_cliente = request.form['nombreCliente']
         telefono = request.form['telefonoCliente']
         direccion = request.form['direccionCliente']
         email = request.form['emailCliente']
-        estado_cliente = request.form['estadoCliente']
+        estado_cliente = request.form['estadoCliente'].lower() == 'activo'
 
-        # Buscar cliente por idclientes, que es el nombre correcto del campo
-        cliente = db.query(Clientes).filter_by(idclientes=cliente_id).first()
+        db = SessionLocal()
+        cliente = Clientes.buscar_cliente_por_id(cliente_id)
 
         if cliente:
-            # Actualizamos los campos del cliente
-            cliente.tipo_documento = tipo_documento
-            cliente.numero_documento = numero_documento
-            cliente.nombres_cliente = nombres_cliente
-            cliente.telefono = telefono
-            cliente.direccion = direccion
-            cliente.email = email
-            cliente.is_active = estado_cliente.lower() == 'activo'
+            # Diccionario de datos actualizados
+            datos_actualizados = {
+                'tipo_documento': tipo_documento,
+                'numero_documento': numero_documento,
+                'nombres_cliente': nombres_cliente,
+                'telefono': telefono,
+                'direccion': direccion,
+                'email': email,
+                'is_active': estado_cliente
+            }
 
             try:
-                db.commit()
+                Clientes.actualizar_cliente(db, cliente, datos_actualizados)
                 flash('Cambios guardados correctamente', 'success')
+                return redirect(url_for('mostrar_formulario_editar_cliente'))
             except Exception as e:
-                db.rollback()
                 flash(f'Error al guardar los cambios: {str(e)}', 'danger')
         else:
             flash('Cliente no encontrado', 'danger')
 
         db.close()
-        # Redirigir a la página de edición del cliente
-        return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente_id))
+        return redirect(url_for('mostrar_formulario_editar_cliente', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
     
-    #ruta para actualizar el esatdo de un cliente
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
     def toggle_estado_cliente():
         db = SessionLocal()

@@ -34,17 +34,7 @@ def pagina_principal():
     return render_template('pgprincipal.html', titulo_pagina ="Pagina principal")
 
 
-@app.route('/vendedores_crear')
-def vendedores_crear():
-    return render_template('form_crear_vendedor.html', titulo_pagina = "Crear vendedor")
 
-@app.route('/vendedores_ver')
-def vendedores_ver():
-    return render_template('form_ver_vendedor.html', titulo_pagina = "Ver vendedor")
-
-@app.route('/vendedores_editar')
-def vendedores_editar():
-    return render_template('form_editar_vendedor.html', titulo_pagina = "Editar vendedor")
 
 @app.route('/productos_crear')
 def productos_crear():

@@ -38,5 +38,44 @@ class Clientes(Base):
             return clientes
         finally:
             session.close()
-
+    @staticmethod
+    def agregar_cliente(db_session, cliente):
+        try:
+            db_session.add(cliente)
+            db_session.commit()
+            return cliente
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    @staticmethod
+    def buscar_cliente_por_documento(tipo_documento, numero_documento):
+        session = SessionLocal()
+        try:
+            cliente = session.query(Clientes).filter_by(
+                tipo_documento=tipo_documento,
+                numero_documento=numero_documento,
+                
+            ).first()
+            return cliente
+        finally:
+            session.close()
+            
+    @staticmethod
+    def actualizar_cliente(db_session, cliente, datos_actualizados):
+        try:
+            for key, value in datos_actualizados.items():
+                setattr(cliente, key, value)
+            db_session.commit()
+            return cliente
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    @staticmethod
+    def buscar_cliente_por_id(cliente_id):
+        session = SessionLocal()
+        try:
+            cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
+            return cliente
+        finally:
+            session.close()
 
