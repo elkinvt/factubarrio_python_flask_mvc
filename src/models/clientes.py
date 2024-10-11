@@ -96,7 +96,8 @@ class Clientes(Base):
         finally:
             session.close()
             
-    
+    #-----------------
+            
     # Método estático para actualizar el estado de un cliente        
     @staticmethod
     def toggle_estado_cliente(db_session, cliente):
@@ -107,5 +108,16 @@ class Clientes(Base):
         except Exception as e:
             db_session.rollback()  # Revierte los cambios si hay algún error
             raise e
-
+    #-----------
+    
+    #----------------
+    @staticmethod
+    def eliminar_cliente(db_session, cliente):
+        try:
+            cliente.is_deleted = True  # Marcamos el cliente como eliminado
+            db_session.commit()  # Guardamos los cambios
+        except Exception as e:
+            db_session.rollback()  # En caso de error, revertimos la transacción
+            raise e
+    #------------
 
