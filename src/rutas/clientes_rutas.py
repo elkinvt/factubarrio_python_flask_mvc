@@ -14,7 +14,7 @@ def registrar_rutas(app):
         clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
     
-    
+    #----------------------------------
 
     
     #Ruta para crear el cliente
@@ -56,37 +56,39 @@ def registrar_rutas(app):
 
         # Si es GET, mostrar el formulario
         return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
+    #------------------------
     
-    
-      
-    
-
-    # Ruta para mostrar el formulario de edición (GET)
+    # Ruta para mostrar el formulario de edición (GET)  
     @app.route('/clientes_editar', methods=['GET'])
     def mostrar_formulario_editar_cliente():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
-
-        # Verificar si se ingresan ambos campos
+        
+         # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
             flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
             return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
-        cliente = Clientes.buscar_cliente_por_documento(tipo_documento, numero_documento)
+        db = SessionLocal()  # Crear la sesión de base de datos
+        try:
+            # Usar la sesión en la función de búsqueda
+            cliente = Clientes.buscar_cliente_por_documento(db, tipo_documento, numero_documento)
 
-        if cliente:
-            print(f"Cliente encontrado: {cliente.nombres_cliente}, is_deleted: {cliente.is_deleted}")  # Depuración
-            if cliente.is_deleted:
-                flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
-                return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
-            else:
+            if cliente:
+                if cliente.is_deleted:
+                    flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
+                    return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
                 return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
-        else:
-            flash('Cliente no encontrado. Verifique los datos ingresados.', 'danger')
-            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
+            else:
+                flash('Cliente no encontrado. Verifique los datos ingresados.', 'danger')
+                return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
+        except Exception as e:
+            flash(f'Error al buscar el cliente: {str(e)}', 'danger')
+        finally:
+            db.close()  # Cerrar la sesión después de completar la operación
 
-
-
+        
+    #---------------------------------
 
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
@@ -127,43 +129,57 @@ def registrar_rutas(app):
         db.close()
         return redirect(url_for('mostrar_formulario_editar_cliente', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
     
+    #--------------------
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
     #ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
     def toggle_estado_cliente():
-        db = SessionLocal()
-        numero_documento = request.form['numeroDocumento']
         tipo_documento = request.form['tipoDocumento']
-
+        numero_documento = request.form['numeroDocumento']
+        
+        db = SessionLocal()  # Crear una única sesión para toda la transacción
         try:
-            # Buscar el cliente usando el tipo y número de documento
-            cliente = db.query(Clientes).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
+            # Usar la misma sesión para buscar al cliente y modificarlo
+            cliente = Clientes.buscar_cliente_por_documento(db, tipo_documento, numero_documento)
+            
             if cliente:
-                # Cambiar el estado (activo/inactivo)
-                cliente.is_active = not cliente.is_active
-                db.commit()
+                print(f"Cliente encontrado: {cliente.nombres_cliente}, Estado actual: {cliente.is_active}")  # Depuración
+                Clientes.toggle_estado_cliente(db, cliente)  # Cambiar el estado y hacer commit en la misma sesión
+                print(f"Nuevo estado: {cliente.is_active}")  # Depuración
                 estado = 'activado' if cliente.is_active else 'desactivado'
                 flash(f'Cliente {estado} con éxito.', 'success')
             else:
                 flash('Cliente no encontrado.', 'danger')
         except Exception as e:
-            db.rollback()
+            db.rollback()  # Rollback si hay un error
             flash(f'Error al cambiar el estado del cliente: {str(e)}', 'danger')
         finally:
-            db.close()
+            db.close()  # Cierra la sesión después de hacer commit
 
-        # Redirigir a la página donde corresponda
-        return redirect(url_for('mostrar_formulario_editar_cliente', cliente_id=cliente.idclientes))
+        return redirect(url_for('mostrar_formulario_editar_cliente', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])

@@ -38,6 +38,9 @@ class Clientes(Base):
             return clientes
         finally:
             session.close()
+    #------------        
+    
+    # Método estático para agregar un cliente       
     @staticmethod
     def agregar_cliente(db_session, cliente):
         try:
@@ -47,6 +50,9 @@ class Clientes(Base):
         except Exception as e:
             db_session.rollback()
             raise e
+    #------------------
+        
+    '''# Método estático para buscar un cliente   
     @staticmethod
     def buscar_cliente_por_documento(tipo_documento, numero_documento):
         session = SessionLocal()
@@ -58,8 +64,19 @@ class Clientes(Base):
             ).first()
             return cliente
         finally:
-            session.close()
-            
+            session.close()'''
+    # Método estático para buscar un cliente usando una sesión existente
+    @staticmethod
+    def buscar_cliente_por_documento(db_session, tipo_documento, numero_documento):
+        cliente = db_session.query(Clientes).filter_by(
+            tipo_documento=tipo_documento,
+            numero_documento=numero_documento
+        ).first()
+        return cliente
+
+    #------------- 
+    
+    # Método estático para actualizar un cliente       
     @staticmethod
     def actualizar_cliente(db_session, cliente, datos_actualizados):
         try:
@@ -78,4 +95,17 @@ class Clientes(Base):
             return cliente
         finally:
             session.close()
+            
+    
+    # Método estático para actualizar el estado de un cliente        
+    @staticmethod
+    def toggle_estado_cliente(db_session, cliente):
+        try:
+            cliente.is_active = not cliente.is_active  # Cambia el estado (activo/inactivo)
+            db_session.commit()  # Guarda los cambios en la base de dato
+            return cliente
+        except Exception as e:
+            db_session.rollback()  # Revierte los cambios si hay algún error
+            raise e
+
 
