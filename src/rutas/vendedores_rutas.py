@@ -3,6 +3,24 @@ from models import SessionLocal
 from models.vendedores import Vendedores
 
 def registrar_rutas(app):
+    
+    '''# Ver vendedores
+    @app.route('/vendedores_ver', methods=['GET'])
+    def ver_vendedores():
+        vendedores = db.query(Vendedores).filter_by(is_deleted=False).all()
+        db.close()
+        return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)'''
+    
+    # Ruta para ver todos los vendedores
+    @app.route('/vendedores_ver', methods=['GET'])
+    def ver_vendedores():
+        # Obtener los clientes desde el modelo Clientes
+        vendedores = Vendedores.obtener_vendedores()
+        return render_template('form_ver_vendedor.html', titulo_pagina="Ver  Vendedores", vendedores=vendedores)
+    
+    
+    
+    
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
     def crear_vendedor():
@@ -39,14 +57,6 @@ def registrar_rutas(app):
 
         return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
 
-
-    # Ver vendedores
-    @app.route('/vendedores_ver', methods=['GET'])
-    def ver_vendedores():
-        db = SessionLocal()
-        vendedores = db.query(Vendedores).filter_by(is_deleted=False).all()
-        db.close()
-        return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
 
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])

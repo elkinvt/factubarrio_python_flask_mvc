@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from . import Base
+from . import Base, SessionLocal
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
@@ -24,6 +24,19 @@ class Vendedores(Base):
 
     def __repr__(self):
         return f'<Vendedor {self.nombres_vendedor}>'
+    
+    
+    
+    # Método estático para obtener los vendedores no eliminados
+    @staticmethod
+    def obtener_vendedores():
+        session = SessionLocal()
+        try:
+            vendedores = session.query(Vendedores).filter_by(is_deleted=False).all()
+            return vendedores
+        finally:
+            session.close()
+    #------------     
 
 
 
