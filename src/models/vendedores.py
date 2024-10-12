@@ -58,4 +58,29 @@ class Vendedores(Base):
             numero_documento=numero_documento
         ).first()
         return vendedores
+    #---------
+    
+    # Método estático para actualizar un vendedor     
+    @staticmethod
+    def actualizar_vendedor(db_session, vendedor, datos_actualizados):
+        try:
+            for key, value in datos_actualizados.items():
+                setattr(vendedor, key, value)  # Actualiza el campo del vendedor
+            
+            db_session.commit()  # Confirmar los cambios en la base de datos
+            return vendedor
+        except Exception as e:
+            db_session.rollback()  # Deshacer cambios si ocurre un error
+            raise e
+
+    @staticmethod
+    def buscar_vendedor_por_id(vendedor_id):
+        session = SessionLocal()
+        try:
+            vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+            return vendedor
+        finally:
+            session.close()
+            
+    #-----------------
 

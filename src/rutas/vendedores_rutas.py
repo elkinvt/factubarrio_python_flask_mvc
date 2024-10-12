@@ -50,7 +50,7 @@ def registrar_rutas(app):
     
     #------------
 
-    # Ruta para mostrar el formulario de edición (GET)
+   # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
     def mostrar_formulario_editar_vendedor():
         tipo_documento = request.args.get('tipoDocumento')
@@ -59,10 +59,10 @@ def registrar_rutas(app):
         # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
             flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
-            return render_template('form_editar_vendedor.html',vendedor=None, titulo_pagina="Editar Vendedor")
+            return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
 
         db = SessionLocal()
-        
+
         try:
             # Usar la sesión en la función de búsqueda
             vendedor = Vendedores.buscar_vendedor_por_documento(db, tipo_documento, numero_documento)
@@ -78,42 +78,12 @@ def registrar_rutas(app):
         except Exception as e:
             flash(f'Error al buscar el vendedor: {str(e)}', 'danger')
         finally:
-            db.close()  # Cerrar la sesión después de completar la operación
-        
-        
-
-    # Buscar vendedor
-    @app.route('/vendedores_buscar', methods=['GET'])
-    def buscar_vendedor():
-        tipo_documento = request.args.get('tipoDocumento')
-        numero_documento = request.args.get('numeroDocumento')
-
-        # Verificar si se ingresan ambos campos
-        if not tipo_documento or not numero_documento:
-            flash("Faltan datos de búsqueda", 'danger')
-            return redirect(url_for('ver_vendedores'))
-
-        db = SessionLocal()
-        vendedor = db.query(Vendedores).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            is_deleted=False  # Aseguramos que el vendedor no esté marcado como eliminado
-        ).first()
-        db.close()
-
-        if vendedor:
-            # Renderizar la plantilla de edición con los datos del vendedor
-            return render_template('form_editar_vendedor.html', vendedor=vendedor, titulo_pagina="Editar Vendedor")
-        else:
-            flash("Vendedor no encontrado", 'danger')
-            return redirect(url_for('ver_vendedores'))
-
+            db.close()  # Cerramos la sesión aquí después de obtener el vendedor
 
     # Actualizar vendedor
     @app.route('/vendedores_actualizar', methods=['POST'])
     def actualizar_vendedor():
-        db = SessionLocal()
-        vendedor_id = request.form['vendedorId']  # ID del vendedor
+        vendedor_id = request.form['vendedorId']
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['numeroDocumento']
         nombre = request.form['nombreVendedor']
@@ -121,30 +91,55 @@ def registrar_rutas(app):
         direccion = request.form['direccionVendedor']
         email = request.form['emailVendedor']
 
-        # Buscar al vendedor por su idvendedores
-        vendedor = db.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+        db = SessionLocal()  # Iniciar nueva sesión
 
-        if vendedor:
-            # Actualizar los campos del vendedor
-            vendedor.tipo_documento = tipo_documento
-            vendedor.numero_documento = numero_documento
-            vendedor.nombres_vendedor = nombre
-            vendedor.telefono = telefono
-            vendedor.direccion = direccion
-            vendedor.email = email
+        try:
+            # Rebuscar al vendedor por su idvendedores para asegurarse de que está asociado a esta sesión
+            vendedor = Vendedores.buscar_vendedor_por_id(vendedor_id)
 
-            try:
-                db.commit()  # Guardar los cambios en la base de datos
-                flash('Cambios guardados correctamente', 'success')
-            except Exception as e:
-                db.rollback()  # Deshacer los cambios si hay un error
-                flash(f'Error al guardar los cambios: {str(e)}', 'danger')
-        else:
-            flash('Vendedor no encontrado', 'danger')
+            if vendedor:
+                # Diccionario de datos actualizados
+                datos_actualizados = {
+                    'tipo_documento': tipo_documento,
+                    'numero_documento': numero_documento,
+                    'nombres_vendedor': nombre,
+                    'telefono': telefono,
+                    'direccion': direccion,
+                    'email': email
+                }
 
-        db.close()
-        # Redirigir a la página de lista de vendedores
+                # Verificar si el vendedor está en la sesión actual, si no lo está, reasociarlo
+                if not db.object_session(vendedor):
+                    db.add(vendedor)
+                
+                # Actualizar el vendedor utilizando el método en el modelo
+                Vendedores.actualizar_vendedor(db, vendedor, datos_actualizados)
+                flash('Cambios guardados correctamente.', 'success')
+            else:
+                flash('Vendedor no encontrado.', 'danger')
+
+        except Exception as e:
+            db.rollback()  # Deshacer los cambios si hay un error
+            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
+        finally:
+            db.close()  # Asegurar que la sesión se cierra correctamente
+
         return redirect(url_for('ver_vendedores'))
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     # Eliminar vendedor
     @app.route('/vendedores_eliminar', methods=['POST'])
