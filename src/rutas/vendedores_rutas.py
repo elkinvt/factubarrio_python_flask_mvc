@@ -11,8 +11,7 @@ def registrar_rutas(app):
         vendedores = Vendedores.obtener_vendedores()
         return render_template('form_ver_vendedor.html', titulo_pagina="Ver  Vendedores", vendedores=vendedores)
     
-    
-    
+    #--------------
     
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
@@ -46,10 +45,10 @@ def registrar_rutas(app):
             finally:
                 db.close()
 
-            '''return redirect(url_for('crear_vendedor'))'''
-
+        # Si es GET, mostrar el formulario
         return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
-
+    
+    #------------
 
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
@@ -59,21 +58,29 @@ def registrar_rutas(app):
 
         # Verificar si se ingresan ambos campos
         if not tipo_documento or not numero_documento:
+            flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
             return render_template('form_editar_vendedor.html',vendedor=None, titulo_pagina="Editar Vendedor")
 
         db = SessionLocal()
-        vendedor = db.query(Vendedores).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            is_deleted=False
-        ).first()
-        db.close()
+        
+        try:
+            # Usar la sesión en la función de búsqueda
+            vendedor = Vendedores.buscar_vendedor_por_documento(db, tipo_documento, numero_documento)
 
-        if vendedor:
-            return render_template('form_editar_vendedor.html', vendedor=vendedor, titulo_pagina="Editar Vendedor")
-        else:
-            flash("Vendedor no encontrado", 'danger')  # Usa flash para el error
-            return render_template('form_editar_vendedor.html', mensaje="Vendedor no encontrado", vendedor=None, titulo_pagina="Editar Vendedor")
+            if vendedor:
+                if vendedor.is_deleted:
+                    flash('Este vendedor ha sido eliminado y no puede ser editado.', 'danger')
+                    return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Vendedor Eliminado")
+                return render_template('form_editar_vendedor.html', vendedor=vendedor, titulo_pagina="Editar Vendedor")
+            else:
+                flash('Vendedor no encontrado. Verifique los datos ingresados.', 'danger')
+                return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
+        except Exception as e:
+            flash(f'Error al buscar el vendedor: {str(e)}', 'danger')
+        finally:
+            db.close()  # Cerrar la sesión después de completar la operación
+        
+        
 
     # Buscar vendedor
     @app.route('/vendedores_buscar', methods=['GET'])

@@ -49,4 +49,13 @@ class Vendedores(Base):
             db_session.rollback()
             raise e
     #------------------
+    
+    # Método estático para buscar un vendedor usando una sesión existente
+    @staticmethod
+    def buscar_vendedor_por_documento(db_session, tipo_documento, numero_documento):
+        vendedores = db_session.query(Vendedores).filter_by(
+            tipo_documento=tipo_documento,
+            numero_documento=numero_documento
+        ).first()
+        return vendedores
 
