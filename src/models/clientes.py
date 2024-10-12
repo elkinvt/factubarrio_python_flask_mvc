@@ -52,19 +52,7 @@ class Clientes(Base):
             raise e
     #------------------
         
-    '''# Método estático para buscar un cliente   
-    @staticmethod
-    def buscar_cliente_por_documento(tipo_documento, numero_documento):
-        session = SessionLocal()
-        try:
-            cliente = session.query(Clientes).filter_by(
-                tipo_documento=tipo_documento,
-                numero_documento=numero_documento,
-                
-            ).first()
-            return cliente
-        finally:
-            session.close()'''
+        
     # Método estático para buscar un cliente usando una sesión existente
     @staticmethod
     def buscar_cliente_por_documento(db_session, tipo_documento, numero_documento):

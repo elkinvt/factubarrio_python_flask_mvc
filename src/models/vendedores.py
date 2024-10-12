@@ -38,5 +38,15 @@ class Vendedores(Base):
             session.close()
     #------------     
 
-
+    # Método estático para agregar un vendedor      
+    @staticmethod
+    def agregar_vendedor(db_session, vendedor):
+        try:
+            db_session.add(vendedor)
+            db_session.commit()
+            return vendedor
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    #------------------
 

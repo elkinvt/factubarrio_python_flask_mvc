@@ -4,13 +4,6 @@ from models.vendedores import Vendedores
 
 def registrar_rutas(app):
     
-    '''# Ver vendedores
-    @app.route('/vendedores_ver', methods=['GET'])
-    def ver_vendedores():
-        vendedores = db.query(Vendedores).filter_by(is_deleted=False).all()
-        db.close()
-        return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)'''
-    
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
     def ver_vendedores():
@@ -44,16 +37,16 @@ def registrar_rutas(app):
             )
 
             try:
-                db.add(nuevo_vendedor)
-                db.commit()
+                Vendedores.agregar_vendedor(db,nuevo_vendedor)
                 flash('Vendedor creado con éxito', 'success')
+                return redirect(url_for('crear_vendedor')) 
             except Exception as e:
                 db.rollback()
                 flash(f'Error al crear vendedor: {str(e)}', 'danger')
             finally:
                 db.close()
 
-            return redirect(url_for('crear_vendedor'))
+            '''return redirect(url_for('crear_vendedor'))'''
 
         return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
 
