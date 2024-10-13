@@ -83,4 +83,17 @@ class Vendedores(Base):
             session.close()
             
     #-----------------
+    
+     # Método estático para eliminar un vendedor 
+      #----------------
+    @staticmethod
+    def eliminar_vendedor(db_session, vendedor):
+        try:
+            vendedor.is_deleted = True  # Marcamos el cliente como eliminado
+            db_session.commit()  # Guardamos los cambios
+        except Exception as e:
+            db_session.rollback()  # En caso de error, revertimos la transacción
+            raise e
+    #------------    
+    
 

@@ -79,6 +79,8 @@ def registrar_rutas(app):
             flash(f'Error al buscar el vendedor: {str(e)}', 'danger')
         finally:
             db.close()  # Cerramos la sesión aquí después de obtener el vendedor
+            
+    #------------
 
     # Actualizar vendedor
     @app.route('/vendedores_actualizar', methods=['POST'])
@@ -125,53 +127,38 @@ def registrar_rutas(app):
             db.close()  # Asegurar que la sesión se cierra correctamente
 
         return redirect(url_for('ver_vendedores'))
-
-
     
+    #------------------
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    # Eliminar vendedor
+      # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
     def eliminar_vendedor():
-        # Obtener los datos del formulario
-        tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')
-
-        db = SessionLocal()
-
+        tipo_documento = request.form.get('tipoDocumento')
+        
+        db = SessionLocal()  # Iniciamos la sesión de la base de datos
         try:
-            # Buscar el vendedor por tipo de documento y número de documento
-            vendedor = db.query(Vendedores).filter_by(
-                tipo_documento=tipo_documento,
-                numero_documento=numero_documento
-            ).first()
+            # Buscar el cliente usando la misma sesión
+            vendedor = Vendedores.buscar_vendedor_por_documento(db, tipo_documento, numero_documento)
 
             if vendedor and not vendedor.is_deleted:
-                # Marcar al vendedor como eliminado (eliminación lógica)
-                vendedor.is_deleted = True
-
-                try:
-                    db.commit()
-                    flash('Vendedor eliminado correctamente', 'success')
-                except Exception as e:
-                    db.rollback()
-                    flash(f'Error al eliminar el vendedor: {str(e)}', 'danger')
+                # Usar el método del modelo para eliminar al cliente
+                Vendedores.eliminar_vendedor(db, vendedor)
+                flash('vendedor  eliminado correctamente.', 'success')
             else:
-                flash('Vendedor no encontrado o ya estaba eliminado.', 'danger')
-
+                flash('vendedor no encontrado o ya eliminado.', 'danger')
+        except Exception as e:
+            db.rollback()  # Rollback si hay error
+            flash(f'Error al eliminar el vendedor: {str(e)}', 'danger')
         finally:
-            db.close()
+            db.close()  # Cerrar la sesión después de la operación
 
-        # Redirigir a la lista de vendedores después de eliminar
+        # Redirigir a la página donde se ven todos los clientes
         return redirect(url_for('ver_vendedores'))
+    
+    #-----------
+
+    
+    
+    
+   
