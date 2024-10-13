@@ -36,14 +36,6 @@ def pagina_principal():
 
 
 
-@app.route('/productos_crear')
-def productos_crear():
-    return render_template('form_crear_producto.html', titulo_pagina = " Crear producto")
-
-@app.route('/productos_ver')
-def productos_ver():
-    return render_template('form_ver_producto.html', titulo_pagina = "Ver producto")
-
 @app.route('/productos_editar')
 def productos_editar():
     return render_template('form_editar_producto.html', titulo_pagina = "Editar producto")

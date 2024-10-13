@@ -67,12 +67,7 @@ def registrar_rutas(app):
 
     #------------------
     
-    
-    
-    
-    
-
-  # Ruta para ver productos
+    # Ruta para ver productos
     @app.route('/productos_ver', methods=['GET'])
     def ver_productos():
         db = SessionLocal()
@@ -86,35 +81,127 @@ def registrar_rutas(app):
             db.close()  # Aseguramos el cierre de la sesión
 
         return render_template('form_ver_producto.html', titulo_pagina="Ver Productos", productos=productos)
+    
+    #---------
 
     
     
 
-    # Ruta para buscar un producto por su código (ejemplo)
+   # Ruta para buscar productos por código o nombre (GET)
     @app.route('/productos_buscar', methods=['GET'])
-    def buscar_producto():
-        codigo = request.args.get('codigoProducto')
+    def buscar_productos():
+        termino = request.args.get('termino', '').lower()
         db = SessionLocal()
-        producto = db.query(Productos).filter_by(codigo=codigo).first()
-        db.close()
+        
+        try:
+            # Verificar si el término no está vacío
+            if termino:
+                # Usamos el método buscar_por_codigo_o_nombre que definimos en el modelo
+                productos = Productos.buscar_por_codigo_o_nombre(termino, db)
+                
+                if productos:
+                    flash(f'Se encontraron {len(productos)} productos que coinciden con "{termino}".', 'success')
+                else:
+                    flash('No se encontraron productos que coincidan con el término de búsqueda.', 'warning')
+            else:
+                flash('Ingrese un término de búsqueda válido.', 'warning')
+                productos = []  # Si no se ingresa ningún término, devolvemos una lista vacía
+                
+            # Renderizamos la plantilla con los productos encontrados
+            return render_template('lista_productos.html', productos=productos)
+        
+        except Exception as e:
+            flash(f'Error al buscar productos: {str(e)}', 'danger')
+            return render_template('lista_productos.html', productos=[])
+        
+        finally:
+            db.close()
 
-        if producto:
-            return jsonify({
-                'id': producto.id,
-                'codigo': producto.codigo,
-                'nombre': producto.nombre,
-                'descripcion': producto.descripcion,
-                'categoria': producto.categoria,
-                'precio': producto.precio,
-                'unidad_medida': producto.unidad_medida,
-                'presentacion': producto.presentacion,
-                'cantidad_stock': producto.cantidad_stock,
-                'is_active': producto.is_active
-            })
-        else:
-            return jsonify({'error': 'Producto no encontrado'}), 404
+    
+    #-------------
+    
+    
+    
+   
+    # Ruta para mostrar el formulario de edición de productos (GET)
+    @app.route('/productos_editar', methods=['GET'])
+    def mostrar_formulario_editar_producto():
+        codigo = request.args.get('codigoProducto')
+        nombre = request.args.get('nombreProducto')
+        
+        # Verificar si se ingresan al menos uno de los campos
+        if not codigo and not nombre:
+            flash('Por favor, ingrese el Código o Nombre del Producto.', 'warning')
+            return render_template('form_editar_producto.html', producto=None, titulo_pagina="Editar Producto")
 
-    # Ruta para actualizar un producto
+        db = SessionLocal()
+        
+        try:
+            # Buscar el producto por código o nombre
+            producto = Productos.buscar_por_codigo_o_nombre(db, codigo, nombre)
+            
+            if producto:
+                return render_template('form_editar_producto.html', producto=producto, titulo_pagina="Editar Producto")
+            else:
+                flash('Producto no encontrado. Verifique los datos ingresados.', 'danger')
+                return render_template('form_editar_producto.html', producto=None, titulo_pagina="Editar Producto")
+        
+        except Exception as e:
+            flash(f'Error al buscar el producto: {str(e)}', 'danger')
+        finally:
+            db.close()
+
+
+
+
+    #--------------
+    
+    
+   
+    # Ruta para actualizar el producto (POST)
+    @app.route('/productos_actualizar/<int:id>', methods=['POST'])
+    def actualizar_producto(id):
+        db = SessionLocal()
+        
+        try:
+            # Usamos el método del modelo para obtener el producto por ID
+            producto = Productos.obtener_por_id(id, db)
+            
+            if producto:
+                # Diccionario de datos actualizados
+                datos_actualizados = {
+                    'codigo': request.form['codigo'],
+                    'nombre': request.form['nombre'],
+                    'descripcion': request.form['descripcion'],
+                    'categoria_idcategoria': request.form['categoria_id'],
+                    'unidad_medida_idunidad_medida': request.form['unidad_medida_id'],
+                    'presentacion': request.form['presentacion'],
+                    'cantidad_stock': request.form['cantidad_stock'],
+                    'precio_unitario': request.form['precio']
+                }
+
+                # Usamos el método del modelo para actualizar el producto
+                Productos.actualizar_producto(producto, datos_actualizados, db)
+                flash('Producto actualizado correctamente.', 'success')
+            else:
+                flash('Producto no encontrado.', 'danger')
+        
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al actualizar producto: {str(e)}', 'danger')
+        
+        finally:
+            db.close()
+        
+        return redirect(url_for('ver_productos'))
+
+    
+    #---------------
+
+    
+
+
+''' # Ruta para actualizar un producto
     @app.route('/productos_actualizar', methods=['POST'])
     def actualizar_producto():
         db = SessionLocal()
@@ -168,4 +255,4 @@ def registrar_rutas(app):
             flash('Producto no encontrado', 'danger')
         
         db.close()
-        return redirect(url_for('ver_productos'))
+        return redirect(url_for('ver_productos'))'''

@@ -62,4 +62,42 @@ class Productos(Base):
             raise e
     #--------
 
+    # Método para buscar productos por código o nombre
+    @staticmethod
+    def buscar_por_codigo_o_nombre(termino, db_session):
+        try:
+            productos = db_session.query(Productos).filter(
+                (Productos.codigo.ilike(f'%{termino}%')) |
+                (Productos.nombre.ilike(f'%{termino}%')),
+                Productos.is_deleted == False
+            ).all()
+            return productos
+        except Exception as e:
+            raise e
+    #---------
+    
+    # Método para obtener un producto por su ID
+    @staticmethod
+    def obtener_por_id(id, db_session):
+        try:
+            producto = db_session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
+            return producto
+        except Exception as e:
+            raise e
+        
+    #-----------
+    
+    # Método para actualizar los datos de un producto
+    @staticmethod
+    def actualizar_producto(producto, datos_actualizados, db_session):
+        try:
+            for key, value in datos_actualizados.items():
+                setattr(producto, key, value)
+            db_session.commit()
+            return producto
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    
+    #-------------
 
