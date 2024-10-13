@@ -28,5 +28,18 @@ class Productos(Base):
 
     def __repr__(self):
         return f'<Producto {self.nombre}>'
+    
+    
+    # Método estático para agregar un producto
+    @staticmethod
+    def agregar_producto(db_session, producto):
+        try:
+            db_session.add(producto)
+            db_session.commit()
+            return producto
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    #--------
 
 

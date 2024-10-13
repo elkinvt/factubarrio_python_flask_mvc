@@ -10,7 +10,7 @@ class UnidadMedida(Base):
     unidad_padre_id = Column(Integer, ForeignKey('unidad_medida.idunidad_medida'))  # Clave foránea hacia sí misma
 
     # Relación para acceder a la unidad padre desde una unidad hija
-    unidad_padre = relationship('UnidadMedida', remote_side=[idunidad_medida])
+    unidad_padre = relationship('UnidadMedida', remote_side=[idunidad_medida], backref='subunidades')
 
     def __init__(self, unidad_medida, unidad_padre_id=None):
         self.unidad_medida = unidad_medida

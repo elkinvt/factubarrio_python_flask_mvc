@@ -2,133 +2,63 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Registrar Producto</h2>
-    <form id="formCrearProducto" onsubmit="guardarProducto(event)">
+    <form id="formCrearProducto" action="{{ url_for('crear_producto') }}" method="POST">
         <div class="mb-3">
             <label for="codigoProducto" class="form-label">Código</label>
-            <input type="text" class="form-control form-control-sm" id="codigoProducto" required>
+            <input type="text" class="form-control form-control-sm" id="codigoProducto" name="codigoProducto" required>
         </div>
         <div class="mb-3">
             <label for="nombreProducto" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreProducto" required>
+            <input type="text" class="form-control form-control-sm" id="nombreProducto" name="nombreProducto" required>
         </div>
         <div class="mb-3">
             <label for="descripcionProducto" class="form-label">Descripción</label>
-            <textarea class="form-control form-control-sm" id="descripcionProducto" rows="3" required></textarea>
+            <textarea class="form-control form-control-sm" id="descripcionProducto" name="descripcionProducto" rows="3" required></textarea>
         </div>
+        
         <div class="mb-3">
             <label for="categoriaProducto" class="form-label">Categoría</label>
-            <select class="form-select form-control-sm" id="categoriaProducto" required>
+            <select class="form-select form-control-sm" id="categoriaProducto" name="categoriaProducto" required>
                 <option value="">Seleccione una categoría</option>
-                <option value="Abarrotes">Abarrotes</option>
-                <option value="Productos Frescos">Productos Frescos</option>
-                <option value="Carnes y Aves">Carnes y Aves</option>
-                <option value="Pescados y Mariscos">Pescados y Mariscos</option>
-                <option value="Lácteos y Huevos">Lácteos y Huevos</option>
-                <option value="Panadería y Pastelería">Panadería y Pastelería</option>
-                <option value="Bebidas">Bebidas</option>
-                <option value="Congelados">Congelados</option>
-                <option value="Snacks y Golosinas">Snacks y Golosinas</option>
-                <option value="Productos de Despensa">Productos de Despensa</option>
-                <option value="Productos para Bebés">Productos para Bebés</option>
-                <option value="Salud y Belleza">Salud y Belleza</option>
-                <option value="Limpieza y Hogar">Limpieza y Hogar</option>
-                <option value="Mascotas">Mascotas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.idcategoria }}">{{ categoria.nombre }}</option>
+                {% endfor %}
             </select>
         </div>
-
+        
         <div class="mb-3">
             <label for="precioProducto" class="form-label">Precio</label>
-            <input type="number" class="form-control form-control-sm" id="precioProducto" required step="0.01">
+            <input type="number" class="form-control form-control-sm" id="precioProducto" name="precioProducto" required step="0.01">
         </div>
+
         <div class="mb-3">
             <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
-            <select class="form-select form-control-sm" id="unidadMedidaProducto" required>
+            <select class="form-select form-control-sm" id="unidadMedidaProducto" name="unidadMedidaProducto" required>
                 <option value="">Seleccione una unidad</option>
-                <optgroup label="Peso">
-                    <option value="kg">Kilogramos (kg)</option>
-                    <option value="g">Gramos (g)</option>
-                    <option value="mg">Miligramos (mg)</option>
-                </optgroup>
-                <optgroup label="Volumen">
-                    <option value="lt">Litros (lt)</option>
-                    <option value="ml">Mililitros (ml)</option>
-                    <!-- Confirma que esta opción está correctamente escrita y seleccionable -->
-                    <option value="m3">Metros cúbicos (m³)</option>
-                </optgroup>
-                <optgroup label="Longitud">
-                    <option value="m">Metros (m)</option>
-                    <option value="cm">Centímetros (cm)</option>
-                    <option value="mm">Milímetros (mm)</option>
-                </optgroup>
-                <optgroup label="Unidades">
-                    <option value="un">Unidades (un)</option>
-                    <option value="paq">Paquetes (paq)</option>
-                </optgroup>
+                {% for unidad_padre in unidades_padre %}
+                    <optgroup label="{{ unidad_padre.unidad_medida }}">
+                        {% for subunidad in unidad_padre.subunidades %}
+                            <option value="{{ subunidad.idunidad_medida }}">{{ subunidad.unidad_medida }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
             </select>
-
-
         </div>
+        
+        
         <div class="mb-3">
             <label for="presentacionProducto" class="form-label">Presentación</label>
-            <input type="text" class="form-control form-control-sm" id="presentacionProducto" required>
+            <input type="text" class="form-control form-control-sm" id="presentacionProducto" name="presentacionProducto" required>
         </div>
         <div class="mb-3">
             <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
-            <input type="number" class="form-control form-control-sm" id="cantidadStockProducto" required>
+            <input type="number" class="form-control form-control-sm" id="cantidadStockProducto" name="cantidadStockProducto" required>
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Producto</button>
     </form>
 </div>
-
-<script>
-    function guardarProducto(event) {
-        event.preventDefault();  // Evita que el formulario se envíe de la manera tradicional
-
-        // Recoger los valores del formulario
-        var codigo = document.getElementById('codigoProducto').value;
-        var nombre = document.getElementById('nombreProducto').value;
-        var descripcion = document.getElementById('descripcionProducto').value;
-        var categoria = document.getElementById('categoriaProducto').value;
-        var precio = document.getElementById('precioProducto').value;
-        var unidad_medida = document.getElementById('unidadMedidaProducto').value;
-        var presentacion = document.getElementById('presentacionProducto').value;
-        var cantidad_stock = document.getElementById('cantidadStockProducto').value;
-
-        // Crear un objeto con los datos del formulario
-        var producto = {
-            codigo: codigo,
-            nombre: nombre,
-            descripcion: descripcion,
-            categoria: categoria,
-            precio: precio,
-            unidad_medida: unidad_medida,
-            presentacion: presentacion,
-            cantidad_stock: cantidad_stock
-        };
-
-        // Enviar los datos a Flask utilizando fetch
-        fetch('/productos_crear', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(producto)  // Convertimos el objeto a JSON
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Producto guardado con éxito');
-                // Limpiar el formulario o redirigir a otra página
-                document.getElementById('formCrearProducto').reset();
-            } else {
-                alert('Error al guardar el producto: ' + data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-</script>
-
 {% endblock %}
+
     
 
 

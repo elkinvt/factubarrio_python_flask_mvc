@@ -2,11 +2,16 @@
 from flask import request, redirect, url_for, flash, render_template, jsonify
 from models import SessionLocal
 from models.productos import Productos  # Importa el modelo de Productos
+from models.categorias import Categoria
+from models.unidad_medida import UnidadMedida
+from sqlalchemy.orm import joinedload
+
+
 
 # Función para registrar las rutas de productos en la aplicación Flask
 def registrar_rutas(app):
 
-   # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
+    # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
     def crear_producto():
         db = SessionLocal()
@@ -17,10 +22,10 @@ def registrar_rutas(app):
             nombre = request.form['nombreProducto']
             descripcion = request.form['descripcionProducto']
             categoria = request.form['categoriaProducto']
-            precio = request.form['precioProducto']
+            precio = float(request.form['precioProducto'])  # Convertimos a float
             unidad_medida = request.form['unidadMedidaProducto']
             presentacion = request.form['presentacionProducto']
-            cantidad_stock = request.form['cantidadStockProducto']
+            cantidad_stock = int(request.form['cantidadStockProducto'])  # Convertimos a int
 
             # Crea una nueva instancia de Productos
             nuevo_producto = Productos(
@@ -46,15 +51,21 @@ def registrar_rutas(app):
 
             return redirect(url_for('crear_producto'))
 
-        # Cargar las categorías y unidades de medida desde la base de datos
-        categorias = db.query(Categoria).all()  # Obtener todas las categorías
-        unidades_padre = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()  # Obtener unidades padre
-        unidades_hijas = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()  # Obtener unidades hijas
-        db.close()
+        try:
+            # Cargar las categorías y unidades de medida desde la base de datos
+            categorias = db.query(Categoria).all()  # Obtener todas las categorías
+            # Usar joinedload para cargar las subunidades junto con las unidades padre
+            unidades_padre = db.query(UnidadMedida).options(joinedload(UnidadMedida.subunidades)).filter(UnidadMedida.unidad_padre_id == None).all()
+            unidades_hijas = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
+
+        except Exception as e:
+            flash(f'Error al cargar datos: {str(e)}', 'danger')
+        finally:
+            db.close()  # Cerrar sesión incluso en GET
 
         return render_template('form_crear_producto.html', categorias=categorias, unidades_padre=unidades_padre, unidades_hijas=unidades_hijas, titulo_pagina="Crear Producto")
 
-
+    #------------------
     
     
     

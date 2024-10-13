@@ -47,7 +47,7 @@ def registrar_rutas(app):
             try:
                 Clientes.agregar_cliente(db, nuevo_cliente) 
                 flash('Cliente creado con éxito', 'success')
-                return redirect(url_for('crear_cliente'))  # Redirigir al formulario después de crear el cliente
+                return redirect(url_for('ver_clientes'))
             except Exception as e:
                 db.rollback()  # Deshacer cambios si ocurre un error
                 flash(f'Error al crear cliente: {str(e)}', 'danger')
