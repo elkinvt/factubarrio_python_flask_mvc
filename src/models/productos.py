@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Numeric,Boolean, ForeignKey
-from . import Base
+from . import Base, SessionLocal
+from models.categorias import Categoria
+from models.unidad_medida import UnidadMedida
 
 class Productos(Base):
     __tablename__ = 'productos'
@@ -29,6 +31,24 @@ class Productos(Base):
     def __repr__(self):
         return f'<Producto {self.nombre}>'
     
+    
+    # Método estático para obtener los productos no eliminados con JOIN a categorías y unidades de medida
+    @staticmethod
+    def obtener_productos():
+        session = SessionLocal()
+        try:
+            # Realizamos el join entre productos, categorías y unidades de medida
+            productos = session.query(Productos, Categoria, UnidadMedida).join(
+                Categoria, Productos.categoria_idcategoria == Categoria.idcategoria  # Join con Categorías
+            ).join(
+                UnidadMedida, Productos.unidad_medida_idunidad_medida == UnidadMedida.idunidad_medida  # Join con Unidades de Medida
+            ).filter(Productos.is_deleted == False).all()  # Filtramos solo productos no eliminados
+            
+            return productos  # Retornamos la lista de productos con las relaciones
+        finally:
+            session.close()  # Cerramos la sesión después de completar la consulta
+
+    #------------
     
     # Método estático para agregar un producto
     @staticmethod

@@ -72,13 +72,23 @@ def registrar_rutas(app):
     
     
 
-    # Ruta para ver productos
+  # Ruta para ver productos
     @app.route('/productos_ver', methods=['GET'])
     def ver_productos():
         db = SessionLocal()
-        productos = db.query(Productos).filter_by(is_deleted=False).all()
-        db.close()
+        try:
+            # Usar el método que obtienes con el JOIN de productos, categorías y unidades de medida
+            productos = Productos.obtener_productos()
+        except Exception as e:
+            flash(f'Error al obtener productos: {str(e)}', 'danger')
+            productos = []  # En caso de error, asignamos una lista vacía para evitar fallos en la vista
+        finally:
+            db.close()  # Aseguramos el cierre de la sesión
+
         return render_template('form_ver_producto.html', titulo_pagina="Ver Productos", productos=productos)
+
+    
+    
 
     # Ruta para buscar un producto por su código (ejemplo)
     @app.route('/productos_buscar', methods=['GET'])

@@ -1,5 +1,5 @@
 #crear la tabla de la base de datos!!!
-from sqlalchemy import Column, Integer, String, Boolean,ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean
 from . import Base, SessionLocal
 
 class Clientes(Base):

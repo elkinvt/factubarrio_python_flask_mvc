@@ -1,112 +1,52 @@
 {% extends 'layout.html' %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>Buscar producto por Código o Nombre</h2>
-    <input type="text" id="buscarProductoInput" placeholder="Ingrese código o nombre del producto"
-        class="form-control mt-2 form-control-sm" onkeypress="handleKeyPress(event)">
-    <button type="button" class="btn btn-primary mt-3" onclick="buscarProducto()">Buscar</button>
-    <div id="listaProductos" class="list-group mt-3"></div>
-</div>
 
-<div id="infoProducto" class="container mt-5">
-    <h2>Informacion del producto</h2>
-    <form id="formCrearProducto">
-        <div class="mb-3">
-            <label for="codigoProducto" class="form-label">Código</label>
-            <input type="text" class="form-control form-control-sm" id="codigoProducto" required readonly>
-        </div>
-        <div class="mb3">
-            <label for="nombreProducto" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreProducto" required readonly>
-        </div>
-        <div class="mb-3">
-            <label for="descripcionProducto" class="form-label">Descripción</label>
-            <textarea class="form-control form-control-sm" id="descripcionProducto" rows="3" required
-                readonly></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="categoriaProducto" class="form-label">Categoría</label>
-            <input type="text" class="form-control form-control-sm" id="categoriaProducto" required readonly>
-        </div>
-        <div class="mb-3">
-            <label for="precioProducto" class="form-label">Precio</label>
-            <input type="number" class="form-control form-control-sm" id="precioProducto" required readonly>
-        </div>
-        <div class="mb-3">
-            <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
-            <input type="text" class="form-control form-control-sm" id="unidadMedidaProducto" required readonly>
-        </div>
+    <!-- Mostrar la tabla de todos los productos -->
+    <div class="container mt-5">
+        <h3>Lista de Productos</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Unidad de Medida</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto, categoria, unidad_medida in productos %}
+                <tr>
+                    <td>{{ producto.idproductos }}</td> 
+                    <td>{{ producto.codigo }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ categoria.nombre }}</td>  <!-- Mostrar el nombre de la categoría -->
+                    <td>{{ unidad_medida.unidad_medida }}</td>  <!-- Mostrar el nombre de la unidad de medida -->
+                    <td>{{ producto.precio_unitario }}</td>
+                    <td>{{ producto.cantidad_stock }}</td>
+                    <td>
+                        {% if producto.is_active %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">No hay productos registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-        <div class="mb-3">
-            <label for="presentacionProducto" class="form-label">Presentación</label>
-            <input type="text" class="form-control form-control-sm" id="presentacionProducto" required readonly>
-        </div>
-        <div class="mb-3">
-            <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
-            <input type="number" class="form-control form-control-sm" id="cantidadStockProducto" required readonly>
-        </div>
-        <div class="mb-3">
-            <label for="estadoProducto" class="form-label">Estado</label>
-            <input type="text" class="form-control form-control-sm" id="estadoProducto" required readonly>
-        </div>
-
-    </form>
-
-</div>
-<script>
-    function handleKeyPress(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();  // Previene que el formulario se envíe
-            buscarProducto();  // Llama a la función que ejecuta la búsqueda
-        }
-    }
-</script>
-
-<script>
-    function buscarProducto() {
-        var textoBusqueda = document.getElementById('buscarProductoInput').value.trim().toLowerCase();
-        document.getElementById('buscarProductoInput').value = '';
-        var productos = JSON.parse(localStorage.getItem('Productos')) || [];
-        var productosFiltrados = productos.filter(producto =>
-            (producto.codigo.toLowerCase().includes(textoBusqueda) ||
-                producto.nombre.toLowerCase().includes(textoBusqueda)) &&
-            !producto.isDeleted);
-
-        var listaProductos = document.getElementById('listaProductos');
-        listaProductos.innerHTML = '';
-        listaProductos.style.visibility = productosFiltrados.length > 0 ? 'visible' : 'hidden';
-
-        if (productosFiltrados.length === 0) {
-            listaProductos.innerHTML = '<div class="list-group-item">No se encontraron productos con el término buscado.</div>';
-            listaProductos.style.visibility = 'visible';  // Asegura que el mensaje sea visible
-        } else {
-            productosFiltrados.forEach(producto => {
-                var item = document.createElement('button');
-                item.classList.add('list-group-item', 'list-group-item-action');
-                item.textContent = `${producto.nombre} - ${producto.codigo}`;
-                item.onclick = () => cargarProducto(producto);
-                listaProductos.appendChild(item);
-            });
-            listaProductos.style.visibility = 'visible';  // Asegura que la lista sea visible
-        }
-    }
-
-    function cargarProducto(producto) {
-        document.getElementById('codigoProducto').value = producto.codigo;
-        document.getElementById('nombreProducto').value = producto.nombre;
-        document.getElementById('descripcionProducto').value = producto.descripcion;
-        document.getElementById('categoriaProducto').value = producto.categoria;
-        document.getElementById('precioProducto').value = producto.precio;
-        document.getElementById('presentacionProducto').value = producto.presentacion;
-        document.getElementById('cantidadStockProducto').value = producto.cantidadStock;
-        document.getElementById('estadoProducto').value = producto.isActive ? "Habilitado" : "Deshabilitado";
-        document.getElementById('unidadMedidaProducto').value = producto.unidadMedida;
-
-        // Mostrar los detalles del producto si está presente
-        document.getElementById('infoProducto').style.visibility = 'visible';
-    }
-</script>
 {% endblock %}
+
 
    
 
