@@ -49,21 +49,19 @@ def registrar_rutas(app):
             finally:
                 db.close()
 
-            return redirect(url_for('crear_producto'))
+            return redirect(url_for('ver_productos'))
 
         try:
-            # Cargar las categorías y unidades de medida desde la base de datos
-            categorias = db.query(Categoria).all()  # Obtener todas las categorías
-            # Usar joinedload para cargar las subunidades junto con las unidades padre
-            unidades_padre = db.query(UnidadMedida).options(joinedload(UnidadMedida.subunidades)).filter(UnidadMedida.unidad_padre_id == None).all()
-            unidades_hijas = db.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
+            # Usar los métodos del modelo para obtener las categorías y unidades de medida
+            categorias = Categoria.obtener_todas(db)  # Método en el modelo Categoria
+            unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)  # Método en el modelo UnidadMedida
 
         except Exception as e:
             flash(f'Error al cargar datos: {str(e)}', 'danger')
         finally:
             db.close()  # Cerrar sesión incluso en GET
 
-        return render_template('form_crear_producto.html', categorias=categorias, unidades_padre=unidades_padre, unidades_hijas=unidades_hijas, titulo_pagina="Crear Producto")
+        return render_template('form_crear_producto.html', categorias=categorias, unidades_padre=unidades_padre, subunidades=subunidades, titulo_pagina="Crear Producto")
 
     #------------------
     
@@ -82,79 +80,74 @@ def registrar_rutas(app):
 
         return render_template('form_ver_producto.html', titulo_pagina="Ver Productos", productos=productos)
     
-    #---------
+    #-------------------
 
     
     
 
-   # Ruta para buscar productos por código o nombre (GET)
-    @app.route('/productos_buscar', methods=['GET'])
-    def buscar_productos():
-        termino = request.args.get('termino', '').lower()
-        db = SessionLocal()
-        
-        try:
-            # Verificar si el término no está vacío
-            if termino:
-                # Usamos el método buscar_por_codigo_o_nombre que definimos en el modelo
-                productos = Productos.buscar_por_codigo_o_nombre(termino, db)
-                
-                if productos:
-                    flash(f'Se encontraron {len(productos)} productos que coinciden con "{termino}".', 'success')
-                else:
-                    flash('No se encontraron productos que coincidan con el término de búsqueda.', 'warning')
-            else:
-                flash('Ingrese un término de búsqueda válido.', 'warning')
-                productos = []  # Si no se ingresa ningún término, devolvemos una lista vacía
-                
-            # Renderizamos la plantilla con los productos encontrados
-            return render_template('lista_productos.html', productos=productos)
-        
-        except Exception as e:
-            flash(f'Error al buscar productos: {str(e)}', 'danger')
-            return render_template('lista_productos.html', productos=[])
-        
-        finally:
-            db.close()
 
-    
-    #-------------
-    
-    
-    
    
     # Ruta para mostrar el formulario de edición de productos (GET)
     @app.route('/productos_editar', methods=['GET'])
-    def mostrar_formulario_editar_producto():
-        codigo = request.args.get('codigoProducto')
-        nombre = request.args.get('nombreProducto')
-        
-        # Verificar si se ingresan al menos uno de los campos
-        if not codigo and not nombre:
-            flash('Por favor, ingrese el Código o Nombre del Producto.', 'warning')
-            return render_template('form_editar_producto.html', producto=None, titulo_pagina="Editar Producto")
+    def mostrar_formulario_edicion_producto():
+        # Renderiza el formulario vacío, con los campos del producto sin datos
+        return render_template('form_editar_producto.html', producto=None, categorias=[], unidades_medida=[], titulo_pagina="Editar Producto")
 
+    #--------------
+    
+    
+    # Ruta para buscarr el producto por el nombre o codigo (GET)
+    @app.route('/productos_buscar', methods=['GET'])
+    def buscar_producto():
+        termino = request.args.get('termino', '').lower()
         db = SessionLocal()
-        
+
         try:
-            # Buscar el producto por código o nombre
-            producto = Productos.buscar_por_codigo_o_nombre(db, codigo, nombre)
+            productos = Productos.buscar_por_codigo_o_nombre(termino, db)
+            categorias = Categoria.obtener_todas(db)  # Método en el modelo Categoria
+            unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)  # Método en el modelo UnidadMedida
             
-            if producto:
-                return render_template('form_editar_producto.html', producto=producto, titulo_pagina="Editar Producto")
-            else:
-                flash('Producto no encontrado. Verifique los datos ingresados.', 'danger')
-                return render_template('form_editar_producto.html', producto=None, titulo_pagina="Editar Producto")
-        
+            
+            # Renderizar la misma plantilla con los productos y los datos adicionales
+            return render_template('form_editar_producto.html', productos=productos, categorias=categorias, unidades_padre=unidades_padre, 
+            subunidades=subunidades, titulo_pagina="Seleccionar producto")
+
         except Exception as e:
             flash(f'Error al buscar el producto: {str(e)}', 'danger')
+            return render_template('form_editar_producto.html', productos=[], categorias=[], unidades_medida=[])
+        
+        finally:
+            db.close()
+    
+    #-------------------
+
+    # Ruta para mostrar el formulario con los datos del producto a editar
+    @app.route('/productos_editar/<int:id>', methods=['GET'])
+    def mostrar_formulario_editar_producto(id):
+        db = SessionLocal()
+        try:
+            # Usar el método del modelo para obtener el producto por ID
+            producto = Productos.obtener_por_id(id, db)
+            categorias = Categoria.obtener_todas(db)   # Obtener todas las categorías
+            unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)  # Obtener todas las unidades de medida
+
+            if producto:
+                # Pasar los datos del producto a la plantilla
+                return render_template('form_editar_producto.html', producto=producto, categorias=categorias, unidades_padre=unidades_padre, 
+            subunidades=subunidades, titulo_pagina="Editar Producto prueba")
+            else:
+                flash('Producto no encontrado.', 'danger')
+                return redirect(url_for('buscar_producto'))
         finally:
             db.close()
 
+            
+    #--------------------------
 
 
 
-    #--------------
+
+
     
     
    
@@ -174,7 +167,7 @@ def registrar_rutas(app):
                     'nombre': request.form['nombre'],
                     'descripcion': request.form['descripcion'],
                     'categoria_idcategoria': request.form['categoria_id'],
-                    'unidad_medida_idunidad_medida': request.form['unidad_medida_id'],
+                    'unidad_medida_idunidad_medida': request.form['unidadMedidaProducto'],
                     'presentacion': request.form['presentacion'],
                     'cantidad_stock': request.form['cantidad_stock'],
                     'precio_unitario': request.form['precio']
@@ -256,3 +249,4 @@ def registrar_rutas(app):
         
         db.close()
         return redirect(url_for('ver_productos'))'''
+

@@ -18,3 +18,15 @@ class UnidadMedida(Base):
 
     def __repr__(self):
         return f'<UnidadMedida {self.unidad_medida}>'
+
+
+    #Metodo estatico para obtener las unidades de medida
+    @staticmethod
+    def obtener_todas_con_subunidades(db_session):
+        try:
+            unidades_padre = db_session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()
+            subunidades = db_session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
+            return unidades_padre, subunidades
+        except Exception as e:
+            raise e
+    #------------------
