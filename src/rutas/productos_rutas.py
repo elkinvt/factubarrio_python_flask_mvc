@@ -179,6 +179,31 @@ def registrar_rutas(app):
     
     #---------------
 
+    # Ruta para activar o desactivar un Producto
+    @app.route('/productos_toggle_estado', methods=['POST'])
+    def toggle_estado_producto():
+        db = SessionLocal()
+        idproducto = request.form['idproducto']  # Recibimos el id del producto
+
+        try:
+            # Utilizamos el método obtener_por_id para buscar el producto
+            producto = Productos.obtener_por_id(idproducto, db)
+            if producto:
+                producto.is_active = not producto.is_active
+                db.commit()
+                estado = 'activado' if producto.is_active else 'desactivado'
+                flash(f'Producto {estado} con éxito.', 'success')
+            else:
+                flash('Producto no encontrado.', 'danger')
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al cambiar el estado del producto: {str(e)}', 'danger')
+        finally:
+            db.close()
+
+        return redirect(url_for('ver_productos'))
+
+
     
 
 

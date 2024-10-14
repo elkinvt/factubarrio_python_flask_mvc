@@ -114,7 +114,23 @@
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
     </form>
+
+    <!-- Activar/Desactivar Producto -->
+    <form action="/productos_toggle_estado" method="POST" class="mt-3">
+        <input type="hidden" name="idproducto" value="{{ producto.idproductos }}">
+        <button type="submit" class="btn btn-warning mb-2">
+            {% if producto.is_active %}
+                Desactivar Producto
+            {% else %}
+                Activar Producto
+            {% endif %}
+        </button>
+    </form>
 </div>
+
+
+
+
 
 {% endif %}
 
