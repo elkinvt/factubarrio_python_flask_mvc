@@ -126,11 +126,27 @@
             {% endif %}
         </button>
     </form>
+
+    <!-- Eliminar Producto -->
+    <form id="eliminarProductoForm" action="/productos_eliminar" method="POST" class="mt-2">
+        <input type="hidden" name="idProducto" value="{{ producto.idproductos }}">
+        <button type="button" class="btn btn-danger" onclick="confirmarEliminarProducto()">Eliminar Producto</button>
+    </form>
+
+    <script>
+        function confirmarEliminarProducto() {
+            // Mostrar la alerta de confirmación
+            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este producto?");
+            
+            // Si el usuario confirma, enviar el formulario
+            if (confirmacion) {
+                document.getElementById("eliminarProductoForm").submit();
+            }
+        }
+    </script>
+
+
 </div>
-
-
-
-
 
 {% endif %}
 

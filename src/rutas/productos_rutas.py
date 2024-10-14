@@ -202,33 +202,41 @@ def registrar_rutas(app):
             db.close()
 
         return redirect(url_for('ver_productos'))
+    
+
+    # Ruta para eliminar un producto (eliminación lógica)
+    @app.route('/productos_eliminar', methods=['POST'])
+    def eliminar_producto():
+        db = SessionLocal()
+        id_producto = request.form['idProducto']  # Obtener el ID del producto desde el formulario
+
+        try:
+            # Usar el método en el modelo para obtener el producto por ID
+            producto = Productos.obtener_por_id(id_producto, db)
+            
+            if producto:
+                # Realizar eliminación lógica
+                producto.is_deleted = True
+                db.commit()
+                flash('Producto eliminado con éxito.', 'success')
+            else:
+                flash('Producto no encontrado.', 'danger')
+
+        except Exception as e:
+            db.rollback()
+            flash(f'Error al eliminar el producto: {str(e)}', 'danger')
+
+        finally:
+            db.close()
+
+        return redirect(url_for('ver_productos'))
+
 
 
     
 
 
-''' # Ruta para activar o desactivar un Producto
-    @app.route('/productos_toggle_estado', methods=['POST'])
-    def toggle_estado_producto():
-        db = SessionLocal()
-        codigo = request.form['codigoProducto']
-
-        try:
-            producto = db.query(Productos).filter_by(codigo=codigo).first()
-            if producto:
-                producto.is_active = not producto.is_active
-                db.commit()
-                estado = 'activado' if producto.is_active else 'desactivado'
-                flash(f'Producto {estado} con éxito.', 'success')
-            else:
-                flash('Producto no encontrado.', 'danger')
-        except Exception as e:
-            db.rollback()
-            flash(f'Error al cambiar el estado del producto: {str(e)}', 'danger')
-        finally:
-            db.close()
-
-        return redirect(url_for('ver_productos'))
+''' 
 
 
     # Ruta para eliminar un producto (eliminación lógica)
