@@ -2,19 +2,20 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Formulario de búsqueda -->
+    {% if not productos and not producto %}
     <h2>Buscar Producto</h2>
-    <form action="{{ url_for('buscar_producto') }}" method="GET">
+    <form id="formBuscarProducto" action="{{ url_for('buscar_producto') }}" method="GET">
         <div class="mb-3">
             <label for="terminoBusqueda" class="form-label">Ingrese el Código o Nombre del Producto</label>
             <input type="text" class="form-control" id="terminoBusqueda" name="termino" required>
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Buscar Producto</button>
     </form>
+    {% endif %}
 </div>
 
 <!-- Mostrar la lista de productos si hay resultados -->
-{% if productos %}
+{% if productos and not producto %}
 <div class="container mt-5">
     <h3>Resultados de la búsqueda</h3>
     <table class="table table-striped">
@@ -23,7 +24,7 @@
                 <th>ID</th>
                 <th>Código</th>
                 <th>Nombre</th>
-                <th>descripcion</th>
+                <th>Descripcion</th>
                 <th>Precio</th>
                 <th>Stock</th>
                 <th>Acciones</th>
@@ -39,7 +40,6 @@
                 <td>{{ producto.precio_unitario }}</td>
                 <td>{{ producto.cantidad_stock }}</td>
                 <td>
-                    <!-- Botón para seleccionar el producto y editar -->
                     <a href="{{ url_for('mostrar_formulario_editar_producto', id=producto.idproductos) }}" class="btn btn-sm btn-primary">Seleccionar</a>
                 </td>
             </tr>
@@ -54,6 +54,7 @@
 {% endif %}
 
 <!-- Formulario de edición del producto (vacío o con datos del producto seleccionado) -->
+{% if producto %}
 <div class="container mt-5">
     <h2>Editar Producto</h2>
     <form action="{% if producto %}{{ url_for('actualizar_producto', id=producto.idproductos) }}{% else %}#{% endif %}" method="POST">
@@ -86,16 +87,23 @@
             <select class="form-select" id="unidadMedidaProducto" name="unidadMedidaProducto" required>
                 {% for unidad in unidades_padre %}
                     <optgroup label="{{ unidad.unidad_medida }}">
-                        <option value="{{ unidad.idunidad_medida }}">{{ unidad.unidad_medida }}</option>
+                        <!-- Verificamos si la unidad padre está seleccionada -->
+                        <option value="{{ unidad.idunidad_medida }}" {% if producto and producto.unidad_medida_idunidad_medida == unidad.idunidad_medida %}selected{% endif %}>
+                            {{ unidad.unidad_medida }}
+                        </option>
+                        <!-- Verificamos si alguna subunidad está seleccionada -->
                         {% for subunidad in subunidades %}
                             {% if subunidad.unidad_padre_id == unidad.idunidad_medida %}
-                                <option value="{{ subunidad.idunidad_medida }}">- {{ subunidad.unidad_medida }}</option>
+                                <option value="{{ subunidad.idunidad_medida }}" {% if producto and producto.unidad_medida_idunidad_medida == subunidad.idunidad_medida %}selected{% endif %}>
+                                    - {{ subunidad.unidad_medida }}
+                                </option>
                             {% endif %}
                         {% endfor %}
                     </optgroup>
                 {% endfor %}
             </select>
         </div>
+        
         <div class="mb-3">
             <label for="presentacionProducto" class="form-label">Presentación</label>
             <input type="text" class="form-control" id="presentacionProducto" name="presentacion" value="{{ producto.presentacion if producto else '' }}" required>
@@ -107,5 +115,7 @@
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
     </form>
 </div>
+
+{% endif %}
 
 {% endblock %}

@@ -82,11 +82,7 @@ def registrar_rutas(app):
     
     #-------------------
 
-    
-    
 
-
-   
     # Ruta para mostrar el formulario de edición de productos (GET)
     @app.route('/productos_editar', methods=['GET'])
     def mostrar_formulario_edicion_producto():
@@ -94,7 +90,6 @@ def registrar_rutas(app):
         return render_template('form_editar_producto.html', producto=None, categorias=[], unidades_medida=[], titulo_pagina="Editar Producto")
 
     #--------------
-    
     
     # Ruta para buscarr el producto por el nombre o codigo (GET)
     @app.route('/productos_buscar', methods=['GET'])
@@ -144,13 +139,6 @@ def registrar_rutas(app):
             
     #--------------------------
 
-
-
-
-
-    
-    
-   
     # Ruta para actualizar el producto (POST)
     @app.route('/productos_actualizar/<int:id>', methods=['POST'])
     def actualizar_producto(id):
@@ -194,18 +182,7 @@ def registrar_rutas(app):
     
 
 
-''' # Ruta para actualizar un producto
-    @app.route('/productos_actualizar', methods=['POST'])
-    def actualizar_producto():
-        db = SessionLocal()
-        producto_id = request.form['productoId']
-        # (Recibe y actualiza los datos similares a la ruta de creación)
-        # ...
-        db.close()
-        return redirect(url_for('ver_productos'))
-    
-    
-    # Ruta para activar o desactivar un Producto
+''' # Ruta para activar o desactivar un Producto
     @app.route('/productos_toggle_estado', methods=['POST'])
     def toggle_estado_producto():
         db = SessionLocal()
