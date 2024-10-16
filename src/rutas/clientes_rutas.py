@@ -117,10 +117,14 @@ def registrar_rutas(app):
                 'is_active': estado_cliente
             }
 
+             # Verificar si el cliente está en la sesión actual, si no lo está, reasociarlo
+            if not db.object_session(cliente):
+                db.add(cliente)
+
             try:
                 Clientes.actualizar_cliente(db, cliente, datos_actualizados)
                 flash('Cambios guardados correctamente', 'success')
-                return redirect(url_for('mostrar_formulario_editar_cliente'))
+                return redirect(url_for('ver_clientes'))
             except Exception as e:
                 flash(f'Error al guardar los cambios: {str(e)}', 'danger')
         else:

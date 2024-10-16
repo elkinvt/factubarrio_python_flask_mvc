@@ -274,15 +274,15 @@
             <tr>
                 <td>${item.producto}</td>
                 <td>${item.cantidad}</td>
-                <td>$${item.precio}</td>
-                <td>$${item.subtotal}</td>
+                <td>$${item.precio.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</td>
+                <td>$${item.subtotal.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</td>
                 <td><button onclick="eliminarProductoDeFactura(${index})" class="btn btn-danger btn-sm">Eliminar</button></td>
             </tr>`;
         facturaBody.innerHTML += row;
         total += item.subtotal;
     });
 
-    facturaTotal.textContent = `$${total.toFixed(2)}`;
+    facturaTotal.textContent = `$${total.toLocaleString('es-CO', { minimumFractionDigits: 2 })}`;
 }
 
     // Eliminar un producto de la factura
