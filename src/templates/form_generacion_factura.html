@@ -4,12 +4,12 @@
     <h2>Generar Factura</h2>
     <form id="formFactura" method="POST" action="{{ url_for('factura_crear') }}">
 
-        <input type="hidden" id="productoFacturaCodigo" name="productoFacturaCodigo">
+        <!-- Campo oculto para almacenar productos -->
         <input type="hidden" id="productosFactura" name="productosFactura">
 
+        <!-- Campo oculto para el código del producto seleccionado -->
+        <input type="hidden" id="productoFacturaCodigo" name="productoFacturaCodigo">
 
-
-        
         <!-- Buscar y seleccionar Cliente -->
         <div class="mb-3">
             <label for="buscarCliente" class="form-label">Buscar Cliente por Nombre</label>
@@ -19,8 +19,7 @@
             <input type="hidden" id="clienteId" name="clienteId">
         </div>
         
-        
-      <!-- Seleccionar Vendedor -->
+        <!-- Seleccionar Vendedor -->
         <div class="mb-3">
             <label for="vendedorFactura" class="form-label">Vendedor</label>
             <select class="form-control form-control-sm" id="vendedorFactura" name="vendedorFactura" required>
@@ -31,18 +30,12 @@
             </select>
         </div>
 
-
-
-
-      <!-- Campo de texto para buscar productos -->
-    <div class="mb-3">
-        <label for="buscarProducto" class="form-label">Buscar Producto</label>
-        <input type="text" class="form-control" id="buscarProducto" placeholder="Escribe el nombre del producto" autocomplete="off">
-        <div id="listaSugerenciasProducto" class="list-group" style="position: absolute; z-index: 1000;"></div>
-    </div>
-
-
-
+        <!-- Campo de texto para buscar productos -->
+        <div class="mb-3">
+            <label for="buscarProducto" class="form-label">Buscar Producto</label>
+            <input type="text" class="form-control" id="buscarProducto" placeholder="Escribe el nombre del producto" autocomplete="off">
+            <div id="listaSugerenciasProducto" class="list-group" style="position: absolute; z-index: 1000;"></div>
+        </div>
 
         <!-- Cantidad de Producto -->
         <div class="mb-3">
@@ -50,14 +43,20 @@
             <input type="number" class="form-control form-control-sm" id="cantidadFactura" name="cantidadFactura" placeholder="Escribe la cantidad del producto" required>
         </div>
         
+        
+        <!-- Campo para el descuento (opcional) -->
+        <div class="mb-3">
+            <label for="descuentoFactura" class="form-label">Descuento</label>
+            <input type="number" class="form-control form-control-sm" id="descuentoFactura" name="descuentoFactura" placeholder="Escribe el descuento (opcional)" step="0.01" min="0" value="0">
+        </div>
+
+
         <!-- Agregar Producto -->
         <button type="button" class="btn btn-primary form-control-sm" onclick="agregarProductoAFactura()">Agregar a Factura</button>
 
         <!-- Detalles de la Factura -->
-        <div id="detallesFactura" class="mt-4">
-            <!-- Aquí se mostrarán los detalles de la factura -->
-        </div>
-        
+        <div id="detallesFactura" class="mt-4"></div>
+
         <!-- Tabla de Detalles -->
         <div class="container mb-3">
             <table class="table mt-5 form-control-sm">
@@ -70,9 +69,7 @@
                         <th>Acción</th>
                     </tr>
                 </thead>
-                <tbody id="facturaBody">
-                    <!-- Los productos agregados se mostrarán aquí -->
-                </tbody>
+                <tbody id="facturaBody"></tbody>
                 <tfoot>
                     <tr>
                         <th colspan="3">Total</th>
@@ -89,6 +86,8 @@
         </div>
     </form>
 </div>
+
+
 
 <!-- Función para buscar cliente desde el servidor -->
 
@@ -244,6 +243,7 @@
 
     // Agregar el producto a la factura
     factura.push({
+        id: producto.id,
         codigo: producto.codigo,
         producto: producto.nombre,
         cantidad: parseInt(cantidad),

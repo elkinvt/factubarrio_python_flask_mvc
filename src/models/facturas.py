@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
+from sqlalchemy.exc import SQLAlchemyError
+
 from . import Base
 
 class Factura(Base):
@@ -25,11 +27,11 @@ class Factura(Base):
     def __repr__(self):
         return f'<Factura {self.id}>'
     
-    #Metodo estatico para crear una factura
-    @staticmethod
-    def crear_factura(clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, db_session):
+    # Método para crear una factura
+    @classmethod
+    def crear_factura(cls, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, db_session):
         try:
-            nueva_factura = Factura(
+            nueva_factura = cls(
                 clientes_idclientes=clientes_idclientes,
                 vendedores_idvendedores=vendedores_idvendedores,
                 fecha=fecha,
@@ -41,8 +43,9 @@ class Factura(Base):
             db_session.add(nueva_factura)
             db_session.commit()
             return nueva_factura
-        except Exception as e:
+        except SQLAlchemyError as e:
             db_session.rollback()
-            raise e
-    
-    #-----------------
+            print(f"Error al crear la factura: {str(e)}")
+            return None
+    #--------------------------
+     

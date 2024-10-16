@@ -20,15 +20,16 @@ def registrar_rutas(app):
 
         if request.method == 'POST':
             try:
-                # Recibe los datos del formulario (Asegúrate de que los nombres coincidan)
-                clientes_idclientes = request.form.get('clienteId')  # Cambia a 'clienteId'
-                vendedores_idvendedores = request.form.get('vendedorFactura')  # Cambia a 'vendedorFactura'
-                productos = json.loads(request.form.get('productosFactura'))  # Cambia a 'productosFactura'
+                
+                # Recibe los datos del formulario
+                clientes_idclientes = request.form.get('clienteId')
+                vendedores_idvendedores = request.form.get('vendedorFactura')
+                productos = json.loads(request.form.get('productosFactura'))
 
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
                 impuesto = total_valor * 0.19  # Impuesto del 19%
-                descuento = float(request.form.get('descuento', 0))
+                descuento = float(request.form.get('descuentoFactura', 0))
                 total_final = total_valor + impuesto - descuento
 
                 # Crear la factura usando el método del modelo
@@ -43,8 +44,14 @@ def registrar_rutas(app):
                     db
                 )
 
+                if not nueva_factura:
+                    flash('Error al crear la factura', 'danger')
+                    return redirect(url_for('factura_crear'))
+
                 # Agregar detalles de los productos
-                DetalleProducto.agregar_detalles(nueva_factura.id, productos, db)
+                if not DetalleProducto.agregar_detalles(nueva_factura.id, productos, db):
+                    flash('Error al agregar productos a la factura', 'danger')
+                    return redirect(url_for('factura_crear'))
 
                 flash('Factura creada exitosamente', 'success')
                 return redirect(url_for('factura_crear'))
@@ -59,10 +66,7 @@ def registrar_rutas(app):
         # GET: Cargar datos para el formulario
         try:
             vendedores = Vendedores.obtener_vendedores()
-
-            # Transformamos los productos para que sean JSON serializables
             productos_data = Productos.obtener_productos()
-
             productos = [
                 {
                     "id": producto.Productos.idproductos,
@@ -71,7 +75,7 @@ def registrar_rutas(app):
                     "descripcion": producto.Productos.descripcion,
                     "categoria": producto.Categoria.nombre,
                     "unidad_medida": producto.UnidadMedida.unidad_medida,
-                    "precio_unitario": float(producto.Productos.precio_unitario),  # Convertimos Decimal a float
+                    "precio_unitario": float(producto.Productos.precio_unitario),
                     "cantidad_stock": producto.Productos.cantidad_stock,
                     "is_active": producto.Productos.is_active
                 }
@@ -82,4 +86,3 @@ def registrar_rutas(app):
             flash(f'Error al cargar los datos: {str(e)}', 'danger')
 
         return render_template('form_generacion_factura.html', vendedores=vendedores, productos=productos, titulo_pagina="Generar factura")
-

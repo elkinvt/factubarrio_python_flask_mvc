@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
+from sqlalchemy.exc import SQLAlchemyError
 from . import Base
 
 class DetalleProducto(Base):
@@ -20,21 +21,25 @@ class DetalleProducto(Base):
     def __repr__(self):
         return f'<DetalleProducto Factura {self.factura_id} Producto {self.productos_idproductos}>'
     
-    #Metodo estatico para agregar productos a la factura
-    @staticmethod
-    def agregar_detalles(factura_id, productos, db_session):
+    #Metodo estatico para agregar productos al detalle de la factura
+    @classmethod
+    def agregar_detalles(cls, factura_id, productos, db_session):
         try:
-            for item in productos:
-                nuevo_detalle = DetalleProducto(
+            for producto in productos:
+                detalle = cls(
                     factura_idfactura=factura_id,
-                    productos_idproductos=item['id'],
-                    cantidad=item['cantidad'],
-                    precio_unitario=item['precio'],
-                    total_precio=float(item['precio']) * int(item['cantidad'])
+                    productos_idproductos=producto['id'],  # Usamos el ID del producto
+                    cantidad=producto['cantidad'],
+                    precio_unitario=producto['precio'],
+                    total_precio=producto['subtotal']
                 )
-                db_session.add(nuevo_detalle)
+                db_session.add(detalle)
             db_session.commit()
-        except Exception as e:
+        except SQLAlchemyError as e:
             db_session.rollback()
-            raise e
+            print(f"Error al agregar detalles: {str(e)}")
+            return False
+        return True
     #----------
+
+   
