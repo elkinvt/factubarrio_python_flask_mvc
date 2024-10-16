@@ -239,6 +239,12 @@
         return;
     }
 
+    // Verificar si hay suficiente stock
+    if (producto.cantidad_stock < cantidad) {
+            alert(`No hay suficiente stock para el producto ${producto.nombre}. Stock disponible: ${producto.cantidad_stock}`);
+            return;
+        }
+
     var subtotal = producto.precio_unitario * cantidad;
 
     // Agregar el producto a la factura
@@ -290,9 +296,20 @@
         if (!confirm("¿Estás seguro de que deseas anular la factura?")) {
             return;
         }
+        
+        // Limpia el array de productos en la factura
         factura = [];
         actualizarDetallesFactura();
+        
+        // Limpia los campos del formulario
+        document.getElementById('buscarCliente').value = '';
+        document.getElementById('clienteId').value = '';
+        document.getElementById('vendedorFactura').value = '';
+        document.getElementById('buscarProducto').value = '';
+        document.getElementById('cantidadFactura').value = '';
+        document.getElementById('productoFacturaCodigo').value = '';
     }
+
 </script>
 
 <script>
