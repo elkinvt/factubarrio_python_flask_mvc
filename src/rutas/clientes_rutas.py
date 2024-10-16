@@ -186,3 +186,18 @@ def registrar_rutas(app):
     
     #-----------
 
+    #busqueda del lciente por el nombre para la factura
+    @app.route('/buscar_clientes', methods=['GET'])
+    def buscar_clientes():
+        termino = request.args.get('q', '').lower()
+        db = SessionLocal()
+
+        try:
+            clientes = Clientes.buscar_por_nombre(termino, db)
+            resultados = [{'id': cliente.idclientes, 'nombre': cliente.nombres_cliente} for cliente in clientes]
+            return jsonify(resultados)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+        finally:
+            db.close()
+    #--------------------

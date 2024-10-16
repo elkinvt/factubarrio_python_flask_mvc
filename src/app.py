@@ -8,6 +8,7 @@ from models import init_db  # Importar la función init_db para crear las tablas
 from rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
 from rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
 from rutas.productos_rutas import registrar_rutas as registrar_rutas_productos
+from rutas.facturas_rutas import registrar_rutas as registrar_rutas_facturas
 
 app = Flask(__name__)
 
@@ -24,6 +25,7 @@ init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 registrar_rutas_clientes(app)
 registrar_rutas_vendedores(app)
 registrar_rutas_productos(app)
+registrar_rutas_facturas(app)
 
 @app.route('/')
 def index():
@@ -52,9 +54,7 @@ def usuarios_ver():
 def usuarios_editar():
     return render_template('form_editar_usuario.html', titulo_pagina = "Editar usuario")
 
-@app.route('/generar_factura')
-def generar_factura():
-    return render_template('form_generacion_factura.html', titulo_pagina = "Generar factura")
+
 
 @app.route('/ver_factura')
 def ver_factura():

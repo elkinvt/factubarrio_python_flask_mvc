@@ -38,7 +38,7 @@ def registrar_rutas(app):
             try:
                 Vendedores.agregar_vendedor(db,nuevo_vendedor)
                 flash('Vendedor creado con éxito', 'success')
-                return redirect(url_for('ver_vendedor')) 
+                return redirect(url_for('ver_vendedores')) 
             except Exception as e:
                 db.rollback()
                 flash(f'Error al crear vendedor: {str(e)}', 'danger')

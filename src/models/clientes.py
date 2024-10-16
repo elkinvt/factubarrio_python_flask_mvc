@@ -109,3 +109,16 @@ class Clientes(Base):
             raise e
     #------------
 
+    # Método para buscar clientes por nombre o parte del nombre
+    @staticmethod
+    def buscar_por_nombre(parte_nombre, db_session):
+        try:
+            clientes = db_session.query(Clientes).filter(
+                Clientes.nombres_cliente.ilike(f'%{parte_nombre}%'),
+                Clientes.is_deleted == False,
+                Clientes.is_active == True
+            ).all()
+            return clientes
+        except Exception as e:
+            raise e
+

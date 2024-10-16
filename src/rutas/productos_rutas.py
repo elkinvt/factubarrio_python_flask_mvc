@@ -230,6 +230,21 @@ def registrar_rutas(app):
             db.close()
 
         return redirect(url_for('ver_productos'))
+    
+    #------------------
+    
+    # Ruta para agregar los productos a la factura
+    @app.route('/buscar_productos')
+    def buscar_productos():
+        query = request.args.get('q', '').lower()
+        db = SessionLocal()
+        try:
+            productos = db.query(Productos).filter(Productos.nombre.ilike(f'%{query}%')).filter(Productos.is_deleted == False).all()
+            productos_data = [{'id': producto.idproductos, 'codigo': producto.codigo,  'nombre': producto.nombre,'descripcion': producto.descripcion, 'precio_unitario': float(producto.precio_unitario)} for producto in productos]
+            return jsonify(productos_data)
+        finally:
+            db.close()
+
 
 
 

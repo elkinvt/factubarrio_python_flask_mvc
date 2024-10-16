@@ -19,3 +19,22 @@ class DetalleProducto(Base):
 
     def __repr__(self):
         return f'<DetalleProducto Factura {self.factura_id} Producto {self.productos_idproductos}>'
+    
+    #Metodo estatico para agregar productos a la factura
+    @staticmethod
+    def agregar_detalles(factura_id, productos, db_session):
+        try:
+            for item in productos:
+                nuevo_detalle = DetalleProducto(
+                    factura_idfactura=factura_id,
+                    productos_idproductos=item['id'],
+                    cantidad=item['cantidad'],
+                    precio_unitario=item['precio'],
+                    total_precio=float(item['precio']) * int(item['cantidad'])
+                )
+                db_session.add(nuevo_detalle)
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    #----------
