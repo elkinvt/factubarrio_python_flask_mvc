@@ -14,8 +14,10 @@ class Factura(Base):
     total_valor = Column(Numeric(10, 2), nullable=False)
     impuesto = Column(Numeric(10, 2), nullable=False)
     descuento = Column(Numeric(10, 2), nullable=True)
+    monto_pagado = Column(Numeric(10, 2), nullable=False)
+    cambio = Column(Numeric(10, 2), nullable=True)
 
-    def __init__(self, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento=None):
+    def __init__(self, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento=None, monto_pagado=None, cambio=None):
         self.clientes_idclientes = clientes_idclientes
         self.vendedores_idvendedores = vendedores_idvendedores
         self.fecha = fecha
@@ -23,13 +25,15 @@ class Factura(Base):
         self.total_valor = total_valor
         self.impuesto = impuesto
         self.descuento = descuento
+        self.monto_pagado = monto_pagado
+        self.cambio = cambio
 
     def __repr__(self):
         return f'<Factura {self.id}>'
     
     # Método para crear una factura
     @classmethod
-    def crear_factura(cls, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, db_session):
+    def crear_factura(cls, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio , db_session):
         try:
             nueva_factura = cls(
                 clientes_idclientes=clientes_idclientes,
@@ -38,7 +42,9 @@ class Factura(Base):
                 hora=hora,
                 total_valor=total_valor,
                 impuesto=impuesto,
-                descuento=descuento
+                descuento=descuento,
+                monto_pagado=monto_pagado,
+                cambio=cambio
             )
             db_session.add(nueva_factura)
             db_session.commit()

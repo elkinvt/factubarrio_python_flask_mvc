@@ -25,12 +25,32 @@ def registrar_rutas(app):
                 clientes_idclientes = request.form.get('clienteId')
                 vendedores_idvendedores = request.form.get('vendedorFactura')
                 productos = json.loads(request.form.get('productosFactura'))
+                
+                # Logs para verificar los datos recibidos
+                print(f"Cliente ID: {clientes_idclientes}")
+                print(f"Vendedor ID: {vendedores_idvendedores}")
+                print(f"Productos: {productos}")
 
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
+                print(f"Total Valor: {total_valor}")  # Log del total calculado
+
                 impuesto = total_valor * 0.19  # Impuesto del 19%
+                print(f"Impuesto: {impuesto}")  # Log del impuesto calculado
+
                 descuento = float(request.form.get('descuentoFactura', 0))
+                print(f"Descuento: {descuento}")  # Log del descuento recibido
+
                 total_final = total_valor + impuesto - descuento
+
+                # Recibir los valores de pago y calcular el cambio
+                monto_pagado = float(request.form.get('monto_pagado'))
+                print(f"Monto Pagado: {monto_pagado}")  # Log del monto pagado recibido
+                
+                if monto_pagado < total_final:
+                    raise ValueError("El monto pagado es insuficiente para cubrir el total de la factura.")
+                
+                cambio = monto_pagado - total_final
 
                 # Crear la factura usando el método del modelo
                 nueva_factura = Factura.crear_factura(
@@ -41,6 +61,8 @@ def registrar_rutas(app):
                     total_final,
                     impuesto,
                     descuento,
+                    monto_pagado,
+                    cambio,
                     db
                 )
 
