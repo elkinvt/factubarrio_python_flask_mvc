@@ -190,18 +190,32 @@ def registrar_rutas(app):
     
     #-----------
 
-    #busqueda del lciente por el nombre para la factura
-    @app.route('/buscar_clientes', methods=['GET'])
-    def buscar_clientes():
-        termino = request.args.get('q', '').lower()
-        db = SessionLocal()
+
+    #busqueda del cliente por el numero de documento para la factura
+    @app.route('/buscar_clientes_por_numero_documento')
+    def buscar_clientes_por_numero_documento():
+        db = SessionLocal()  # Iniciar sesión de la base de datos
+        q = request.args.get('q', '')
 
         try:
-            clientes = Clientes.buscar_por_nombre(termino, db)
-            resultados = [{'id': cliente.idclientes, 'nombre': cliente.nombres_cliente} for cliente in clientes]
-            return jsonify(resultados)
+            # Consulta a la base de datos por el número de documento usando la sesión de SQLAlchemy
+            clientes = db.query(Clientes).filter(Clientes.numero_documento.ilike(f"%{q}%")).all()
+
+            # Serializar los datos del cliente para enviarlos al frontend
+            clientes_data = [{
+                'id': cliente.idclientes,
+                'nombre': cliente.nombres_cliente,
+                'numero_documento': cliente.numero_documento
+            } for cliente in clientes]
+
+            return jsonify(clientes_data)
+
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            print(f"Error al buscar clientes: {e}")
+            return jsonify({'error': 'Ocurrió un error al buscar los clientes'}), 500
+
         finally:
-            db.close()
-    #--------------------
+            db.close()  # Cerrar la sesión de la base de datos
+
+    #-----------
+

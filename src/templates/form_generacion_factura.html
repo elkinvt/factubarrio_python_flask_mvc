@@ -15,11 +15,17 @@
 
         <!-- Buscar y seleccionar Cliente -->
         <div class="mb-3">
-            <label for="buscarCliente" class="form-label">Buscar Cliente por Nombre</label>
-            <input type="text" class="form-control" id="buscarCliente" placeholder="Escribe el nombre del cliente" autocomplete="off">
+            <label for="buscarDocumento" class="form-label">Buscar Cliente por número de documento</label>
+            <input type="text" class="form-control" id="buscarDocumento" placeholder="Escribe el numero de documento del cliente" autocomplete="off">
             <div id="listaSugerenciasClientes" class="list-group" style="position: absolute; z-index: 1000;"></div>
             <!-- Campo oculto para almacenar el ID del cliente seleccionado -->
             <input type="hidden" id="clienteId" name="clienteId">
+        </div>
+
+        <!-- Campo para mostrar automáticamente el nombre del cliente -->
+        <div class="mb-3">
+            <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
+            <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre del cliente" readonly>
         </div>
         
         <!-- Seleccionar Vendedor -->
@@ -103,46 +109,56 @@
 <!-- Función para buscar cliente desde el servidor -->
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const inputBuscarCliente = document.getElementById('buscarCliente');
-    const listaSugerencias = document.getElementById('listaSugerenciasClientes');
-    const clienteIdInput = document.getElementById('clienteId'); // Campo oculto para el ID del cliente
+   document.addEventListener('DOMContentLoaded', function () {
+    const inputBuscarDocumento = document.getElementById('buscarDocumento');  // Campo de número de documento
+    const listaSugerencias = document.getElementById('listaSugerenciasClientes');  // Lista de sugerencias
+    const clienteIdInput = document.getElementById('clienteId');  // Campo oculto para el ID del cliente
+    const nombreClienteInput = document.getElementById('nombreCliente');  // Campo para mostrar el nombre del cliente
 
-    inputBuscarCliente.addEventListener('input', function () {
+    // Escuchar el evento "input" en el campo de número de documento
+    inputBuscarDocumento.addEventListener('input', function () {
         const query = this.value.trim();
 
+        // Si el valor ingresado tiene más de dos caracteres, realizamos la búsqueda
         if (query.length > 2) {
-            fetch(`/buscar_clientes?q=${query}`)
+            fetch(`/buscar_clientes_por_numero_documento?q=${query}`)
                 .then(response => response.json())
                 .then(data => {
                     mostrarSugerenciasClientes(data);
                 });
         } else {
             listaSugerencias.innerHTML = '';
+            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no hay suficiente texto
         }
     });
 
+    // Mostrar sugerencias de clientes
     function mostrarSugerenciasClientes(clientes) {
-        listaSugerencias.innerHTML = '';
+        listaSugerencias.innerHTML = ''; // Limpiar la lista de sugerencias
+
         if (clientes.length > 0) {
             clientes.forEach(cliente => {
                 const item = document.createElement('div');
                 item.className = 'list-group-item list-group-item-action';
-                item.textContent = cliente.nombre;
-                item.onclick = function () {
-                    inputBuscarCliente.value = cliente.nombre;
-                    clienteIdInput.value = cliente.id;  // Guardamos el ID del cliente seleccionado
-                    listaSugerencias.innerHTML = '';  // Limpiamos las sugerencias
-                };
+                item.textContent = `${cliente.numero_documento} - ${cliente.nombre}`;
+                
+                // Cuando seleccionamos un cliente de la lista de sugerencias
+                item.addEventListener('click', function () {
+                    inputBuscarDocumento.value = cliente.numero_documento;  // Rellenar el número de documento
+                    nombreClienteInput.value = cliente.nombre;  // Rellenar el nombre del cliente
+                    clienteIdInput.value = cliente.id;  // Guardar el ID del cliente
+                    listaSugerencias.innerHTML = '';  // Limpiar las sugerencias
+                });
+
                 listaSugerencias.appendChild(item);
             });
             listaSugerencias.style.display = 'block';
         } else {
             listaSugerencias.innerHTML = '<div class="list-group-item">No se encontraron clientes.</div>';
+            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no se encuentran clientes
         }
     }
 });
-
 
 </script> <!--termina la busqueda del cliente-->
 
@@ -319,24 +335,34 @@
         actualizarDetallesFactura();
     }
 
-    // Anular la factura
+   // Anular la factura
     function anularFactura() {
         if (!confirm("¿Estás seguro de que deseas anular la factura?")) {
             return;
         }
-        
+
         // Limpia el array de productos en la factura
         factura = [];
         actualizarDetallesFactura();
-        
+
         // Limpia los campos del formulario
-        document.getElementById('buscarCliente').value = '';
-        document.getElementById('clienteId').value = '';
-        document.getElementById('vendedorFactura').value = '';
-        document.getElementById('buscarProducto').value = '';
-        document.getElementById('cantidadFactura').value = '';
-        document.getElementById('productoFacturaCodigo').value = '';
+        document.getElementById('buscarDocumento').value = '';  // Campo de búsqueda del cliente por número de documento
+        document.getElementById('clienteId').value = '';  // Campo oculto del ID del cliente
+        document.getElementById('nombreCliente').value = '';  // Campo del nombre del cliente
+
+        document.getElementById('vendedorFactura').value = '';  // Campo del vendedor
+        document.getElementById('buscarProducto').value = '';  // Campo de búsqueda de producto
+        document.getElementById('cantidadFactura').value = '';  // Campo de cantidad
+        document.getElementById('productoFacturaCodigo').value = '';  // Campo oculto para el código del producto
+        document.getElementById('descuentoFactura').value = '';  // Campo de descuento
+
+        // También asegúrate de limpiar las sugerencias visuales
+        document.getElementById('listaSugerenciasClientes').innerHTML = '';  // Limpia sugerencias de cliente
+        document.getElementById('listaSugerenciasProducto').innerHTML = '';  // Limpia sugerencias de producto
+
+        // Si hay mensajes o alertas visibles, asegúrate de ocultarlos o restablecer el formulario completamente
     }
+
 
 </script>
 
