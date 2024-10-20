@@ -31,7 +31,9 @@
 
         <div class="mb-3">
             <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
-            <select class="form-control form-control-sm" name="tipoDocumento">
+            
+
+            <select class="form-control form-control-sm" name="tipoDocumento" disabled>
                 <option value="">Seleccione tipo de documento</option>
                 <option value="CC" {% if vendedor.tipo_documento == 'CC' %} selected {% endif %}>Cédula de Ciudadanía</option>
                 <option value="TI" {% if vendedor.tipo_documento == 'TI' %} selected {% endif %}>Tarjeta de Identidad</option>
@@ -40,11 +42,15 @@
                 <option value="RC" {% if vendedor.tipo_documento == 'RC' %} selected {% endif %}>Registro Civil</option>
                 <option value="NIT" {% if vendedor.tipo_documento == 'NIT' %} selected {% endif %}>NIT</option>
             </select>
+            <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
+            
+
+            
         </div>
 
         <div class="mb-3">
             <label for="numeroDocumentoVendedor" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control form-control-sm" name="numeroDocumento" value="{{ vendedor.numero_documento }}" required>
+            <input type="text" class="form-control form-control-sm" name="numeroDocumento" value="{{ vendedor.numero_documento }}" readonly>
         </div>
         
 
