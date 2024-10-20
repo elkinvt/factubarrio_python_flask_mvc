@@ -97,6 +97,7 @@ class Factura(Base):
 
     #----------------
 
+    #Metodo para obtener los detalles de la factura
     @staticmethod
     def obtener_detalles(id_factura):
         session = SessionLocal()
@@ -105,8 +106,6 @@ class Factura(Base):
             factura = session.query(Factura).filter_by(id=id_factura).first()
 
             if factura:
-
-                
 
                 # Serializar los datos de la factura
                 factura_data = {
@@ -134,4 +133,6 @@ class Factura(Base):
             return None
         finally:
             session.close()
+    
+    #------------------
      
