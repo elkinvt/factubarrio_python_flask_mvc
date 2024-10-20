@@ -219,29 +219,17 @@ def registrar_rutas(app):
 
     #-----------
 
-    #Ruta para verificar el esatdo inactivo de un cliente
+    #Ruta para verificar el estado inactivo de un cliente
     @app.route('/verificar_cliente_inactivo')
     def verificar_cliente_inactivo():
-        db = SessionLocal()
         numero_documento = request.args.get('numero_documento')
+        
+        # Llama al método en el modelo para verificar el estado del cliente
+        resultado = Clientes.verificar_cliente_inactivo(numero_documento)
 
-        try:
-            # Buscar el cliente por número de documento
-            cliente = db.query(Clientes).filter_by(numero_documento=numero_documento).first()
-
-            if cliente:
-                if not cliente.is_active:
-                    return jsonify({'inactivo': True})
-                else:
-                    return jsonify({'existe': True, 'nombre': cliente.nombres_cliente, 'id': cliente.idclientes})
-            else:
-                return jsonify({'existe': False})
-
-        except Exception as e:
-            print(f"Error al verificar cliente: {e}")
-            return jsonify({'error': 'Error al verificar el cliente'}), 500
-
-        finally:
-            db.close()
+        # Devuelve la respuesta en formato JSON
+        if 'error' in resultado:
+            return jsonify(resultado), 500
+        return jsonify(resultado)
 
 

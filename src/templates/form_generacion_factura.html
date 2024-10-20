@@ -49,7 +49,7 @@
         <!-- Cantidad de Producto -->
         <div class="mb-3">
             <label for="cantidadFactura" class="form-label">Cantidad</label>
-            <input type="number" class="form-control form-control-sm" id="cantidadFactura" name="cantidadFactura" placeholder="Escribe la cantidad del producto" required>
+            <input type="number" class="form-control form-control-sm" id="cantidadFactura" name="cantidadFactura" placeholder="Escribe la cantidad del producto" >
         </div>
         
         
@@ -321,9 +321,7 @@
         document.getElementById('buscarProducto').value = '';
         document.getElementById('cantidadFactura').value = '';
 
-        // Quitar el atributo `required` del campo de cantidad antes de limpiar
-        document.getElementById('cantidadFactura').removeAttribute('required');
-
+        
         // Focalizar el campo de búsqueda para el próximo producto
         document.getElementById('buscarProducto').focus();
 
