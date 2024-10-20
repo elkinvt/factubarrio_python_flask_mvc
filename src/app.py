@@ -1,4 +1,5 @@
 from flask import Flask
+from src.models import Base, engine  # Importar la base y el engine para crear las tablas
 from src.models import init_db  # Importar la función init_db para crear las tablas
 from flask_controller import FlaskControllerRegister #importar la libreria de los controladores
 
