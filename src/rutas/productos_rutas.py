@@ -1,10 +1,10 @@
 # Importa las dependencias necesarias
 from flask import request, redirect, url_for, flash, render_template, jsonify
-from models import SessionLocal
-from models.productos import Productos  # Importa el modelo de Productos
-from models.categorias import Categoria
-from models.unidad_medida import UnidadMedida
-from sqlalchemy.orm import joinedload
+from src.models import SessionLocal
+from src.models.productos import Productos  # Importa el modelo de Productos
+from src.models.categorias import Categoria
+from src.models.unidad_medida import UnidadMedida
+
 
 
 

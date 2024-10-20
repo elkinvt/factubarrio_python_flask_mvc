@@ -1,14 +1,14 @@
 from flask import Flask, render_template
 
 
-from models import Base, engine  # Importar la base y el engine para crear las tablas
-from models import init_db  # Importar la función init_db para crear las tablas
+from src.models import Base, engine  # Importar la base y el engine para crear las tablas
+from src.models import init_db  # Importar la función init_db para crear las tablas
 
 # Importa las rutas con nombres únicos
-from rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
-from rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
-from rutas.productos_rutas import registrar_rutas as registrar_rutas_productos
-from rutas.facturas_rutas import registrar_rutas as registrar_rutas_facturas
+from src.rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
+from src.rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
+from src.rutas.productos_rutas import registrar_rutas as registrar_rutas_productos
+from src.rutas.facturas_rutas import registrar_rutas as registrar_rutas_facturas
 
 app = Flask(__name__)
 
@@ -36,12 +36,6 @@ def pagina_principal():
     return render_template('pgprincipal.html', titulo_pagina ="Pagina principal")
 
 
-
-
-@app.route('/productos_editar')
-def productos_editar():
-    return render_template('form_editar_producto.html', titulo_pagina = "Editar producto")
-
 @app.route('/usuarios_crear')
 def usuarios_crear():
     return render_template('form_crear_usuario.html', titulo_pagina = "Crear usuario")
@@ -56,9 +50,7 @@ def usuarios_editar():
 
 
 
-@app.route('/ver_factura')
-def ver_factura():
-    return render_template('form_ver_factura.html', titulo_pagina = "Ver factura")
+
 
 @app.route('/cerrar_sesion')
 def cerrar_sesion():

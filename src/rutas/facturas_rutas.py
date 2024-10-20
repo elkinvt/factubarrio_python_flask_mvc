@@ -1,18 +1,22 @@
 from flask import request, redirect, url_for, flash, render_template
-from models.detalle_producto import DetalleProducto
 from flask import render_template, request, redirect, url_for, flash, jsonify
-from models.clientes import Clientes  # Importar la clase Clientes
-from models.vendedores import Vendedores  # Importar la clase Vendedores
-from models.productos import Productos  # Importar la clase Productos
-from models.facturas import Factura  # Importar la clase Factura
-from models.detalle_producto import DetalleProducto  # Importar DetalleProducto
-from models import SessionLocal # Importar la sesión para interactuar con la base de datos
+from src.models.clientes import Clientes  # Importar la clase Clientes
+from src.models.vendedores import Vendedores  # Importar la clase Vendedores
+from src.models.productos import Productos  # Importar la clase Productos
+from src.models.facturas import Factura  # Importar la clase Factura
+from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
+from src.models import SessionLocal # Importar la sesión para interactuar con la base de datos
 from datetime import datetime
 import json
 
 
 
 def registrar_rutas(app):
+
+    
+    @app.route('/ver_factura')
+    def ver_factura():
+        return render_template('form_ver_factura.html', titulo_pagina = "Ver factura")
 
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])

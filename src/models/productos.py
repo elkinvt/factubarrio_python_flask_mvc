@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Numeric,Boolean, ForeignKey
 from . import Base, SessionLocal
-from models.categorias import Categoria
-from models.unidad_medida import UnidadMedida
+from src.models.categorias import Categoria
+from src.models.unidad_medida import UnidadMedida
 
 class Productos(Base):
     __tablename__ = 'productos'

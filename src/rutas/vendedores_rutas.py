@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, render_template
-from models import SessionLocal
-from models.vendedores import Vendedores
+from src.models import SessionLocal
+from src.models.vendedores import Vendedores
 
 def registrar_rutas(app):
     

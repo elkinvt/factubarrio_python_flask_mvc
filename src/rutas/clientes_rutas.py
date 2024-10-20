@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, render_template, jsonify
-from models import SessionLocal
-from models.clientes import Clientes
+from src.models import SessionLocal
+from src.models.clientes import Clientes
 
 
 

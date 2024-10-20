@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
-from models.productos import Productos
+from src.models.productos import Productos
 
 from . import Base
 
