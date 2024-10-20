@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Session
 from models.productos import Productos
 
@@ -13,6 +14,9 @@ class DetalleProducto(Base):
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(Numeric(10, 2), nullable=False)
     total_precio = Column(Numeric(10, 2), nullable=False)
+
+     # Relación con la tabla de productos
+    producto = relationship('Productos')
 
     def __init__(self, factura_idfactura, productos_idproductos, cantidad, precio_unitario, total_precio):
         self.factura_idfactura = factura_idfactura

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
+from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
 
 from . import Base
@@ -16,6 +17,15 @@ class Factura(Base):
     descuento = Column(Numeric(10, 2), nullable=True)
     monto_pagado = Column(Numeric(10, 2), nullable=False)
     cambio = Column(Numeric(10, 2), nullable=True)
+
+    # Relación con el cliente
+    cliente = relationship('Clientes', backref='facturas')
+
+    # Relación con el vendedor
+    vendedor = relationship('Vendedores', backref='facturas')
+
+    #Relacion con detalle_producto
+    detalles = relationship('DetalleProducto', backref='factura')
 
     def __init__(self, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento=None, monto_pagado=None, cambio=None):
         self.clientes_idclientes = clientes_idclientes

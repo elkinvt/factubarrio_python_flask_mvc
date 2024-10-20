@@ -191,34 +191,8 @@ def registrar_rutas(app):
     #-----------
 
 
-    #busqueda del cliente por el numero de documento para la factura
-    '''@app.route('/buscar_clientes_por_numero_documento')
-    def buscar_clientes_por_numero_documento():
-        db = SessionLocal()  # Iniciar sesión de la base de datos
-        q = request.args.get('q', '')
-
-        try:
-            # Consulta a la base de datos por el número de documento usando la sesión de SQLAlchemy
-            clientes = db.query(Clientes).filter(Clientes.numero_documento.ilike(f"%{q}%"), Clientes.is_active == True).all()
-
-            # Serializar los datos del cliente para enviarlos al frontend
-            clientes_data = [{
-                'id': cliente.idclientes,
-                'nombre': cliente.nombres_cliente,
-                'numero_documento': cliente.numero_documento
-            } for cliente in clientes]
-
-            return jsonify(clientes_data)
-
-        except Exception as e:
-            print(f"Error al buscar clientes: {e}")
-            return jsonify({'error': 'Ocurrió un error al buscar los clientes'}), 500
-
-        finally:
-            db.close()  # Cerrar la sesión de la base de datos
-
-    #-----------'''
-
+    
+    #Ruta para buscar cliente por numero de documento
     @app.route('/buscar_clientes_por_numero_documento')
     def buscar_clientes_por_numero_documento():
         query = request.args.get('q', '')
@@ -232,6 +206,8 @@ def registrar_rutas(app):
 
         # Devolvemos los datos de los clientes
         return jsonify(clientes_data)
+    
+    #------------------
 
     #Ruta para verificar el estado inactivo de un cliente
     @app.route('/verificar_cliente_inactivo')

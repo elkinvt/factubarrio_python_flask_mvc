@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, flash, render_template
 from models.detalle_producto import DetalleProducto
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from models.clientes import Clientes  # Importar la clase Clientes
 from models.vendedores import Vendedores  # Importar la clase Vendedores
 from models.productos import Productos  # Importar la clase Productos
@@ -14,6 +14,7 @@ import json
 
 def registrar_rutas(app):
 
+    #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
     def factura_crear():
         db = SessionLocal()
@@ -108,3 +109,67 @@ def registrar_rutas(app):
             flash(f'Error al cargar los datos: {str(e)}', 'danger')
 
         return render_template('form_generacion_factura.html', vendedores=vendedores, productos=productos, titulo_pagina="Generar factura")
+
+    #--------------------------
+
+    #Ruta para consultar las facturas
+
+    @app.route('/facturas_por_fecha', methods=['GET'])
+    def obtener_facturas_por_fecha():
+        fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL
+
+        # Abrir una nueva sesión de la base de datos
+        session = SessionLocal()
+        
+        try:
+            # Buscar facturas por la fecha
+            facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
+
+            if facturas:
+                facturas_data = [{
+                    'id': factura.id,
+                    'fecha': factura.fecha,
+                    'cliente': factura.cliente.nombres_cliente,
+                    'total': factura.total_valor
+                } for factura in facturas]
+
+                return jsonify(facturas_data), 200
+            else:
+                return jsonify({'message': 'No se encontraron facturas para la fecha seleccionada'}), 404
+        finally:
+            # Asegurarse de cerrar la sesión para liberar los recursos
+            session.close()
+    
+    #---------------
+
+    @app.route('/detalles_factura/<int:id_factura>', methods=['GET'])
+    def obtener_detalles_factura(id_factura):
+        # Crear una nueva sesión de la base de datos
+        session = SessionLocal()
+        
+        try:
+            # Buscar la factura por id
+            factura = session.query(Factura).filter_by(id=id_factura).first()
+
+            if factura:
+                factura_data = {
+                    'id': factura.id,
+                    'fecha': factura.fecha,
+                    'cliente': factura.cliente.nombres_cliente,
+                    'vendedor': factura.vendedor.nombres_vendedor,
+                    'total':float(factura.total_valor),
+                    'montoPagado':float(factura.monto_pagado),
+                    'cambio':float(factura.cambio),
+                    'items': [{
+                        'producto': item.producto.nombre,
+                        'cantidad': item.cantidad,
+                        'precioUnitario': item.precio_unitario,
+                        'subtotal': item.total_precio
+                    } for item in factura.detalles]
+                }
+                return jsonify(factura_data), 200
+            else:
+                return jsonify({'message': 'Factura no encontrada'}), 404
+        finally:
+            # Asegurarse de cerrar la sesión
+            session.close()

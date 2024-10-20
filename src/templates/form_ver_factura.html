@@ -41,58 +41,73 @@
 
 <script>
     function buscarFacturasPorFecha() {
-        let fechaIngresada = document.getElementById('fechaConsulta').value;
-        let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
-        let contenedor = document.getElementById('listaFacturas');
-        contenedor.innerHTML = ''; // Limpia contenido anterior
+    let fechaIngresada = document.getElementById('fechaConsulta').value;
+    let contenedor = document.getElementById('listaFacturas');
+    contenedor.innerHTML = ''; // Limpia contenido anterior
 
-        // Asegúrate de comparar solo la parte de la fecha de cada factura
-        let facturasFiltradas = facturas.filter(factura => factura.fecha.split(' ')[0] === fechaIngresada);
+    fetch(`/facturas_por_fecha?fecha=${fechaIngresada}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('No se encontraron facturas para la fecha seleccionada');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.length > 0) {
+                data.forEach(factura => {
+                    contenedor.innerHTML += `
+                    <tr>
+                        <td>${factura.id}</td>
+                        <td>${factura.fecha}</td>
+                        <td>${factura.cliente}</td>
+                        <td>$${factura.total}</td>
+                        <td><button class="btn btn-info btn-sm" onclick="mostrarDetallesFactura('${factura.id}')">Ver Detalles</button></td>
+                    </tr>
+                `;
+                });
+            } else {
+                contenedor.innerHTML = '<tr><td colspan="5" class="text-center">No se encontraron facturas para la fecha seleccionada.</td></tr>';
+            }
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<tr><td colspan="5" class="text-center">${error.message}</td></tr>`;
+        });
+}
 
-        if (facturasFiltradas.length > 0) {
-            facturasFiltradas.forEach(factura => {
-                contenedor.innerHTML += `
-                <tr>
-                    <td>${factura.id}</td>
-                    <td>${factura.fecha}</td>
-                    <td>${factura.cliente}</td>
-                    <td>$${factura.total}</td>
-                    <td><button class="btn btn-info btn-sm" onclick="mostrarDetallesFactura('${factura.id}')">Ver Detalles</button></td>
-                </tr>
-            `;
-            });
-        } else {
-            contenedor.innerHTML = '<tr><td colspan="5" class="text-center">No se encontraron facturas para la fecha seleccionada.</td></tr>';
-        }
-    }
 
 
-    function mostrarDetallesFactura(idFactura) {
-        let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
-        let facturaEncontrada = facturas.find(factura => factura.id === idFactura);
-
-        if (facturaEncontrada) {
+function mostrarDetallesFactura(idFactura) {
+    fetch(`/detalles_factura/${idFactura}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Detalles de factura no encontrados');
+            }
+            return response.json();
+        })
+        .then(factura => {
             let detalleHtml = `
-                <p><strong>ID:</strong> ${facturaEncontrada.id}</p>
-                <p><strong>Fecha:</strong> ${facturaEncontrada.fecha} ${facturaEncontrada.hora}</p>
-                <p><strong>Cliente:</strong> ${facturaEncontrada.cliente}</p>
-                <p><strong>Vendedor:</strong> ${facturaEncontrada.vendedor}</p> <!-- Muestra el vendedor aquí -->
-                <p><strong>Total:</strong> $${facturaEncontrada.total}</p>
-                <p><strong>Monto Pagado:</strong> $${facturaEncontrada.montoPagado.toFixed(2)}</p>
-                <p><strong>Cambio:</strong> $${facturaEncontrada.cambio.toFixed(2)}</p>
+                <p><strong>ID:</strong> ${factura.id}</p>
+                <p><strong>Fecha:</strong> ${factura.fecha}</p>
+                <p><strong>Cliente:</strong> ${factura.cliente}</p>
+                <p><strong>Vendedor:</strong> ${factura.vendedor}</p>
+                <p><strong>Total:</strong> $${factura.total}</p>
+                <p><strong>Monto Pagado:</strong> $${factura.montoPagado.toFixed(2)}</p>
+                <p><strong>Cambio:</strong> $${factura.cambio.toFixed(2)}</p>
                 <div><strong>Items:</strong></div>
                 <ul>
-                    ${facturaEncontrada.items.map(item => `<li>${item.producto} - ${item.cantidad} x $${item.precioUnitario} = $${item.subtotal}</li>`).join('')}
+                    ${factura.items.map(item => `<li>${item.producto} - ${item.cantidad} x $${item.precioUnitario} = $${item.subtotal}</li>`).join('')}
                 </ul>
             `;
 
             document.getElementById('detalleFacturaContent').innerHTML = detalleHtml;
             var myModal = new bootstrap.Modal(document.getElementById('facturaModal'));
             myModal.show();
-        } else {
-            alert("Detalles de factura no encontrados.");
-        }
-    }
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+}
+
 
 </script>
 <script>
@@ -109,4 +124,3 @@
 </script>
 {% endblock %}
    
-    
