@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
 
-from . import Base
+from . import Base, SessionLocal
 
 class Factura(Base):
     __tablename__ = 'factura'
@@ -64,4 +64,64 @@ class Factura(Base):
             print(f"Error al crear la factura: {str(e)}")
             return None
     #--------------------------
+
+    #Metodo para búsqueda de facturas por fecha
+    @staticmethod
+    def buscar_por_fecha(fecha):
+        session = SessionLocal()
+        try:
+            # Buscar facturas por la fecha proporcionada
+            facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
+
+            if facturas:
+                # Serializar los datos de las facturas
+                facturas_data = [{
+                    'id': factura.id,
+                    'fecha': factura.fecha,
+                    'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
+                    'total': factura.total_valor
+                } for factura in facturas]
+                return facturas_data
+            else:
+                return None  # Si no hay facturas
+        except Exception as e:
+            print(f"Error al buscar facturas: {e}")
+            return None
+        finally:
+            session.close()
+
+    #----------------
+
+    @staticmethod
+    def obtener_detalles(id_factura):
+        session = SessionLocal()
+        try:
+            # Buscar la factura por id
+            factura = session.query(Factura).filter_by(id=id_factura).first()
+
+            if factura:
+                # Serializar los datos de la factura
+                factura_data = {
+                    'id': factura.id,
+                    'fecha': factura.fecha,
+                    'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
+                    'vendedor': factura.vendedor.nombres_vendedor,  # Asegúrate de que este campo exista
+                    'total': float(factura.total_valor),
+                    'montoPagado': float(factura.monto_pagado),
+                    'cambio': float(factura.cambio),
+                    'items': [{
+                        'producto': item.producto.nombre,  # Asegúrate de que este campo exista en la relación Producto
+                        'cantidad': item.cantidad,
+                        'precioUnitario': item.precio_unitario,
+                        'subtotal': item.total_precio
+                    } for item in factura.detalles]
+                }
+                return factura_data
+            else:
+                return None  # Si no se encuentra la factura
+        except Exception as e:
+            print(f"Error al obtener detalles de la factura: {e}")
+            return None
+        finally:
+            session.close()
      

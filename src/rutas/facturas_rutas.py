@@ -117,59 +117,26 @@ def registrar_rutas(app):
     @app.route('/facturas_por_fecha', methods=['GET'])
     def obtener_facturas_por_fecha():
         fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL
-
-        # Abrir una nueva sesión de la base de datos
-        session = SessionLocal()
         
-        try:
-            # Buscar facturas por la fecha
-            facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
-
-            if facturas:
-                facturas_data = [{
-                    'id': factura.id,
-                    'fecha': factura.fecha,
-                    'cliente': factura.cliente.nombres_cliente,
-                    'total': factura.total_valor
-                } for factura in facturas]
-
-                return jsonify(facturas_data), 200
-            else:
-                return jsonify({'message': 'No se encontraron facturas para la fecha seleccionada'}), 404
-        finally:
-            # Asegurarse de cerrar la sesión para liberar los recursos
-            session.close()
+        # Llamar al método en el modelo para buscar facturas por la fecha
+        facturas_data = Factura.buscar_por_fecha(fecha)
+        
+        if facturas_data:
+            return jsonify(facturas_data), 200
+        else:
+            return jsonify({'message': 'No se encontraron facturas para la fecha seleccionada'}), 404
     
     #---------------
 
+    #Ruta para ver el detalle de las facturas
     @app.route('/detalles_factura/<int:id_factura>', methods=['GET'])
     def obtener_detalles_factura(id_factura):
-        # Crear una nueva sesión de la base de datos
-        session = SessionLocal()
-        
-        try:
-            # Buscar la factura por id
-            factura = session.query(Factura).filter_by(id=id_factura).first()
+        # Llamar al método en el modelo para obtener los detalles de la factura
+        factura_data = Factura.obtener_detalles(id_factura)
 
-            if factura:
-                factura_data = {
-                    'id': factura.id,
-                    'fecha': factura.fecha,
-                    'cliente': factura.cliente.nombres_cliente,
-                    'vendedor': factura.vendedor.nombres_vendedor,
-                    'total':float(factura.total_valor),
-                    'montoPagado':float(factura.monto_pagado),
-                    'cambio':float(factura.cambio),
-                    'items': [{
-                        'producto': item.producto.nombre,
-                        'cantidad': item.cantidad,
-                        'precioUnitario': item.precio_unitario,
-                        'subtotal': item.total_precio
-                    } for item in factura.detalles]
-                }
-                return jsonify(factura_data), 200
-            else:
-                return jsonify({'message': 'Factura no encontrada'}), 404
-        finally:
-            # Asegurarse de cerrar la sesión
-            session.close()
+        if factura_data:
+            return jsonify(factura_data), 200
+        else:
+            return jsonify({'message': 'Factura no encontrada'}), 404
+    
+    #-----------------
