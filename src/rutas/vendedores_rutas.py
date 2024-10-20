@@ -20,7 +20,7 @@ def registrar_rutas(app):
             db = SessionLocal()
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
-            nombre_completo = request.form['nombreVendedor']  # Usamos un solo campo para el nombre completo
+            nombre_completo = request.form['nombreVendedor'].title()  # Usamos un solo campo para el nombre completo
             telefono = request.form['telefonoVendedor']
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
@@ -88,7 +88,7 @@ def registrar_rutas(app):
         vendedor_id = request.form['vendedorId']
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['numeroDocumento']
-        nombre = request.form['nombreVendedor']
+        nombre = request.form['nombreVendedor'].title()
         telefono = request.form['telefonoVendedor']
         direccion = request.form['direccionVendedor']
         email = request.form['emailVendedor']

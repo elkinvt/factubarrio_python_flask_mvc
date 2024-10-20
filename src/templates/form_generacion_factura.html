@@ -132,6 +132,37 @@
         }
     });
 
+
+     // Ocultar sugerencias y buscar el cliente al presionar "Enter"
+     inputBuscarDocumento.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // Evitar que se envíe el formulario si se presiona "Enter"
+            const numeroDocumento = this.value.trim();
+            
+            // Limpiar la lista de sugerencias
+            listaSugerencias.innerHTML = '';  
+            listaSugerencias.style.display = 'none';  
+
+            if (numeroDocumento.length > 2) {
+                // Realizar una búsqueda exacta al presionar "Enter"
+                fetch(`/verificar_cliente_inactivo?numero_documento=${numeroDocumento}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.inactivo) {
+                            alert(`El cliente con número de documento ${numeroDocumento} está inactivo.`);
+                        } else if (!data.existe) {
+                            alert('Cliente no encontrado.');
+                        } else {
+                            // Si el cliente está activo, rellenamos los campos
+                            nombreClienteInput.value = data.nombre;
+                            clienteIdInput.value = data.id;
+                        }
+                    });
+            }
+        }
+    });
+
+    
     // Mostrar sugerencias de clientes
     function mostrarSugerenciasClientes(clientes) {
         listaSugerencias.innerHTML = ''; // Limpiar la lista de sugerencias
@@ -247,48 +278,62 @@
 
     // Los productos son enviados desde Flask como JSON
 
-    // Agregar productos a la factura
+   // Agregar productos a la factura
     function agregarProductoAFactura() {
-    var productocodigo = document.getElementById('productoFacturaCodigo').value;
-    var cantidad = document.getElementById('cantidadFactura').value;
+        var productocodigo = document.getElementById('productoFacturaCodigo').value;
+        var cantidad = document.getElementById('cantidadFactura').value;
 
-    if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
-        alert("Seleccione un producto y una cantidad válida.");
-        return;
-    }
+        // Validar que el producto y la cantidad sean válidos
+        if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
+            alert("Seleccione un producto y una cantidad válida.");
+            return;
+        }
 
-    // Buscamos el producto en la lista de productos enviados desde Flask
-    var producto = productosDisponibles.find(p => p.codigo === productocodigo);
+        // Buscamos el producto en la lista de productos enviados desde Flask
+        var producto = productosDisponibles.find(p => p.codigo === productocodigo);
+        if (!producto) {
+            alert("Producto no encontrado.");
+            return;
+        }
 
-
-    if (!producto) {
-        alert("Producto no encontrado.");
-        return;
-    }
-
-    // Verificar si hay suficiente stock
-    if (producto.cantidad_stock < cantidad) {
+        // Verificar si hay suficiente stock
+        if (producto.cantidad_stock < cantidad) {
             alert(`No hay suficiente stock para el producto ${producto.nombre}. Stock disponible: ${producto.cantidad_stock}`);
             return;
         }
 
-    var subtotal = producto.precio_unitario * cantidad;
+        var subtotal = producto.precio_unitario * cantidad;
 
-    // Agregar el producto a la factura
-    factura.push({
-        id: producto.id,
-        codigo: producto.codigo,
-        producto: producto.nombre,
-        cantidad: parseInt(cantidad),
-        precio: producto.precio_unitario,
-        subtotal: subtotal
-    });
+        // Agregar el producto a la factura
+        factura.push({
+            id: producto.id,
+            codigo: producto.codigo,
+            producto: producto.nombre,
+            cantidad: parseInt(cantidad),
+            precio: producto.precio_unitario,
+            subtotal: subtotal
+        });
 
-    // Actualizar la tabla de detalles de la factura
-    actualizarDetallesFactura();
-}
+        // Actualizar la tabla de detalles de la factura
+        actualizarDetallesFactura();
 
+        // Limpiar los campos de búsqueda y cantidad
+        document.getElementById('buscarProducto').value = '';
+        document.getElementById('cantidadFactura').value = '';
 
+        // Quitar el atributo `required` del campo de cantidad antes de limpiar
+        document.getElementById('cantidadFactura').removeAttribute('required');
+
+        // Focalizar el campo de búsqueda para el próximo producto
+        document.getElementById('buscarProducto').focus();
+
+        // Mantener la página en la parte superior
+        window.scrollTo(0, 0);
+
+       
+    }
+
+   
     // Actualizar detalles de la factura en la tabla
     function actualizarDetallesFactura() {
         var facturaBody = document.getElementById('facturaBody');
@@ -389,7 +434,6 @@
         const impuesto = total * 0.19;
         const totalConImpuesto = total + impuesto;
 
-        
         // Preguntar el monto pagado
         const montoPagado = prompt(`El total de la factura es: $${totalConImpuesto.toLocaleString('es-CO', { minimumFractionDigits: 2 })}. Ingrese el monto con el que va a pagar:`);
 
@@ -425,22 +469,6 @@
         cambioInput.name = 'cambio';
         cambioInput.value = cambio.toFixed(2);
         this.appendChild(cambioInput);
-
-        // Función para ajustar la fracción
-        function ajustarFraccion(valor) {
-            const fraccion = valor % 100; // Obtener la parte fraccionaria en pesos
-
-            if (fraccion < 50) {
-                // Si la fracción es menor a 50, redondea hacia abajo a la centena más cercana
-                return Math.floor(valor / 100) * 100;
-            } else {
-                // Si la fracción es 50 o más, redondea hacia arriba a la centena más cercana
-                return Math.ceil(valor / 100) * 100;
-            }
-        }
-
-
-        
 
         // Envía el formulario manualmente después de asegurarse de que los datos sean correctos
         this.submit();

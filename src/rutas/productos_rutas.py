@@ -19,8 +19,8 @@ def registrar_rutas(app):
         if request.method == 'POST':
             # Recibe los datos enviados desde el formulario
             codigo = request.form['codigoProducto']
-            nombre = request.form['nombreProducto']
-            descripcion = request.form['descripcionProducto']
+            nombre = request.form['nombreProducto'].capitalize()
+            descripcion = request.form['descripcionProducto'].capitalize()
             categoria = request.form['categoriaProducto']
             precio = float(request.form['precioProducto'])  # Convertimos a float
             unidad_medida = request.form['unidadMedidaProducto']
@@ -129,7 +129,7 @@ def registrar_rutas(app):
             if producto:
                 # Pasar los datos del producto a la plantilla
                 return render_template('form_editar_producto.html', producto=producto, categorias=categorias, unidades_padre=unidades_padre, 
-            subunidades=subunidades, titulo_pagina="Editar Producto prueba")
+            subunidades=subunidades, titulo_pagina="Editar Producto ")
             else:
                 flash('Producto no encontrado.', 'danger')
                 return redirect(url_for('buscar_producto'))
@@ -152,8 +152,8 @@ def registrar_rutas(app):
                 # Diccionario de datos actualizados
                 datos_actualizados = {
                     'codigo': request.form['codigo'],
-                    'nombre': request.form['nombre'],
-                    'descripcion': request.form['descripcion'],
+                    'nombre': request.form['nombre'].capitalize(),
+                    'descripcion': request.form['descripcion'].capitalize(),
                     'categoria_idcategoria': request.form['categoria_id'],
                     'unidad_medida_idunidad_medida': request.form['unidadMedidaProducto'],
                     'presentacion': request.form['presentacion'],
@@ -245,33 +245,4 @@ def registrar_rutas(app):
         finally:
             db.close()
 
-
-
-
-    
-
-
-''' 
-
-
-    # Ruta para eliminar un producto (eliminación lógica)
-    @app.route('/productos_eliminar', methods=['POST'])
-    def eliminar_producto():
-        db = SessionLocal()
-        codigo = request.form['codigoProducto']
-        producto = db.query(Productos).filter_by(codigo=codigo).first()
-        
-        if producto:
-            producto.is_deleted = True
-            try:
-                db.commit()
-                flash('Producto eliminado correctamente', 'success')
-            except Exception as e:
-                db.rollback()
-                flash(f'Error al eliminar producto: {str(e)}', 'danger')
-        else:
-            flash('Producto no encontrado', 'danger')
-        
-        db.close()
-        return redirect(url_for('ver_productos'))'''
 

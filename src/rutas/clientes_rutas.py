@@ -27,7 +27,7 @@ def registrar_rutas(app):
             # Obtener los datos del formulario
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
-            nombres_cliente = request.form['nombreCliente']
+            nombres_cliente = request.form['nombreCliente'].title()
             telefono = request.form['telefonoCliente']
             direccion = request.form['direccionCliente']
             email = request.form['emailCliente']
@@ -96,7 +96,7 @@ def registrar_rutas(app):
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['numeroDocumento']
-        nombres_cliente = request.form['nombreCliente']
+        nombres_cliente = request.form['nombreCliente'].title()
         telefono = request.form['telefonoCliente']
         direccion = request.form['direccionCliente']
         email = request.form['emailCliente']
@@ -199,7 +199,7 @@ def registrar_rutas(app):
 
         try:
             # Consulta a la base de datos por el número de documento usando la sesión de SQLAlchemy
-            clientes = db.query(Clientes).filter(Clientes.numero_documento.ilike(f"%{q}%")).all()
+            clientes = db.query(Clientes).filter(Clientes.numero_documento.ilike(f"%{q}%"), Clientes.is_active == True).all()
 
             # Serializar los datos del cliente para enviarlos al frontend
             clientes_data = [{
@@ -218,4 +218,30 @@ def registrar_rutas(app):
             db.close()  # Cerrar la sesión de la base de datos
 
     #-----------
+
+    #Ruta para verificar el esatdo inactivo de un cliente
+    @app.route('/verificar_cliente_inactivo')
+    def verificar_cliente_inactivo():
+        db = SessionLocal()
+        numero_documento = request.args.get('numero_documento')
+
+        try:
+            # Buscar el cliente por número de documento
+            cliente = db.query(Clientes).filter_by(numero_documento=numero_documento).first()
+
+            if cliente:
+                if not cliente.is_active:
+                    return jsonify({'inactivo': True})
+                else:
+                    return jsonify({'existe': True, 'nombre': cliente.nombres_cliente, 'id': cliente.idclientes})
+            else:
+                return jsonify({'existe': False})
+
+        except Exception as e:
+            print(f"Error al verificar cliente: {e}")
+            return jsonify({'error': 'Error al verificar el cliente'}), 500
+
+        finally:
+            db.close()
+
 
