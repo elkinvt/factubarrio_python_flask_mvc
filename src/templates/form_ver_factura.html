@@ -99,8 +99,17 @@ function mostrarDetallesFactura(idFactura) {
                 <p><strong>Monto Pagado:</strong> $${factura.montoPagado.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <p><strong>Cambio:</strong> $${factura.cambio.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <div><strong>Items:</strong></div>
-                <ul>
-                    ${factura.items.map(item => `<li>${item.producto} - ${item.cantidad} x $${item.precioUnitario} = $${item.subtotal}</li>`).join('')}
+               <ul>
+                    ${factura.items.map(item => `
+
+                        <li>${item.producto} - ${item.cantidad} x $${item.precioUnitario.toLocaleString('es-CO', { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                        })} = $${item.subtotal.toLocaleString('es-CO', { 
+                            minimumFractionDigits: 2, 
+                            maximumFractionDigits: 2 
+                        })}
+                        </li>`).join('')}
                 </ul>
             `;
 

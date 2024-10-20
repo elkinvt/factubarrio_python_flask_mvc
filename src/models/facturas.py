@@ -122,8 +122,8 @@ class Factura(Base):
                     'items': [{
                         'producto': item.producto.nombre,  # Asegúrate de que este campo exista en la relación Producto
                         'cantidad': item.cantidad,
-                        'precioUnitario': item.precio_unitario,
-                        'subtotal': item.total_precio
+                        'precioUnitario': float(item.precio_unitario),
+                        'subtotal': float ( item.total_precio)
                     } for item in factura.detalles]
                 }
                 return factura_data
