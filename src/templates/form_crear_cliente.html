@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-
     <h2>Registrar Cliente</h2>
     <form action="/clientes_crear" method="POST" id="formCliente">
         <div class="mb-3">
@@ -16,37 +15,28 @@
         </div>
         <div class="mb-3">
             <label for="numeroDocumento" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="numeroDocumento"
-                required>
+            <input type="text" class="form-control form-control-sm" id="numeroDocumento" name="numeroDocumento" required>
         </div>
         <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente"
-                required>
-        </div>
-        <div class="mb-3">
-            <label for="apellidoCliente" class="form-label">Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoCliente" name="apellidoCliente"
-                required>
+            <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" required>
         </div>
         <div class="mb-3">
             <label for="telefonoCliente" class="form-label">Teléfono</label>
-            <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente"
-                required>
+            <input type="tel" class="form-control form-control-sm" id="telefonoCliente" name="telefonoCliente" required>
         </div>
         <div class="mb-3">
             <label for="direccionCliente" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente"
-                required>
+            <input type="text" class="form-control form-control-sm" id="direccionCliente" name="direccionCliente" required>
         </div>
         <div class="mb-3">
             <label for="emailCliente" class="form-label">Email</label>
             <input type="email" class="form-control form-control-sm" id="emailCliente" name="emailCliente" required>
         </div>
-        <button type="submit" class="btn btn-primary form-control-sm" onclick="guardarCliente()">Guardar
-            Cliente</button>
+        <button type="submit" class="btn btn-primary form-control-sm">Guardar Cliente</button>
     </form>
 </div>
+
 
 
 {% endblock %}

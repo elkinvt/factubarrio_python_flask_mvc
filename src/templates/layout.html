@@ -177,7 +177,6 @@
     </ul>
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
-        {{ messages }}  <!-- Imprime los mensajes flash directamente para depuración -->
         {% if messages %}
             <div class="alert alert-dismissible fade show">
                 {% for category, message in messages %}

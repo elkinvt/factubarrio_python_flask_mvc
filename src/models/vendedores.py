@@ -1,176 +1,99 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from .data_base import Base
+from . import Base, SessionLocal
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
     
-    id = Column(Integer, primary_key=True, autoincrement=True)  # ID único para cada vendedor
-    tipo_documento = Column(String(2), nullable=False)  # Tipo de Documento (CC, TI, CE, PS)
-    numero_documento = Column(String(20), unique=True, nullable=False)  # Número de Documento único
-    nombre = Column(String(100), nullable=False)  # Nombre del vendedor
-    apellido = Column(String(100), nullable=False)  # Apellido del vendedor
-    telefono = Column(String(20), nullable=False)  # Teléfono del vendedor
-    direccion = Column(String(200), nullable=False)  # Dirección del vendedor
-    email = Column(String(100), nullable=False)  # Email del vendedor
-    is_deleted = Column(Boolean, default=False)  # Eliminación lógica (false por defecto)
+    idvendedores = Column(Integer, primary_key=True, autoincrement=True)
+    tipo_documento = Column(String(10), nullable=False)
+    numero_documento = Column(String(20), unique=True, nullable=False)
+    nombres_vendedor = Column(String(100), nullable=False)
+    telefono = Column(String(15))
+    direccion = Column(String(255))  
+    email = Column(String(100))
+    is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
 
-    #crear vendedor!!!
+    def __init__(self, tipo_documento, numero_documento, nombres_vendedor, telefono, direccion, email, is_deleted=False):
+        self.tipo_documento = tipo_documento
+        self.numero_documento = numero_documento
+        self.nombres_vendedor = nombres_vendedor
+        self.telefono = telefono
+        self.direccion = direccion
+        self.email = email
+        self.is_deleted = is_deleted  # Ahora acepta is_deleted
 
-from flask import Blueprint, request, redirect, url_for, flash, render_template, jsonify
-from models.data_base import SessionLocal
-
-
-# Definir el blueprint para las rutas relacionadas con vendedores
-vendedores_bp = Blueprint('vendedores', __name__)
-
-@vendedores_bp.route('/vendedores_crear', methods=['GET', 'POST'])
-def crear_vendedor():
-    if request.method == 'POST':
-        db = SessionLocal()
-
-        # Recibir los datos enviados desde el formulario
-        tipo_documento = request.form['tipoDocumento']
-        numero_documento = request.form['numeroDocumento']
-        nombre = request.form['nombreVendedor']
-        apellido = request.form['apellidoVendedor']
-        telefono = request.form['telefonoVendedor']
-        direccion = request.form['direccionVendedor']
-        email = request.form['emailVendedor']
-
-        # Crear una nueva instancia del vendedor
-        nuevo_vendedor = Vendedores(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento,
-            nombre=nombre,
-            apellido=apellido,
-            telefono=telefono,
-            direccion=direccion,
-            email=email
-        )
-
+    def __repr__(self):
+        return f'<Vendedor {self.nombres_vendedor}>'
+    
+    
+    
+    # Método estático para obtener los vendedores no eliminados
+    @staticmethod
+    def obtener_vendedores():
+        session = SessionLocal()
         try:
-            db.add(nuevo_vendedor)
-            db.commit()
-            flash('Vendedor creado con éxito', 'success')
-        except Exception as e:
-            db.rollback()
-            flash(f'Error al crear vendedor: {str(e)}', 'danger')
+            vendedores = session.query(Vendedores).filter_by(is_deleted=False).all()
+            return vendedores
         finally:
-            db.close()
+            session.close()
+    #------------     
 
-        return redirect(url_for('vendedores.crear_vendedor'))  # Redirigir después de crear el vendedor
-
-    # Si es un GET, mostrar el formulario
-    return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
-
-
-#ver vendedor!!
-@vendedores_bp.route('/vendedores_ver', methods=['GET'])
-def ver_vendedores():
-    db = SessionLocal()
-    vendedores = db.query(Vendedores).filter_by(is_deleted=False).all()  # Solo vendedores que no están eliminados
-    db.close()
-
-    # Renderizar la plantilla con la lista de vendedores
-    return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
-
-#editar el vendedor!!!
-# Ruta para buscar un vendedor por su tipo y número de documento
-@vendedores_bp.route('/vendedores_buscar', methods=['GET'])
-def buscar_vendedor():
-    tipo_documento = request.args.get('tipoDocumento').strip().upper()
-    numero_documento = request.args.get('numeroDocumento').strip()
-
-    print(f"Buscando vendedor con tipo_documento={tipo_documento} y numero_documento={numero_documento}")
-
-    db = SessionLocal()
-    vendedor = db.query(Vendedores).filter(
-        Vendedores.tipo_documento == tipo_documento,
-        Vendedores.numero_documento == numero_documento
-    ).first()
-    db.close()
-
-    if vendedor:
-        return jsonify({
-            'id': vendedor.id,
-            'tipo_documento': vendedor.tipo_documento,
-            'numero_documento': vendedor.numero_documento,
-            'nombre': vendedor.nombre,
-            'apellido': vendedor.apellido,
-            'telefono': vendedor.telefono,
-            'direccion': vendedor.direccion,
-            'email': vendedor.email
-        })
-    else:
-        return jsonify({'error': 'Vendedor no encontrado'}), 404
-
-
-
-# Ruta para actualizar un vendedor (POST)
-@vendedores_bp.route('/vendedores_actualizar', methods=['POST'])
-def actualizar_vendedor():
-    db = SessionLocal()
-
-    # Recibe los datos del formulario
-    vendedor_id = request.form['vendedorId']
-    tipo_documento = request.form['tipoDocumento']
-    numero_documento = request.form['numeroDocumento']
-    nombre = request.form['nombreVendedor']
-    apellido = request.form['apellidoVendedor']
-    telefono = request.form['telefonoVendedor']
-    direccion = request.form['direccionVendedor']
-    email = request.form['emailVendedor']
-
-    # Busca al vendedor en la base de datos
-    vendedor = db.query(Vendedores).filter_by(id=vendedor_id).first()
-
-    if vendedor:
-        vendedor.tipo_documento = tipo_documento
-        vendedor.numero_documento = numero_documento
-        vendedor.nombre = nombre
-        vendedor.apellido = apellido
-        vendedor.telefono = telefono
-        vendedor.direccion = direccion
-        vendedor.email = email
-
+    # Método estático para agregar un vendedor      
+    @staticmethod
+    def agregar_vendedor(db_session, vendedor):
         try:
-            db.commit()
-            flash('Cambios guardados correctamente', 'success')
+            db_session.add(vendedor)
+            db_session.commit()
+            return vendedor
         except Exception as e:
-            db.rollback()
-            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
-    else:
-        flash('Vendedor no encontrado', 'danger')
+            db_session.rollback()
+            raise e
+    #------------------
+    
+    # Método estático para buscar un vendedor usando una sesión existente
+    @staticmethod
+    def buscar_vendedor_por_documento(db_session, tipo_documento, numero_documento):
+        vendedores = db_session.query(Vendedores).filter_by(
+            tipo_documento=tipo_documento,
+            numero_documento=numero_documento
+        ).first()
+        return vendedores
+    #---------
+    
+    # Método estático para actualizar un vendedor     
+    @staticmethod
+    def actualizar_vendedor(db_session, vendedor, datos_actualizados):
+        try:
+            for key, value in datos_actualizados.items():
+                setattr(vendedor, key, value)  # Actualiza el campo del vendedor
+            
+            db_session.commit()  # Confirmar los cambios en la base de datos
+            return vendedor
+        except Exception as e:
+            db_session.rollback()  # Deshacer cambios si ocurre un error
+            raise e
 
-    db.close()
-
-    # Redirigir a la vista de vendedores para mostrar la lista
-    return redirect(url_for('vendedores.ver_vendedores'))
-
-# Ruta para eliminar (lógicamente) un vendedor
-@vendedores_bp.route('/vendedores_eliminar', methods=['POST'])
-def eliminar_vendedor():
-    data = request.get_json()  # Recibir los datos como JSON desde el frontend
-    numero_documento = data.get('numeroDocumento')
-    tipo_documento = data.get('tipoDocumento')
-
-    db = SessionLocal()
-
-    try:
-        # Buscar al vendedor en la base de datos
-        vendedor = db.query(Vendedores).filter_by(numero_documento=numero_documento, tipo_documento=tipo_documento).first()
-
-        if vendedor and not vendedor.is_deleted:
-            vendedor.is_deleted = True  # Eliminación lógica
-
-            try:
-                db.commit()
-                return jsonify({'success': True, 'message': 'Vendedor eliminado correctamente.'})
-            except Exception as e:
-                db.rollback()
-                return jsonify({'success': False, 'message': f'Error al eliminar el vendedor: {str(e)}'})
-        else:
-            return jsonify({'success': False, 'message': 'Vendedor no encontrado o ya eliminado.'}), 404
-    finally:
-        db.close()
+    @staticmethod
+    def buscar_vendedor_por_id(vendedor_id):
+        session = SessionLocal()
+        try:
+            vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+            return vendedor
+        finally:
+            session.close()
+            
+    #-----------------
+    
+     # Método estático para eliminar un vendedor 
+      #----------------
+    @staticmethod
+    def eliminar_vendedor(db_session, vendedor):
+        try:
+            vendedor.is_deleted = True  # Marcamos el cliente como eliminado
+            db_session.commit()  # Guardamos los cambios
+        except Exception as e:
+            db_session.rollback()  # En caso de error, revertimos la transacción
+            raise e
+    #------------    
+    
 

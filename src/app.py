@@ -1,25 +1,31 @@
 from flask import Flask, render_template
-from models.clientes import clientes_bp  # Importa el blueprint de clientes
-from models.vendedores import vendedores_bp # Importa el blueprint de vendedores
-from models.data_base import Base, engine  # Importar la base y el engine para crear las tablas
 
 
+from models import Base, engine  # Importar la base y el engine para crear las tablas
+from models import init_db  # Importar la función init_db para crear las tablas
+
+# Importa las rutas con nombres únicos
+from rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
+from rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
+from rutas.productos_rutas import registrar_rutas as registrar_rutas_productos
+from rutas.facturas_rutas import registrar_rutas as registrar_rutas_facturas
 
 app = Flask(__name__)
 
 app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 
-# Crear las tablas en la base de datos
-Base.metadata.create_all(bind=engine)
 
 
-# Registrar blueprints
-app.register_blueprint(vendedores_bp)
-app.register_blueprint(clientes_bp)
+# Inicializar la base de datos
+init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 
 
-if __name__ == '__main__':
-    app.run(debug = True)
+
+# Registra las rutas
+registrar_rutas_clientes(app)
+registrar_rutas_vendedores(app)
+registrar_rutas_productos(app)
+registrar_rutas_facturas(app)
 
 @app.route('/')
 def index():
@@ -30,25 +36,7 @@ def pagina_principal():
     return render_template('pgprincipal.html', titulo_pagina ="Pagina principal")
 
 
-@app.route('/vendedores_crear')
-def vendedores_crear():
-    return render_template('form_crear_vendedor.html', titulo_pagina = "Crear vendedor")
 
-@app.route('/vendedores_ver')
-def vendedores_ver():
-    return render_template('form_ver_vendedor.html', titulo_pagina = "Ver vendedor")
-
-@app.route('/vendedores_editar')
-def vendedores_editar():
-    return render_template('form_editar_vendedor.html', titulo_pagina = "Editar vendedor")
-
-@app.route('/productos_crear')
-def productos_crear():
-    return render_template('form_crear_producto.html', titulo_pagina = " Crear producto")
-
-@app.route('/productos_ver')
-def productos_ver():
-    return render_template('form_ver_producto.html', titulo_pagina = "Ver producto")
 
 @app.route('/productos_editar')
 def productos_editar():
@@ -66,9 +54,7 @@ def usuarios_ver():
 def usuarios_editar():
     return render_template('form_editar_usuario.html', titulo_pagina = "Editar usuario")
 
-@app.route('/generar_factura')
-def generar_factura():
-    return render_template('form_generacion_factura.html', titulo_pagina = "Generar factura")
+
 
 @app.route('/ver_factura')
 def ver_factura():
@@ -78,12 +64,6 @@ def ver_factura():
 def cerrar_sesion():
     return render_template('index.html')
 
-class Productos:
-    descripcion = 'Carne'
-    valor_unitario = 1000
-    cantidad_stock = 10
-    unidad_medida = 'GRS'
-    
-    def crear_producto(descripcion, valor_unitario, cantidad_stock, unidad_medida):
-        return 'Producto creado correctamente'
-    
+# Punto de entrada de la aplicación
+if __name__ == '__main__':
+    app.run(debug=True)

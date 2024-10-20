@@ -1,31 +1,11 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-    <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
-    <select class="form-control form-control-sm" id="buscarTipoDocumento" name="buscartipoDocumento">
-        <option value="">Seleccione tipo de documento</option>
-        <option value="CC">Cédula de Ciudadanía</option>
-        <option value="TI">Tarjeta de Identidad</option>
-        <option value="CE">Cédula de Extranjería</option>
-        <option value="PA">Pasaporte</option>
-        <option value="RC">Registro Civil</option>
-        <option value="NIT">NIT</option>
-    </select>
-
-    <label for="buscarCedula" class="form-label">Número de Documento:</label>
-    <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm" id="buscarCedula" onkeypress="handleKeyPress(event)">
-
-    <button onclick="buscarYEditarVendedor()" class="btn btn-primary mt-2">Buscar Vendedor</button>
-</div>
-
-<div id="datosVendedor" class="container mt-5" style="display:none;">
-    <h2>Editar Vendedor</h2>
-    <form id="formEditarVendedor" action="/vendedores_actualizar" method="POST">
-        <input type="hidden" id="vendedorId" name="vendedorId">
-        
-        <div class="mb-3">
-            <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
-            <select class="form-control form-control-sm" id="tipoDocumentoEditar" name="tipoDocumento">
+    {% if not vendedor %}
+        <h2>Buscar Vendedor</h2>
+        <form action="/vendedores_editar" method="GET">
+            <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
+            <select class="form-control form-control-sm" id="buscarTipoDocumento" name="tipoDocumento">
                 <option value="">Seleccione tipo de documento</option>
                 <option value="CC">Cédula de Ciudadanía</option>
                 <option value="TI">Tarjeta de Identidad</option>
@@ -34,134 +14,87 @@
                 <option value="RC">Registro Civil</option>
                 <option value="NIT">NIT</option>
             </select>
+
+            <label for="buscarCedula" class="form-label">Número de Documento:</label>
+            <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm" name="numeroDocumento">
+
+            <button type="submit" class="btn btn-primary mt-2 form-control-sm">Buscar Vendedor</button>
+        </form>
+    {% endif %}
+</div>
+
+{% if vendedor %}
+<div class="container mt-5">
+    <h2>Editar Vendedor</h2>
+    <form action="/vendedores_actualizar" method="POST">
+        <input type="hidden" name="vendedorId" value="{{ vendedor.idvendedores }}">
+
+        <div class="mb-3">
+            <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
+            <select class="form-control form-control-sm" name="tipoDocumento">
+                <option value="">Seleccione tipo de documento</option>
+                <option value="CC" {% if vendedor.tipo_documento == 'CC' %} selected {% endif %}>Cédula de Ciudadanía</option>
+                <option value="TI" {% if vendedor.tipo_documento == 'TI' %} selected {% endif %}>Tarjeta de Identidad</option>
+                <option value="CE" {% if vendedor.tipo_documento == 'CE' %} selected {% endif %}>Cédula de Extranjería</option>
+                <option value="PA" {% if vendedor.tipo_documento == 'PA' %} selected {% endif %}>Pasaporte</option>
+                <option value="RC" {% if vendedor.tipo_documento == 'RC' %} selected {% endif %}>Registro Civil</option>
+                <option value="NIT" {% if vendedor.tipo_documento == 'NIT' %} selected {% endif %}>NIT</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="numeroDocumentoVendedor" class="form-label">Número de Documento</label>
+            <input type="text" class="form-control form-control-sm" name="numeroDocumento" value="{{ vendedor.numero_documento }}" required>
         </div>
         
+
         <div class="mb-3">
             <label for="nombreVendedor" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor" required>
+            <input type="text" class="form-control form-control-sm" name="nombreVendedor" value="{{ vendedor.nombres_vendedor }}" required>
         </div>
-        <div class="mb-3">
-            <label for="apellidoVendedor" class="form-label">Apellidos</label>
-            <input type="text" class="form-control form-control-sm" id="apellidoVendedor" name="apellidoVendedor" required>
-        </div>
-        <div class="mb-3">
-            <label for="cedulaVendedor" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaVendedor" name="numeroDocumento" readonly>
-        </div>
+
         <div class="mb-3">
             <label for="telefonoVendedor" class="form-label">Teléfono</label>
-            <input type="tel" class="form-control form-control-sm" id="telefonoVendedor" name="telefonoVendedor">
+            <input type="tel" class="form-control form-control-sm" name="telefonoVendedor" value="{{ vendedor.telefono }}">
         </div>
+
         <div class="mb-3">
             <label for="direccionVendedor" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor" required>
+            <input type="text" class="form-control form-control-sm" name="direccionVendedor" value="{{ vendedor.direccion }}" required>
         </div>
+
         <div class="mb-3">
             <label for="emailVendedor" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor" required>
+            <input type="email" class="form-control form-control-sm" name="emailVendedor" value="{{ vendedor.email }}" required>
         </div>
+
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
         </div>
     </form>
 
-    <form>
-        <div class="container mt-5">
-            <h2>Detalles del Vendedor</h2>
-            <div id="vendedorDetalles" class="hidden">
-                <!-- Campos existentes... -->
-            </div>
-            <!-- Botones para controlar el estado del Vendedor -->
-            <button type="button" class="btn btn-danger" onclick="eliminarVendedor()">Eliminar Vendedor</button>
-        </div>
-
+    <!-- Eliminar Vendedor -->
+    <form id="eliminarVendedorForm" action="/vendedores_eliminar" method="POST" class="mt-2" onsubmit="return confirmarEliminacion();">
+        <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
+        <input type="hidden" name="numeroDocumento" value="{{ vendedor.numero_documento }}">
+        <button type="submit" class="btn btn-danger">Eliminar Vendedor</button>
+    
     </form>
 
+    <script>
+        function confirmarEliminacion() {
+            // Mostrar el mensaje de confirmación
+            return confirm("¿Estás seguro de que deseas eliminar este vendedor?");
+        }
+    </script>
+
+    
 </div>
+{% endif %}
 
-<script>
-    function handleKeyPress(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            buscarYEditarVendedor();
-        }
-    }
-
-    function buscarYEditarVendedor() {
-        const tipoDocumento = document.getElementById('buscarTipoDocumento').value;
-        const numeroDocumento = document.getElementById('buscarCedula').value.trim();
-
-        if (!tipoDocumento || !numeroDocumento) {
-            alert("Por favor, complete el tipo y número de documento antes de buscar.");
-            return;
-        }
-
-        fetch(`/vendedores_buscar?tipoDocumento=${tipoDocumento}&numeroDocumento=${numeroDocumento}`)
-            .then(response => response.json())
-            .then(vendedor => {
-                if (vendedor.error) {
-                    alert('Vendedor no encontrado');
-                    return;
-                }
-
-                document.getElementById('vendedorId').value = vendedor.id;
-                document.getElementById('nombreVendedor').value = vendedor.nombre;
-                document.getElementById('apellidoVendedor').value = vendedor.apellido;
-                document.getElementById('cedulaVendedor').value = vendedor.numero_documento;
-                document.getElementById('telefonoVendedor').value = vendedor.telefono;
-                document.getElementById('direccionVendedor').value = vendedor.direccion;
-                document.getElementById('emailVendedor').value = vendedor.email;
-
-                // Selecciona la opción correcta en el select del tipo de documento
-            var selectTipoDocumento = document.getElementById('tipoDocumentoEditar');
-            for (let i = 0; i < selectTipoDocumento.options.length; i++) {
-                if (selectTipoDocumento.options[i].value === vendedor.tipo_documento) {
-                    selectTipoDocumento.selectedIndex = i;
-                    break;
-                }
-            }
-
-                document.getElementById('datosVendedor').style.display = 'flex';
-            })
-            .catch(error => console.error('Error al buscar el vendedor:', error));
-    }
-
-    function eliminarVendedor() {
-    var numeroDocumento = document.getElementById('buscarCedula').value;
-    var tipoDocumento = document.getElementById('buscarTipoDocumento').value;
-
-    if (!numeroDocumento || !tipoDocumento) {
-        alert("Por favor ingrese el tipo y número de documento del vendedor que desea eliminar.");
-        return;
-    }
-
-    var confirmacion = confirm("¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se puede deshacer.");
-    if (confirmacion) {
-        fetch('/vendedores_eliminar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                numeroDocumento: numeroDocumento,
-                tipoDocumento: tipoDocumento
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                // Limpiar formulario o redirigir según sea necesario
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => console.error('Error al eliminar el vendedor:', error));
-    }
-}
-
-</script>
 {% endblock %}
+
+
 
 
 
