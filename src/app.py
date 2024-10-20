@@ -4,6 +4,9 @@ from flask import Flask, render_template
 from src.models import Base, engine  # Importar la base y el engine para crear las tablas
 from src.models import init_db  # Importar la función init_db para crear las tablas
 
+#importar la libreria de los controladores
+from flask_controller import FlaskControllerRegister
+
 # Importa las rutas con nombres únicos
 from src.rutas.clientes_rutas import registrar_rutas as registrar_rutas_clientes
 from src.rutas.vendedores_rutas import registrar_rutas as registrar_rutas_vendedores
@@ -20,20 +23,13 @@ app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
 init_db()  # En lugar de hacer directamente create_all, llamas a tu función
 
 
-
+register = FlaskControllerRegister(app)
+register.register_package('src.controllers')
 # Registra las rutas
 registrar_rutas_clientes(app)
 registrar_rutas_vendedores(app)
 registrar_rutas_productos(app)
 registrar_rutas_facturas(app)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/pagina_principal')
-def pagina_principal():
-    return render_template('pgprincipal.html', titulo_pagina ="Pagina principal")
 
 
 @app.route('/usuarios_crear')
@@ -52,9 +48,6 @@ def usuarios_editar():
 
 
 
-@app.route('/cerrar_sesion')
-def cerrar_sesion():
-    return render_template('index.html')
 
 # Punto de entrada de la aplicación
 if __name__ == '__main__':
