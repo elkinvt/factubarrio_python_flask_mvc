@@ -115,17 +115,6 @@ function mostrarDetallesFactura(idFactura) {
 
 
 </script>
-<script>
-    function cargarFacturas() {
-        let facturas = JSON.parse(localStorage.getItem('Facturas')) || [];
-        console.log(facturas);  // Verifica qué se está cargando realmente
-        let contenedor = document.getElementById('listaFacturas');
-        contenedor.innerHTML = ''; // Limpia contenido anterior
-        facturas.forEach((factura, index) => {
-            contenedor.innerHTML += `<div>Factura ${factura.id} - ${factura.fecha} - Total: $${factura.total}</div>`;
-        });
-    }
 
-</script>
 {% endblock %}
    
