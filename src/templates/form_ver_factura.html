@@ -58,9 +58,9 @@
                     contenedor.innerHTML += `
                     <tr>
                         <td>${factura.id}</td>
-                        <td>${factura.fecha}</td>
+                        <td>${factura.fecha} ${factura.hora}</td>
                         <td>${factura.cliente}</td>
-                        <td>$${factura.total}</td>
+                        <td>$${factura.total.toFixed(2)}</td>
                         <td><button class="btn btn-info btn-sm" onclick="mostrarDetallesFactura('${factura.id}')">Ver Detalles</button></td>
                     </tr>
                 `;
@@ -85,12 +85,17 @@ function mostrarDetallesFactura(idFactura) {
             return response.json();
         })
         .then(factura => {
+
+            let fechaFactura = new Date(factura.fecha);
+            let horaFactura = factura.hora;
+
             let detalleHtml = `
                 <p><strong>ID:</strong> ${factura.id}</p>
-                <p><strong>Fecha:</strong> ${factura.fecha}</p>
+                <p><strong>Fecha:</strong> ${factura.fecha} ${factura.hora}</p>
                 <p><strong>Cliente:</strong> ${factura.cliente}</p>
                 <p><strong>Vendedor:</strong> ${factura.vendedor}</p>
-                <p><strong>Total:</strong> $${factura.total}</p>
+                <p><strong>Impuesto:</strong> $${factura.impuesto.toFixed(2)}</p>
+                <p><strong>Total:</strong> $${factura.total.toFixed(2)}</p>
                 <p><strong>Monto Pagado:</strong> $${factura.montoPagado.toFixed(2)}</p>
                 <p><strong>Cambio:</strong> $${factura.cambio.toFixed(2)}</p>
                 <div><strong>Items:</strong></div>
