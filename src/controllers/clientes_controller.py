@@ -1,11 +1,10 @@
+from src.app import app 
+from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template, jsonify
 from src.models import SessionLocal
 from src.models.clientes import Clientes
 
-
-
-# Función para registrar las rutas en la aplicación Flask
-def registrar_rutas(app):
+class Clientes_Controller(FlaskController):
     
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
@@ -221,5 +220,3 @@ def registrar_rutas(app):
         if 'error' in resultado:
             return jsonify(resultado), 500
         return jsonify(resultado)
-
-

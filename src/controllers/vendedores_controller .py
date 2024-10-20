@@ -1,9 +1,10 @@
+from src.app import app 
+from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template
 from src.models import SessionLocal
 from src.models.vendedores import Vendedores
 
-def registrar_rutas(app):
-    
+class Vendedores_Controller(FlaskController):
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
     def ver_vendedores():
@@ -130,7 +131,7 @@ def registrar_rutas(app):
     
     #------------------
     
-      # Ruta para eliminar vendedor (lógica)
+    # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
     def eliminar_vendedor():
         numero_documento = request.form.get('numeroDocumento')
@@ -157,8 +158,3 @@ def registrar_rutas(app):
         return redirect(url_for('ver_vendedores'))
     
     #-----------
-
-    
-    
-    
-   

@@ -1,17 +1,13 @@
-# Importa las dependencias necesarias
+from src.app import app 
+from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template, jsonify
 from src.models import SessionLocal
 from src.models.productos import Productos  # Importa el modelo de Productos
-from src.models.categorias import Categoria
-from src.models.unidad_medida import UnidadMedida
+from src.models.categorias import Categoria #Importar el modelo de categorias
+from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
 
-
-
-
-# Función para registrar las rutas de productos en la aplicación Flask
-def registrar_rutas(app):
-
-    # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
+class Productos_Controller(FlaskController):
+     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
     def crear_producto():
         db = SessionLocal()
@@ -245,4 +241,4 @@ def registrar_rutas(app):
         finally:
             db.close()
 
-
+    #-------------------
