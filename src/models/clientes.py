@@ -109,19 +109,32 @@ class Clientes(Base):
             raise e
     #------------
 
-    # Método para buscar clientes por nombre o parte del nombre
+    # Método para buscar clientes por número de documento
     @staticmethod
-    def buscar_por_nombre(parte_nombre, db_session):
+    def buscar_por_numero_documento(query):
+        db = SessionLocal()
         try:
-            clientes = db_session.query(Clientes).filter(
-                Clientes.nombres_cliente.ilike(f'%{parte_nombre}%'),
-                Clientes.is_deleted == False,
+            # Consulta para buscar clientes activos cuyo número de documento coincida parcialmente con 'query'
+            clientes = db.query(Clientes).filter(
+                Clientes.numero_documento.ilike(f"%{query}%"),
                 Clientes.is_active == True
             ).all()
-            return clientes
+
+            # Serializar los datos del cliente
+            return [{
+                'id': cliente.idclientes,
+                'nombre': cliente.nombres_cliente,
+                'numero_documento': cliente.numero_documento
+            } for cliente in clientes]
         except Exception as e:
-            raise e
-    #--------------
+            print(f"Error al buscar clientes: {e}")
+            return {'error': 'Error al buscar clientes'}
+        finally:
+            db.close()
+
+
+
+
 
     # Método para verificar si un cliente está inactivo.
     @staticmethod

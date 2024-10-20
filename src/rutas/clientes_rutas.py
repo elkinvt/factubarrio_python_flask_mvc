@@ -192,7 +192,7 @@ def registrar_rutas(app):
 
 
     #busqueda del cliente por el numero de documento para la factura
-    @app.route('/buscar_clientes_por_numero_documento')
+    '''@app.route('/buscar_clientes_por_numero_documento')
     def buscar_clientes_por_numero_documento():
         db = SessionLocal()  # Iniciar sesión de la base de datos
         q = request.args.get('q', '')
@@ -217,7 +217,21 @@ def registrar_rutas(app):
         finally:
             db.close()  # Cerrar la sesión de la base de datos
 
-    #-----------
+    #-----------'''
+
+    @app.route('/buscar_clientes_por_numero_documento')
+    def buscar_clientes_por_numero_documento():
+        query = request.args.get('q', '')
+        
+        # Llamada al método en el modelo para buscar clientes
+        clientes_data = Clientes.buscar_por_numero_documento(query)
+
+        # Si hubo un error, devolvemos un error en formato JSON
+        if 'error' in clientes_data:
+            return jsonify(clientes_data), 500
+
+        # Devolvemos los datos de los clientes
+        return jsonify(clientes_data)
 
     #Ruta para verificar el estado inactivo de un cliente
     @app.route('/verificar_cliente_inactivo')
