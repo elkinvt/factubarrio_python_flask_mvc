@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Reemplaza 'usuario', 'contraseña', y 'factu_barrio' con tus credenciales y nombre de base de datos
-DATABASE_URL = "postgresql+psycopg2://postgres:KDOSqztr024**@localhost/factu_barrio_3"
+DATABASE_URL = "postgresql+psycopg2://postgres:KDOSqztr024**@localhost/factu_barrio_prueba_modelos"
 
 # Creación del motor de la base de datos para conectarse con PostgreSQL
 engine = create_engine(DATABASE_URL)
