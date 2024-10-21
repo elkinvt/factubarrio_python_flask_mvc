@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Reemplaza 'usuario', 'contraseña', y 'factu_barrio' con tus credenciales y nombre de base de datos
-DATABASE_URL = "postgresql+psycopg2://postgres:KDOSqztr024**@localhost/factu_barrio_prueba_modelos"
+DATABASE_URL = "postgresql+psycopg2://postgres:KDOSqztr024**@localhost/factu_barrio_4"
 
 # Creación del motor de la base de datos para conectarse con PostgreSQL
 engine = create_engine(DATABASE_URL)
@@ -16,16 +16,15 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Función para inicializar las tablas
 def init_db():
-    from .detalle_producto import DetalleProducto
-    from .categorias import Categoria
-    from .unidad_medida import UnidadMedida
-    from .clientes import Clientes  
-    from .facturas import Factura
-    from .vendedores import Vendedores
-    from .productos import Productos
-    from .detalle_producto import DetalleProducto
-    from .facturas import Factura
-   
+    from src.models.categorias import Categoria
+    from src.models.unidad_medida import UnidadMedida
+    from src.models.clientes import Clientes  
+    from src.models.facturas import Factura
+    from src.models.vendedores import Vendedores
+    from src.models.productos import Productos
+    from src.models.detalle_producto import DetalleProducto
     
-     # Crear todas las tablas
+    # Crear todas las tablas
     Base.metadata.create_all(bind=engine)
+
+#--------------
