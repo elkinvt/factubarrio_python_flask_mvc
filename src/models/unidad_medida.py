@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from . import Base
+from src.models import Base
 
 class UnidadMedida(Base):
     __tablename__ = 'unidad_medida'

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from . import Base, SessionLocal
+from src.models import Base, SessionLocal
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
