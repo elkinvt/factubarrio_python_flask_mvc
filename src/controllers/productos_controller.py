@@ -98,7 +98,11 @@ class Productos_Controller(FlaskController):
             categorias = Categoria.obtener_todas(db)  # Método en el modelo Categoria
             unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)  # Método en el modelo UnidadMedida
             
-            
+            # Si no se encuentran productos, mostramos un mensaje flash
+            if not productos:
+                flash('No se encontraron productos con ese nombre o código', 'warning')
+
+
             # Renderizar la misma plantilla con los productos y los datos adicionales
             return render_template('form_editar_producto.html', productos=productos, categorias=categorias, unidades_padre=unidades_padre, 
             subunidades=subunidades, titulo_pagina="Seleccionar producto")
