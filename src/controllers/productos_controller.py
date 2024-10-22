@@ -7,7 +7,8 @@ from src.models.categorias import Categoria #Importar el modelo de categorias
 from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
 
 class Productos_Controller(FlaskController):
-     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
+
+    # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
     def crear_producto():
         db = SessionLocal()
@@ -78,43 +79,54 @@ class Productos_Controller(FlaskController):
     
     #-------------------
 
-
-    # Ruta para mostrar el formulario de edición de productos (GET)
+    # Ruta para buscar o seleccionar el producto
     @app.route('/productos_editar', methods=['GET'])
-    def mostrar_formulario_edicion_producto():
-        # Renderiza el formulario vacío, con los campos del producto sin datos
-        return render_template('form_editar_producto.html', producto=None, categorias=[], unidades_medida=[], titulo_pagina="Editar Producto")
-
-    #--------------
-    
-    # Ruta para buscarr el producto por el nombre o codigo (GET)
-    @app.route('/productos_buscar', methods=['GET'])
-    def buscar_producto():
-        termino = request.args.get('termino', '').lower()
+    def editar_producto():
+        # Conexión a la base de datos
         db = SessionLocal()
 
+        # Obtener el término de búsqueda (si existe)
+        termino = request.args.get('termino', '').lower()
+        producto_id = request.args.get('producto_id')  # ID del producto seleccionado
+
         try:
-            productos = Productos.buscar_por_codigo_o_nombre(termino, db)
-            categorias = Categoria.obtener_todas(db)  # Método en el modelo Categoria
-            unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)  # Método en el modelo UnidadMedida
-            
-            # Si no se encuentran productos, mostramos un mensaje flash
-            if not productos:
-                flash('No se encontraron productos con ese nombre o código', 'warning')
+            # Fase 1: Si no hay término ni producto_id, mostramos solo el formulario de búsqueda
+            if not termino and not producto_id:
+                return render_template('form_editar_producto.html', productos=[], producto=None, 
+                                    titulo_pagina="Buscar Producto")
 
+            # Fase 2: Si hay término, buscar los productos correspondientes
+            if termino:
+                productos = Productos.buscar_por_codigo_o_nombre(termino, db)
 
-            # Renderizar la misma plantilla con los productos y los datos adicionales
-            return render_template('form_editar_producto.html', productos=productos, categorias=categorias, unidades_padre=unidades_padre, 
-            subunidades=subunidades, titulo_pagina="Seleccionar producto")
+                # Si no se encuentran productos, mostramos un mensaje flash
+                if not productos:
+                    flash('No se encontraron productos con ese nombre o código', 'warning')
+
+                # Mostrar resultados de búsqueda, pero sin formulario de edición aún
+                return render_template('form_editar_producto.html', productos=productos, producto=None, 
+                                    titulo_pagina="Seleccionar Producto")
+
+            # Fase 3: Si se seleccionó un producto por ID, cargar los detalles del producto
+            if producto_id:
+                producto = db.query(Productos).get(producto_id)
+                categorias = Categoria.obtener_todas(db)
+                unidades_padre, subunidades = UnidadMedida.obtener_todas_con_subunidades(db)
+
+                # Mostrar el formulario de edición con los detalles del producto seleccionado
+                return render_template('form_editar_producto.html', productos=[], producto=producto, 
+                                    categorias=categorias, unidades_padre=unidades_padre, subunidades=subunidades, 
+                                    titulo_pagina="Editar Producto")
 
         except Exception as e:
-            flash(f'Error al buscar el producto: {str(e)}', 'danger')
-            return render_template('form_editar_producto.html', productos=[], categorias=[], unidades_medida=[])
-        
+            flash(f'Error al procesar la solicitud: {str(e)}', 'danger')
+            return render_template('form_editar_producto.html', productos=[], producto=None, 
+                                titulo_pagina="Error")
+
         finally:
             db.close()
-    
-    #-------------------
+
+    #--------------------
 
     # Ruta para mostrar el formulario con los datos del producto a editar
     @app.route('/productos_editar/<int:id>', methods=['GET'])

@@ -4,7 +4,7 @@
 <div class="container mt-5">
     {% if not productos and not producto %}
     <h2>Buscar Producto</h2>
-    <form id="formBuscarProducto" action="{{ url_for('buscar_producto') }}" method="GET">
+    <form id="formBuscarProducto" action="{{ url_for('editar_producto') }}" method="GET">
         <div class="mb-3">
             <label for="terminoBusqueda" class="form-label">Ingrese el Código o Nombre del Producto</label>
             <input type="text" class="form-control" id="terminoBusqueda" name="termino" required>
