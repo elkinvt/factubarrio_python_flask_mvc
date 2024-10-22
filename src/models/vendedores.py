@@ -72,7 +72,10 @@ class Vendedores(Base):
         except Exception as e:
             db_session.rollback()  # Deshacer cambios si ocurre un error
             raise e
+    
+    #--------------
 
+    #Metodo estatico para buscar vendedor por id
     @staticmethod
     def buscar_vendedor_por_id(vendedor_id):
         session = SessionLocal()
