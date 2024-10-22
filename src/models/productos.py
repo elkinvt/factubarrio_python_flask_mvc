@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Numeric,Boolean, ForeignKey
-from . import Base, SessionLocal
+from src.models import Base, SessionLocal
 from src.models.categorias import Categoria
 from src.models.unidad_medida import UnidadMedida
 
