@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric,Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from src.models import Base, SessionLocal
 from src.models.categorias import Categoria
 from src.models.unidad_medida import UnidadMedida
@@ -14,7 +14,7 @@ class Productos(Base):
     unidad_medida_idunidad_medida = Column(Integer, ForeignKey('unidad_medida.idunidad_medida'))
     presentacion = Column(String(50))
     cantidad_stock = Column(Integer, nullable=False)
-    precio_unitario = Column(Numeric(10, 2), nullable=False)
+    precio_unitario = Column(Float, nullable=False)
     is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
     is_active = Column(Boolean, default=True)  # Campo de activación
 

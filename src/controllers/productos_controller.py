@@ -19,7 +19,15 @@ class Productos_Controller(FlaskController):
             nombre = request.form['nombreProducto'].capitalize()
             descripcion = request.form['descripcionProducto'].capitalize()
             categoria = request.form['categoriaProducto']
-            precio = float(request.form['precioProducto'])  # Convertimos a float
+
+            # Convertimos el precio a flotante y lo redondeamos a 2 decimales
+            try:
+                precio = float(request.form['precioProducto'].replace(',', ''))  # Si hay comas en el número, las eliminamos
+                precio = round(precio, 2)  # Redondeamos a dos decimales
+            except ValueError:
+                flash('Precio no válido', 'danger')
+                return redirect(url_for('crear_producto'))
+
             unidad_medida = request.form['unidadMedidaProducto']
             presentacion = request.form['presentacionProducto']
             cantidad_stock = int(request.form['cantidadStockProducto'])  # Convertimos a int
@@ -33,7 +41,7 @@ class Productos_Controller(FlaskController):
                 unidad_medida_idunidad_medida=unidad_medida,
                 presentacion=presentacion,
                 cantidad_stock=cantidad_stock,
-                precio_unitario=precio
+                precio_unitario=precio  # Guardamos el precio redondeado
             )
 
             try:
@@ -60,6 +68,7 @@ class Productos_Controller(FlaskController):
 
         return render_template('form_crear_producto.html', categorias=categorias, unidades_padre=unidades_padre, subunidades=subunidades, titulo_pagina="Crear Producto")
 
+
     #------------------
     
     # Ruta para ver productos
@@ -69,6 +78,18 @@ class Productos_Controller(FlaskController):
         try:
             # Usar el método que obtienes con el JOIN de productos, categorías y unidades de medida
             productos = Productos.obtener_productos()
+
+            # Imprimir los datos sin asumir la estructura
+            for producto in productos:
+                print(producto)  # Imprimir cada producto para verificar su estructura
+
+            # Formatear el precio con separadores de miles y dos decimales
+            for producto, categoria, unidad_medida in productos:
+                if producto.precio_unitario is not None:
+                    producto.precio_unitario_formateado = "{:,.2f}".format(producto.precio_unitario)
+                else:
+                    producto.precio_unitario_formateado = "N/A"
+
         except Exception as e:
             flash(f'Error al obtener productos: {str(e)}', 'danger')
             productos = []  # En caso de error, asignamos una lista vacía para evitar fallos en la vista

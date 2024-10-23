@@ -28,7 +28,7 @@
                     <td>{{ producto.descripcion }}</td>
                     <td>{{ categoria.nombre }}</td>  <!-- Mostrar el nombre de la categoría -->
                     <td>{{ unidad_medida.unidad_medida }}</td>  <!-- Mostrar el nombre de la unidad de medida -->
-                    <td>{{ producto.precio_unitario }}</td>
+                    <td>${{ producto.precio_unitario_formateado }}</td>
                     <td>{{ producto.cantidad_stock }}</td>
                     <td>
                         {% if producto.is_active %}
