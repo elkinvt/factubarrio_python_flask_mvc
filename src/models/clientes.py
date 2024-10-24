@@ -124,13 +124,18 @@ class Clientes(Base):
             return [{
                 'id': cliente.idclientes,
                 'nombre': cliente.nombres_cliente,
-                'numero_documento': cliente.numero_documento
+                'numero_documento': cliente.numero_documento,
+                'direccion': cliente.direccion,  # Añadir más información si es necesario
+                'telefono': cliente.telefono
             } for cliente in clientes]
         except Exception as e:
             print(f"Error al buscar clientes: {e}")
             return {'error': 'Error al buscar clientes'}
         finally:
             db.close()
+
+
+    #--------------
 
 
 

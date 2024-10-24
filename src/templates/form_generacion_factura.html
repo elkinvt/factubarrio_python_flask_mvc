@@ -27,6 +27,24 @@
             <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
             <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre del cliente" readonly>
         </div>
+
+        <!-- Campo para mostrar automáticamente el número de documento del cliente -->
+        <div class="mb-3">
+            <label for="numeroDocumentoCliente" class="form-label">Número de Documento</label>
+            <input type="text" class="form-control" id="numeroDocumentoCliente" placeholder="Número de documento del cliente" readonly>
+        </div>
+
+        <!-- Campo para mostrar automáticamente la dirección del cliente -->
+        <div class="mb-3">
+            <label for="direccionCliente" class="form-label">Dirección del Cliente</label>
+            <input type="text" class="form-control" id="direccionCliente" placeholder="Dirección del cliente" readonly>
+        </div>
+
+        <!-- Campo para mostrar automáticamente el teléfono del cliente -->
+        <div class="mb-3">
+            <label for="telefonoCliente" class="form-label">Teléfono del Cliente</label>
+            <input type="text" class="form-control" id="telefonoCliente" placeholder="Teléfono del cliente" readonly>
+        </div>
         
         <!-- Seleccionar Vendedor -->
         <div class="mb-3">
@@ -107,89 +125,54 @@
 
 
 <!-- Función para buscar cliente desde el servidor -->
-
 <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const inputBuscarDocumento = document.getElementById('buscarDocumento');  // Campo de número de documento
-    const listaSugerencias = document.getElementById('listaSugerenciasClientes');  // Lista de sugerencias
-    const clienteIdInput = document.getElementById('clienteId');  // Campo oculto para el ID del cliente
-    const nombreClienteInput = document.getElementById('nombreCliente');  // Campo para mostrar el nombre del cliente
-
-    // Escuchar el evento "input" en el campo de número de documento
-    inputBuscarDocumento.addEventListener('input', function () {
-        const query = this.value.trim();
-
-        // Si el valor ingresado tiene más de dos caracteres, realizamos la búsqueda
-        if (query.length > 2) {
-            fetch(`/buscar_clientes_por_numero_documento?q=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    mostrarSugerenciasClientes(data);
-                });
-        } else {
-            listaSugerencias.innerHTML = '';
-            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no hay suficiente texto
-        }
-    });
-
-
-     // Ocultar sugerencias y buscar el cliente al presionar "Enter"
-     inputBuscarDocumento.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();  // Evitar que se envíe el formulario si se presiona "Enter"
-            const numeroDocumento = this.value.trim();
-            
-            // Limpiar la lista de sugerencias
-            listaSugerencias.innerHTML = '';  
-            listaSugerencias.style.display = 'none';  
-
-            if (numeroDocumento.length > 2) {
-                // Realizar una búsqueda exacta al presionar "Enter"
-                fetch(`/verificar_cliente_inactivo?numero_documento=${numeroDocumento}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.inactivo) {
-                            alert(`El cliente con número de documento ${numeroDocumento} está inactivo.`);
-                        } else if (!data.existe) {
-                            alert('Cliente no encontrado.');
-                        } else {
-                            // Si el cliente está activo, rellenamos los campos
-                            nombreClienteInput.value = data.nombre;
-                            clienteIdInput.value = data.id;
-                        }
-                    });
-            }
-        }
-    });
-
+   $('#buscarDocumento').on('input', function() {
+    var query = $(this).val();
     
-    // Mostrar sugerencias de clientes
-    function mostrarSugerenciasClientes(clientes) {
-        listaSugerencias.innerHTML = ''; // Limpiar la lista de sugerencias
-
-        if (clientes.length > 0) {
-            clientes.forEach(cliente => {
-                const item = document.createElement('div');
-                item.className = 'list-group-item list-group-item-action';
-                item.textContent = `${cliente.numero_documento} - ${cliente.nombre}`;
-                
-                // Cuando seleccionamos un cliente de la lista de sugerencias
-                item.addEventListener('click', function () {
-                    inputBuscarDocumento.value = cliente.numero_documento;  // Rellenar el número de documento
-                    nombreClienteInput.value = cliente.nombre;  // Rellenar el nombre del cliente
-                    clienteIdInput.value = cliente.id;  // Guardar el ID del cliente
-                    listaSugerencias.innerHTML = '';  // Limpiar las sugerencias
-                });
-
-                listaSugerencias.appendChild(item);
-            });
-            listaSugerencias.style.display = 'block';
-        } else {
-            listaSugerencias.innerHTML = '<div class="list-group-item">No se encontraron clientes.</div>';
-            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no se encuentran clientes
-        }
+    if (query.length > 2) {
+        $.ajax({
+            type: "GET",
+            url: "/buscar_clientes_por_numero_documento?q=" + query,
+            dataType: 'json',
+            success: function(data) {
+                mostrarSugerenciasClientes(data);  // Llenar las sugerencias
+            },
+            error: function(error) {
+                console.log("Error:", error);
+                $('#listaSugerenciasClientes').html('<div class="list-group-item">No se encontraron clientes.');
+            }
+        });
+    } else {
+        $('#listaSugerenciasClientes').html('');
     }
 });
+
+// Mostrar sugerencias de clientes
+function mostrarSugerenciasClientes(clientes) {
+    var listaSugerencias = $('#listaSugerenciasClientes');
+    listaSugerencias.html('');
+
+    if (clientes.length > 0) {
+        clientes.forEach(function(cliente) {
+            var item = $('<div class="list-group-item list-group-item-action"></div>').text(cliente.numero_documento + ' - ' + cliente.nombre);
+            item.on('click', function() {
+                // Rellenar los campos con los datos seleccionados del cliente
+                $('#buscarDocumento').val(cliente.numero_documento);
+                $('#nombreCliente').val(cliente.nombre);
+                $('#numeroDocumentoCliente').val(cliente.numero_documento);
+                $('#direccionCliente').val(cliente.direccion);
+                $('#telefonoCliente').val(cliente.telefono);
+                $('#clienteId').val(cliente.id);  // Guardar el ID del cliente
+                listaSugerencias.html('');  // Limpiar las sugerencias
+            });
+            listaSugerencias.append(item);
+        });
+    } else {
+        listaSugerencias.html('<div class="list-group-item">No se encontraron clientes.</div>');
+    }
+}
+
+
 
 </script> <!--termina la busqueda del cliente-->
 
