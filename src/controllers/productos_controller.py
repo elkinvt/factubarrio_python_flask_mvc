@@ -79,10 +79,6 @@ class Productos_Controller(FlaskController):
             # Usar el método que obtienes con el JOIN de productos, categorías y unidades de medida
             productos = Productos.obtener_productos()
 
-            # Imprimir los datos sin asumir la estructura
-            for producto in productos:
-                print(producto)  # Imprimir cada producto para verificar su estructura
-
             # Formatear el precio con separadores de miles y dos decimales
             for producto, categoria, unidad_medida in productos:
                 if producto.precio_unitario is not None:

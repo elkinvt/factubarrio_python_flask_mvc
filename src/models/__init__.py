@@ -11,17 +11,4 @@ Base = declarative_base()
 # Crear una sesión para interactuar con la base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Función para inicializar las tablas
-def init_db():
-    from src.models.categorias import Categoria
-    from src.models.unidad_medida import UnidadMedida
-    from src.models.clientes import Clientes  
-    from src.models.facturas import Factura
-    from src.models.vendedores import Vendedores
-    from src.models.productos import Productos
-    from src.models.detalle_producto import DetalleProducto
-    
-    # Crear todas las tablas
-    Base.metadata.create_all(bind=engine)
 
-#--------------
