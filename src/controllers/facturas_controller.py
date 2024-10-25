@@ -32,12 +32,7 @@ class Facturas_Controller(FlaskController):
                 clientes_idclientes = request.form.get('clienteId')
                 vendedores_idvendedores = request.form.get('vendedorFactura')
                 productos = json.loads(request.form.get('productosFactura'))
-                
-                # Logs para verificar los datos recibidos
-                print(f"Cliente ID: {clientes_idclientes}")
-                print(f"Vendedor ID: {vendedores_idvendedores}")
-                print(f"Productos: {productos}")
-
+            
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
                 print(f"Total Valor: {total_valor}")  # Log del total calculado

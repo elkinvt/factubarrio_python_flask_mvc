@@ -126,130 +126,105 @@
 
 <!-- Función para buscar cliente desde el servidor -->
 <script>
-   $('#buscarDocumento').on('input', function() {
-    var query = $(this).val();
-    
-    if (query.length > 2) {
-        $.ajax({
-            type: "GET",
-            url: "/buscar_clientes_por_numero_documento?q=" + query,
-            dataType: 'json',
-            success: function(data) {
-                mostrarSugerenciasClientes(data);  // Llenar las sugerencias
-            },
-            error: function(error) {
-                console.log("Error:", error);
-                $('#listaSugerenciasClientes').html('<div class="list-group-item">No se encontraron clientes.');
-            }
-        });
-    } else {
-        $('#listaSugerenciasClientes').html('');
-    }
-});
-
-// Mostrar sugerencias de clientes
-function mostrarSugerenciasClientes(clientes) {
-    var listaSugerencias = $('#listaSugerenciasClientes');
-    listaSugerencias.html('');
-
-    if (clientes.length > 0) {
-        clientes.forEach(function(cliente) {
-            var item = $('<div class="list-group-item list-group-item-action"></div>').text(cliente.numero_documento + ' - ' + cliente.nombre);
-            item.on('click', function() {
-                // Rellenar los campos con los datos seleccionados del cliente
-                $('#buscarDocumento').val(cliente.numero_documento);
-                $('#nombreCliente').val(cliente.nombre);
-                $('#numeroDocumentoCliente').val(cliente.numero_documento);
-                $('#direccionCliente').val(cliente.direccion);
-                $('#telefonoCliente').val(cliente.telefono);
-                $('#clienteId').val(cliente.id);  // Guardar el ID del cliente
-                listaSugerencias.html('');  // Limpiar las sugerencias
+    $('#buscarDocumento').on('input', function() {
+        var query = $(this).val();
+        
+        if (query.length > 2) {
+            $.ajax({
+                type: "GET",
+                url: "/buscar_clientes_por_numero_documento?q=" + query,
+                dataType: 'json',
+                success: function(data) {
+                    mostrarSugerenciasClientes(data);  // Llenar las sugerencias
+                },
+                error: function(error) {
+                    console.log("Error:", error);
+                    $('#listaSugerenciasClientes').html('<div class="list-group-item">No se encontraron clientes.');
+                }
             });
-            listaSugerencias.append(item);
-        });
-    } else {
-        listaSugerencias.html('<div class="list-group-item">No se encontraron clientes.</div>');
+        } else {
+            $('#listaSugerenciasClientes').html('');
+        }
+    });
+
+    // Mostrar sugerencias de clientes
+    function mostrarSugerenciasClientes(clientes) {
+        var listaSugerencias = $('#listaSugerenciasClientes');
+        listaSugerencias.html('');
+
+        if (clientes.length > 0) {
+            clientes.forEach(function(cliente) {
+                var item = $('<div class="list-group-item list-group-item-action"></div>').text(cliente.numero_documento + ' - ' + cliente.nombre);
+                item.on('click', function() {
+                    // Rellenar los campos con los datos seleccionados del cliente
+                    $('#buscarDocumento').val(cliente.numero_documento);
+                    $('#nombreCliente').val(cliente.nombre);
+                    $('#numeroDocumentoCliente').val(cliente.numero_documento);
+                    $('#direccionCliente').val(cliente.direccion);
+                    $('#telefonoCliente').val(cliente.telefono);
+                    $('#clienteId').val(cliente.id);  // Guardar el ID del cliente
+
+                    listaSugerencias.html('');  // Limpiar las sugerencias
+                });
+                listaSugerencias.append(item);
+            });
+        } else {
+            listaSugerencias.html('<div class="list-group-item">No se encontraron clientes.</div>');
+        }
     }
-}
-
-
-
 </script> <!--termina la busqueda del cliente-->
 
 <!-- Función para buscar el producto desde el servidor -->
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBuscarProducto = document.getElementById('buscarProducto');
-        const listaSugerenciasProducto = document.getElementById('listaSugerenciasProducto');
-        const productocodigoInput = document.getElementById('productoFacturaCodigo');  // Campo oculto para el código del producto
-    
-        // Evento al escribir en el campo de búsqueda
-        inputBuscarProducto.addEventListener('input', function () {
-            const query = this.value.trim();
-    
+    $(document).ready(function() {
+        $('#buscarProducto').on('input', function() {
+            var query = $(this).val().trim();
+            
             if (query.length > 2) {
-                // Realiza una búsqueda en el backend
-                fetch(`/buscar_productos?q=${query}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Muestra las sugerencias con la función actualizada
-                        mostrarSugerenciasProducto(data);
-                    });
+                // Realiza la solicitud AJAX para buscar productos
+                $.ajax({
+                    type: "GET",
+                    url: "/buscar_productos?q=" + query,
+                    dataType: 'json',
+                    success: function(data) {
+                        mostrarSugerenciasProducto(data);  // Llamada a la función para mostrar las sugerencias
+                    },
+                    error: function(error) {
+                        console.log("Error:", error);
+                        $('#listaSugerenciasProducto').html('<div class="list-group-item">No se encontraron productos.');
+                    }
+                });
             } else {
-                // Si no hay texto suficiente, limpia las sugerencias
-                listaSugerenciasProducto.innerHTML = '';
+                $('#listaSugerenciasProducto').html('');  // Limpiamos las sugerencias si no hay texto suficiente
             }
         });
-    
+
         // Función para mostrar las sugerencias de productos
         function mostrarSugerenciasProducto(productos) {
-            listaSugerenciasProducto.innerHTML = ''; // Limpiamos la lista de sugerencias
+            var listaSugerenciasProducto = $('#listaSugerenciasProducto');
+            listaSugerenciasProducto.html('');  // Limpiamos la lista de sugerencias
 
             if (productos.length > 0) {
-                productos.forEach(producto => {
+                productos.forEach(function(producto) {
+                    var item = $('<div class="list-group-item list-group-item-action"></div>').text(producto.nombre + ' - ' + producto.descripcion + ' - $' + producto.precio_unitario);
                     
-                    const item = document.createElement('div');
-                    item.className = 'list-group-item list-group-item-action';
-                    
-                    const nombre = producto.nombre || 'Nombre no disponible';
-                    const descripcion = producto.descripcion || 'Descripción no disponible';
-                    const precio = producto.precio_unitario || 'Precio no disponible';
+                    // Evento al hacer clic en la sugerencia
+                    item.on('click', function() {
+                        $('#buscarProducto').val(producto.nombre);  // Rellenamos el campo de búsqueda con el nombre del producto
+                        $('#productoFacturaCodigo').val(producto.codigo);  // Rellenamos el código del producto en el campo oculto
+                        listaSugerenciasProducto.html('');  // Limpiamos las sugerencias
+                    });
 
-                    // Mostramos los detalles del producto (nombre, descripción, precio)
-                    item.textContent = `${nombre} - ${descripcion} - $${precio}`;
-
-                    // Evento cuando el usuario selecciona una sugerencia
-                    item.onclick = function () {
-                        // Colocamos el nombre del producto en el campo de búsqueda
-                        inputBuscarProducto.value = nombre;
-
-                        // Asignar el código del producto al campo oculto
-                        const codigoProducto = producto.codigo;  // Obtienes el código del producto
-                        const campoCodigo = document.getElementById('productoFacturaCodigo');  // Buscas el campo oculto por su ID
-
-                        if (campoCodigo) {
-                            campoCodigo.value = codigoProducto;  // Asignas el valor
-                        } else {
-                            console.error("Campo oculto 'productoFacturaCodigo' no encontrado");
-                        }
-
-                        // Limpiamos las sugerencias
-                        listaSugerenciasProducto.innerHTML = '';
-                    };
-
-                    // Agregamos la sugerencia a la lista de sugerencias
-                    listaSugerenciasProducto.appendChild(item);
+                    listaSugerenciasProducto.append(item);
                 });
-
-                // Mostramos la lista de sugerencias
-                listaSugerenciasProducto.style.display = 'block';
             } else {
-                listaSugerenciasProducto.innerHTML = '<div class="list-group-item">No se encontraron productos.</div>';
+                listaSugerenciasProducto.html('<div class="list-group-item">No se encontraron productos.');
             }
         }
-
     });
-    </script>
+
+</script>
     
 
 
