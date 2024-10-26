@@ -1,4 +1,6 @@
+from src.app import app 
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from flask import jsonify, request
 from src.models import Base, SessionLocal
 from src.models.categorias import Categoria
 from src.models.unidad_medida import UnidadMedida
@@ -100,6 +102,30 @@ class Productos(Base):
             raise e
     
     #-------------
+    # Ruta para verificar producto y stock
+    @app.route('/verificar_producto')
+    def verificar_producto():
+        codigo = request.args.get('codigo')
+        cantidad = int(request.args.get('cantidad'))
+        session = SessionLocal()  # Inicia la sesión
+
+        try:
+            producto = session.query(Productos).filter_by(codigo=codigo).first()
+            
+            if not producto:
+                return jsonify({'error': 'Producto no encontrado', 'error_type': 'not_found'}), 200
+            elif producto.cantidad_stock < cantidad:
+                return jsonify({'error': 'Stock insuficiente para la cantidad solicitada', 'error_type': 'insufficient_stock'}), 200
+            else:
+                return jsonify({
+                    'id': producto.idproductos,
+                    'codigo': producto.codigo,
+                    'nombre': producto.nombre,
+                    'precio_unitario': producto.precio_unitario,
+                    'cantidad_stock': producto.cantidad_stock
+                })
+        finally:
+            session.close()  # Cierra la sesión
 
 
     

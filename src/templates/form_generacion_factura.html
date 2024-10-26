@@ -68,6 +68,7 @@
         <div class="mb-3">
             <label for="cantidadFactura" class="form-label">Cantidad</label>
             <input type="number" class="form-control form-control-sm" id="cantidadFactura" name="cantidadFactura" placeholder="Escribe la cantidad del producto" >
+            <div id="stockStatus"></div> <!-- Muestra el estado del stock en tiempo real -->
         </div>
         
         
@@ -236,58 +237,94 @@
 
     // Los productos son enviados desde Flask como JSON
 
-   // Agregar productos a la factura
+    // Función para agregar productos a la factura
     function agregarProductoAFactura() {
-        var productocodigo = document.getElementById('productoFacturaCodigo').value;
-        var cantidad = document.getElementById('cantidadFactura').value;
+    var productocodigo = $('#productoFacturaCodigo').val();
+    var cantidad = $('#cantidadFactura').val();
 
-        // Validar que el producto y la cantidad sean válidos
-        if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
-            alert("Seleccione un producto y una cantidad válida.");
-            return;
-        }
+    
 
-        // Buscamos el producto en la lista de productos enviados desde Flask
-        var producto = productosDisponibles.find(p => p.codigo === productocodigo);
-        if (!producto) {
-            alert("Producto no encontrado.");
-            return;
-        }
-
-        // Verificar si hay suficiente stock
-        if (producto.cantidad_stock < cantidad) {
-            alert(`No hay suficiente stock para el producto ${producto.nombre}. Stock disponible: ${producto.cantidad_stock}`);
-            return;
-        }
-
-        var subtotal = producto.precio_unitario * cantidad;
-
-        // Agregar el producto a la factura
-        factura.push({
-            id: producto.id,
-            codigo: producto.codigo,
-            producto: producto.nombre,
-            cantidad: parseInt(cantidad),
-            precio: producto.precio_unitario,
-            subtotal: subtotal
-        });
-
-        // Actualizar la tabla de detalles de la factura
-        actualizarDetallesFactura();
-
-        // Limpiar los campos de búsqueda y cantidad
-        document.getElementById('buscarProducto').value = '';
-        document.getElementById('cantidadFactura').value = '';
-
-        
-        // Focalizar el campo de búsqueda para el próximo producto
-        document.getElementById('buscarProducto').focus();
-
-        // Mantener la página en la parte superior
-        window.scrollTo(0, 0);
-
-       
+    // Validación de entrada
+    if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
+        alert("Seleccione un producto y una cantidad válida.");
+        return;
     }
+
+    // Solicitud AJAX para verificar el producto y su stock
+    $.ajax({
+        type: "GET",
+        url: `/verificar_producto?codigo=${productocodigo}&cantidad=${cantidad}`, // Ruta de verificación
+        dataType: 'json',
+        success: function(response) {
+            // Manejo de errores específicos basado en error_type
+            if (response.error) {
+                if (response.error_type === 'not_found') {
+                    alert("El producto no fue encontrado.");
+                } else if (response.error_type === 'insufficient_stock') {
+                    alert("La cantidad solicitada excede el stock disponible.");
+                } else {
+                    alert(response.error);
+                }
+            } else {
+                // Agregar producto a la factura
+                factura.push({
+                    id: response.id,
+                    codigo: response.codigo,
+                    producto: response.nombre,
+                    cantidad: parseInt(cantidad),
+                    precio: response.precio_unitario,
+                    subtotal: response.precio_unitario * cantidad
+                });
+                actualizarDetallesFactura();
+
+                // Limpiar campos
+                $('#buscarProducto').val('');
+                $('#cantidadFactura').val('');
+                $('#productoFacturaCodigo').val('');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error en la solicitud:", error);
+            alert("Ocurrió un error al verificar el producto. Por favor, intente nuevamente.");
+        }
+    });
+}
+        // Verificación en tiempo real de la cantidad ingresada
+    $('#cantidadFactura').on('input', function() {
+        var productocodigo = $('#productoFacturaCodigo').val();
+        var cantidad = $(this).val();
+
+        // Validación inicial
+        if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
+            $('#stockStatus').text('Seleccione un producto y una cantidad válida.');
+            return;
+        }
+
+        // Verificación de stock disponible en tiempo real
+        $.ajax({
+            type: "GET",
+            url: `/verificar_producto?codigo=${productocodigo}&cantidad=${cantidad}`,
+            dataType: 'json',
+            success: function(response) {
+                if (response.error) {
+                    // Mostrar el mensaje de error específico en tiempo real
+                    if (response.error_type === 'not_found') {
+                        $('#stockStatus').text("El producto no fue encontrado.");
+                    } else if (response.error_type === 'insufficient_stock') {
+                        $('#stockStatus').text("La cantidad solicitada excede el stock disponible.");
+                    }
+                } else {
+                    // Si hay stock suficiente, mostrar un mensaje positivo
+                    $('#stockStatus').text("Stock suficiente para la cantidad solicitada.");
+                }
+            },
+            error: function() {
+                $('#stockStatus').text("Error al verificar el stock. Intente nuevamente.");
+            }
+        });
+    });
+
+
 
    
     // Actualizar detalles de la factura en la tabla

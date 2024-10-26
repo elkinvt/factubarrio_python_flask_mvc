@@ -141,3 +141,5 @@ class Facturas_Controller(FlaskController):
             return jsonify({'message': 'Factura no encontrada'}), 404
     
     #-----------------
+
+   
