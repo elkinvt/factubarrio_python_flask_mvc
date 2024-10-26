@@ -148,25 +148,33 @@
         }
     });
 
-    // Mostrar sugerencias de clientes
+    // Función para mostrar sugerencias de clientes
     function mostrarSugerenciasClientes(clientes) {
         var listaSugerencias = $('#listaSugerenciasClientes');
         listaSugerencias.html('');
 
         if (clientes.length > 0) {
             clientes.forEach(function(cliente) {
-                var item = $('<div class="list-group-item list-group-item-action"></div>').text(cliente.numero_documento + ' - ' + cliente.nombre);
-                item.on('click', function() {
-                    // Rellenar los campos con los datos seleccionados del cliente
-                    $('#buscarDocumento').val(cliente.numero_documento);
-                    $('#nombreCliente').val(cliente.nombre);
-                    $('#numeroDocumentoCliente').val(cliente.numero_documento);
-                    $('#direccionCliente').val(cliente.direccion);
-                    $('#telefonoCliente').val(cliente.telefono);
-                    $('#clienteId').val(cliente.id);  // Guardar el ID del cliente
+                var itemText = cliente.numero_documento + ' - ' + cliente.nombre;
+                
+                if (!cliente.is_active) {
+                    // Mostrar mensaje si el cliente está inactivo
+                    var item = $('<div class="list-group-item list-group-item-warning"></div>').text(itemText + ' (Inactivo)');
+                } else {
+                    var item = $('<div class="list-group-item list-group-item-action"></div>').text(itemText);
+                    item.on('click', function() {
+                        // Rellenar los campos con los datos seleccionados del cliente
+                        $('#buscarDocumento').val(cliente.numero_documento);
+                        $('#nombreCliente').val(cliente.nombre);
+                        $('#numeroDocumentoCliente').val(cliente.numero_documento);
+                        $('#direccionCliente').val(cliente.direccion);
+                        $('#telefonoCliente').val(cliente.telefono);
+                        $('#clienteId').val(cliente.id);  // Guardar el ID del cliente
 
-                    listaSugerencias.html('');  // Limpiar las sugerencias
-                });
+                        listaSugerencias.html('');  // Limpiar las sugerencias
+                    });
+                }
+                
                 listaSugerencias.append(item);
             });
         } else {
@@ -176,7 +184,6 @@
 </script> <!--termina la busqueda del cliente-->
 
 <!-- Función para buscar el producto desde el servidor -->
-
 <script>
     $(document).ready(function() {
         $('#buscarProducto').on('input', function() {

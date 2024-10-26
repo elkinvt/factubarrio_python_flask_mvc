@@ -114,26 +114,25 @@ class Clientes(Base):
     def buscar_por_numero_documento(query):
         db = SessionLocal()
         try:
-            # Consulta para buscar clientes activos cuyo número de documento coincida parcialmente con 'query'
+            # Consulta para buscar clientes cuyo número de documento coincida parcialmente con 'query'
             clientes = db.query(Clientes).filter(
-                Clientes.numero_documento.ilike(f"%{query}%"),
-                Clientes.is_active == True
+                Clientes.numero_documento.ilike(f"%{query}%")
             ).all()
 
-            # Serializar los datos del cliente
+            # Serializar los datos del cliente incluyendo el estado de actividad
             return [{
                 'id': cliente.idclientes,
                 'nombre': cliente.nombres_cliente,
                 'numero_documento': cliente.numero_documento,
-                'direccion': cliente.direccion,  # Añadir más información si es necesario
-                'telefono': cliente.telefono
+                'direccion': cliente.direccion,
+                'telefono': cliente.telefono,
+                'is_active': cliente.is_active  # Añadir estado de actividad
             } for cliente in clientes]
         except Exception as e:
             print(f"Error al buscar clientes: {e}")
             return {'error': 'Error al buscar clientes'}
         finally:
             db.close()
-
 
     #--------------
 
