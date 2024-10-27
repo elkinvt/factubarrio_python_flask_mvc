@@ -2,7 +2,8 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Registrar Cliente</h2>
-    <form action="/clientes_crear" method="POST" id="formCliente">
+    <div id="mensajeErrorGeneral" class="text-danger"></div>
+    <form  id="formCliente">
         <div class="mb-3">
             <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
             <select class="form-control form-control-sm" id="tipoDocumento" name="tipoDocumento" required>
@@ -40,6 +41,58 @@
     </form>
 </div>
 
+
+<!-- Código JavaScript para manejar el envío con AJAX -->
+<script>
+    $('#formCliente').on('submit', function(event) {
+        event.preventDefault();  // Evitar el envío estándar del formulario
+
+        // Recopilar datos del formulario
+        const tipoDocumento = $('#tipoDocumento').val();
+        const numeroDocumento = $('#numeroDocumento').val();
+        const nombreCliente = $('#nombreCliente').val();
+        const telefonoCliente = $('#telefonoCliente').val();
+        const direccionCliente = $('#direccionCliente').val();
+        const emailCliente = $('#emailCliente').val();
+
+        // Enviar datos al backend con AJAX
+        $.ajax({
+            type: 'POST',
+            url: '/clientes_crear',
+            contentType: 'application/json',  // Especifica que el contenido es JSON
+            data: JSON.stringify({
+                tipoDocumento: tipoDocumento,
+                numeroDocumento: numeroDocumento,
+                nombreCliente: nombreCliente,
+                telefonoCliente: telefonoCliente,
+                direccionCliente: direccionCliente,
+                emailCliente: emailCliente
+            }),
+            success: function(response) {
+                alert(response.message);
+                window.location.href = '/ver_clientes';
+            },
+            error: function(xhr) {
+            const errores = xhr.responseJSON.errores || {};
+            $('#numeroDocumentoError').text(errores.numeroDocumento || '');
+            $('#emailClienteError').text(errores.emailCliente || '');
+
+            // Mostrar mensaje de error general en caso de errores específicos
+            if (Object.keys(errores).length > 0) {
+                $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+            } else if (xhr.responseJSON.message) {
+                // Mostrar mensaje de error general si hay otro tipo de error
+                $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+            } else {
+                $('#mensajeErrorGeneral').text('');
+            }
+        }
+    });
+});
+</script>
+
+
+<!-- Código JavaScript para validacion de datos del cliente -->
 <script>
     // Asignar la validación solo a los campos específicos
     $('#numeroDocumento').on('blur', function() {

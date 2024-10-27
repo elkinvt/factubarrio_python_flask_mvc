@@ -19,26 +19,29 @@ class Clientes_Controller(FlaskController):
     # Ruta para crear el cliente
     @app.route('/clientes_crear', methods=['GET', 'POST'])
     def crear_cliente():
+        if request.method == 'GET':
+            # Si es GET, mostrar el formulario
+            return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
+        
+        # Si es POST, manejar el envío de datos en JSON
         if request.method == 'POST':
-            # Procesar el formulario enviado
+            data = request.get_json()  # Obtiene los datos en JSON
             db = SessionLocal()
 
             # Obtener los datos del formulario
-            tipo_documento = request.form['tipoDocumento']
-            numero_documento = request.form['numeroDocumento']
-            nombres_cliente = request.form['nombreCliente'].title()
-            telefono = request.form['telefonoCliente']
-            direccion = request.form['direccionCliente']
-            email = request.form['emailCliente']
+            tipo_documento = data.get('tipoDocumento')
+            numero_documento = data.get('numeroDocumento')
+            nombres_cliente = data.get('nombreCliente').title()
+            telefono = data.get('telefonoCliente')
+            direccion = data.get('direccionCliente')
+            email = data.get('emailCliente')
 
             # Validar si hay datos duplicados antes de crear el cliente
             errores = Clientes.validar_datos(numero_documento=numero_documento, email=email)
 
             if errores:
-                # Si hay errores de duplicados, mostrar un mensaje y no guardar
-                for campo, mensaje in errores.items():
-                    flash(f"{mensaje}", 'danger')
-                return redirect(url_for('crear_cliente'))  # Redirige de vuelta al formulario
+                # Si hay errores de duplicados, devolver un mensaje de error en formato JSON
+                return jsonify({'status': 'error', 'errores': errores}), 400
 
             # Si no hay duplicados, crear el cliente
             nuevo_cliente = Clientes(
@@ -54,16 +57,13 @@ class Clientes_Controller(FlaskController):
 
             try:
                 Clientes.agregar_cliente(db, nuevo_cliente) 
-                flash('Cliente creado con éxito', 'success')
-                return redirect(url_for('ver_clientes'))
+                return jsonify({'status': 'success', 'message': 'Cliente creado con éxito'}), 200
             except Exception as e:
                 db.rollback()  # Deshacer cambios si ocurre un error
-                flash(f'Error al crear cliente: {str(e)}', 'danger')
+                return jsonify({'status': 'error', 'message': f'Error al crear cliente: {str(e)}'}), 500
             finally:
                 db.close()
 
-        # Si es GET, mostrar el formulario
-        return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
 
     #------------------------
     
