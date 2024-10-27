@@ -215,7 +215,7 @@ class Clientes_Controller(FlaskController):
     
     #------------------
 
-    #Ruta para buscar cliente por numero de documento
+    #Ruta para validar los datos de un cliente
     @app.route('/validar_cliente', methods=['POST'])
     def validar_cliente():
         data = request.get_json()

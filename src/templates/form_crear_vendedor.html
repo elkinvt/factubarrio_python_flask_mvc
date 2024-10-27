@@ -19,6 +19,7 @@
     <div class="mb-3">
         <label for="numeroDocumentoVendedor" class="form-label">Número de Documento:</label>
         <input type="text" class="form-control form-control-sm" id="numeroDocumentoVendedor" name="numeroDocumento" required>
+        <div id="numeroDocumentoError" class="text-danger"></div> <!-- Error en tiempo real -->
     </div>
 
     <div class="mb-3">
@@ -39,11 +40,69 @@
     <div class="mb-3">
         <label for="emailVendedor" class="form-label">Email</label>
         <input type="email" class="form-control form-control-sm" id="emailVendedor" name="emailVendedor" required>
+        <div id="emailVendedorError" class="text-danger"></div> <!-- Error en tiempo real -->
     </div>
 
     <button type="submit" class="btn btn-primary form-control-sm">Guardar vendedor</button>
     </form>
 </div>
+
+<script>
+    // Asignar la validación solo a los campos específicos
+    $('#numeroDocumentoVendedor').on('blur', function() {
+        validarVendedor('numeroDocumento');
+    });
+
+    $('#emailVendedor').on('blur', function() {
+        validarVendedor('emailVendedor');
+    });
+
+    function validarVendedor(campo) {
+        // Recopilar los valores de los campos
+        const numeroDocumento = $('#numeroDocumentoVendedor').val().trim();
+        const emailVendedor = $('#emailVendedor').val().trim();
+
+        // Crear un objeto de datos para enviar solo los campos que deben validarse
+        const datos = {};
+        if (campo === 'numeroDocumento' && numeroDocumento !== '') {
+            datos.numeroDocumento = numeroDocumento;
+        }
+        if (campo === 'emailVendedor' && emailVendedor !== '') {
+            datos.emailVendedor = emailVendedor;
+        }
+
+        // Si no hay datos que validar, salir de la función
+        if (Object.keys(datos).length === 0) return;
+
+        // Enviar datos al backend para validación
+        $.ajax({
+            type: 'POST',
+            url: '/validar_vendedor',
+            contentType: 'application/json',
+            data: JSON.stringify(datos),
+            success: function(response) {
+                // Limpiar mensajes de error para los campos que se están validando
+                if (campo === 'numeroDocumento') {
+                    $('#numeroDocumentoError').text('');
+                }
+                if (campo === 'emailVendedor') {
+                    $('#emailVendedorError').text('');
+                }
+            },
+            error: function(xhr) {
+                const errores = xhr.responseJSON.errores || {};
+                // Mostrar mensajes de error específicos solo para los campos que se están validando
+                if (campo === 'numeroDocumento') {
+                    $('#numeroDocumentoError').text(errores.numeroDocumento || '');
+                }
+                if (campo === 'emailVendedor') {
+                    $('#emailVendedorError').text(errores.emailVendedor || '');
+                }
+            }
+        });
+    }
+</script>
+
 {% endblock %}
 
     

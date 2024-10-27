@@ -136,35 +136,6 @@ class Clientes(Base):
 
     #--------------
 
-
-
-
-
-    # Método para verificar si un cliente está inactivo.
-    @staticmethod
-    def verificar_cliente_inactivo(numero_documento):
-        # Crea una sesión de base de datos
-        db = SessionLocal()
-        try:
-            # Buscar el cliente por número de documento
-            cliente = db.query(Clientes).filter_by(numero_documento=numero_documento).first()
-
-            if cliente:
-                if not cliente.is_active:
-                    return {'inactivo': True}
-                else:
-                    return {'existe': True, 'nombre': cliente.nombre_completo, 'id': cliente.idclientes}
-            else:
-                return {'existe': False}
-        except Exception as e:
-            print(f"Error al verificar cliente: {e}")
-            return {'error': 'Error al verificar el cliente'}
-        finally:
-            db.close()
-
-    #-------------
-
-
     # Método de validación en Clientes
     @staticmethod
     def validar_datos(numero_documento=None, email=None):
@@ -183,4 +154,6 @@ class Clientes(Base):
 
         session.close()
         return errores
+    
+    #---------
 

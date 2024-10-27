@@ -1,6 +1,6 @@
 from src.app import app 
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template
+from flask import request, redirect, url_for, flash, render_template, jsonify
 from src.models import SessionLocal
 from src.models.vendedores import Vendedores
 
@@ -25,6 +25,15 @@ class Vendedores_Controller(FlaskController):
             telefono = request.form['telefonoVendedor']
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
+
+             # Validar si hay datos duplicados antes de crear el cliente
+            errores = Vendedores.validar_datos(numero_documento=numero_documento, email=email)
+
+            if errores:
+                # Si hay errores de duplicados, mostrar un mensaje y no guardar
+                for campo, mensaje in errores.items():
+                    flash(f"{mensaje}", 'danger')
+                return redirect(url_for('crear_vendedor'))  # Redirige de vuelta al formulario
 
             # Creando el objeto del nuevo vendedor con el modelo que ya tienes en la base de datos
             nuevo_vendedor = Vendedores(
@@ -158,3 +167,23 @@ class Vendedores_Controller(FlaskController):
         return redirect(url_for('ver_vendedores'))
     
     #-----------
+
+    #Ruta para validar los datos de un cliente
+    @app.route('/validar_vendedor', methods=['POST'])
+    def validar_vendedor():
+        data = request.get_json()
+        
+        # Llamada al método de validación en el modelo Vendedores
+        errores = Vendedores.validar_datos(
+            numero_documento=data.get('numeroDocumento'),
+            email=data.get('emailVendedor')
+        )
+
+        # Si hay errores, retornar con código 400
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        return jsonify({'status': 'success'})
+
+    
+    #---------------------
