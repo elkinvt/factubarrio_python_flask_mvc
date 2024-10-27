@@ -161,3 +161,26 @@ class Clientes(Base):
             return {'error': 'Error al verificar el cliente'}
         finally:
             db.close()
+
+    #-------------
+
+
+    # Método de validación en Clientes
+    @staticmethod
+    def validar_datos(numero_documento=None, email=None):
+        session = SessionLocal()
+        errores = {}
+
+        # Validación de número de documento único (solo si hay datos)
+        if numero_documento:
+            if session.query(Clientes).filter_by(numero_documento=numero_documento).first():
+                errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
+
+        # Validación de email único (solo si hay datos)
+        if email:
+            if session.query(Clientes).filter_by(email=email).first():
+                errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
+
+        session.close()
+        return errores
+

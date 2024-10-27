@@ -16,7 +16,7 @@ class Clientes_Controller(FlaskController):
     #----------------------------------
 
     
-    #Ruta para crear el cliente
+    # Ruta para crear el cliente
     @app.route('/clientes_crear', methods=['GET', 'POST'])
     def crear_cliente():
         if request.method == 'POST':
@@ -31,7 +31,16 @@ class Clientes_Controller(FlaskController):
             direccion = request.form['direccionCliente']
             email = request.form['emailCliente']
 
-            # Crear el cliente con los datos recibidos
+            # Validar si hay datos duplicados antes de crear el cliente
+            errores = Clientes.validar_datos(numero_documento=numero_documento, email=email)
+
+            if errores:
+                # Si hay errores de duplicados, mostrar un mensaje y no guardar
+                for campo, mensaje in errores.items():
+                    flash(f"{mensaje}", 'danger')
+                return redirect(url_for('crear_cliente'))  # Redirige de vuelta al formulario
+
+            # Si no hay duplicados, crear el cliente
             nuevo_cliente = Clientes(
                 tipo_documento=tipo_documento,
                 numero_documento=numero_documento,
@@ -55,7 +64,7 @@ class Clientes_Controller(FlaskController):
 
         # Si es GET, mostrar el formulario
         return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
-    
+
     #------------------------
     
     # Ruta para mostrar el formulario de edición (GET)  
@@ -189,8 +198,6 @@ class Clientes_Controller(FlaskController):
     
     #-----------
 
-
-    
     #Ruta para buscar cliente por numero de documento
     @app.route('/buscar_clientes_por_numero_documento')
     def buscar_clientes_por_numero_documento():
@@ -208,15 +215,24 @@ class Clientes_Controller(FlaskController):
     
     #------------------
 
-    #Ruta para verificar el estado inactivo de un cliente
-    @app.route('/verificar_cliente_inactivo')
-    def verificar_cliente_inactivo():
-        numero_documento = request.args.get('numero_documento')
+    #Ruta para buscar cliente por numero de documento
+    @app.route('/validar_cliente', methods=['POST'])
+    def validar_cliente():
+        data = request.get_json()
         
-        # Llama al método en el modelo para verificar el estado del cliente
-        resultado = Clientes.verificar_cliente_inactivo(numero_documento)
+        # Llamada al método de validación en el modelo
+        errores = Clientes.validar_datos(
+            numero_documento=data.get('numeroDocumento'),
+            email=data.get('emailCliente')
+        )
 
-        # Devuelve la respuesta en formato JSON
-        if 'error' in resultado:
-            return jsonify(resultado), 500
-        return jsonify(resultado)
+        # Si hay errores, retornar con código 400
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        return jsonify({'status': 'success'})
+    
+    #---------------------
+
+
+    
