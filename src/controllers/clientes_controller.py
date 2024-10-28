@@ -63,8 +63,7 @@ class Clientes_Controller(FlaskController):
                 return jsonify({'status': 'error', 'message': f'Error al crear cliente: {str(e)}'}), 500
             finally:
                 db.close()
-
-
+                
     #------------------------
     
     # Ruta para mostrar el formulario de edición (GET)  
