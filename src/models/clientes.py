@@ -1,5 +1,6 @@
-#crear la tabla de la base de datos!!!
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.exc import SQLAlchemyError
+from contextlib import contextmanager
 from src.models import Base, SessionLocal
 
 class Clientes(Base):
@@ -29,131 +30,113 @@ class Clientes(Base):
         return f'<Cliente {self.nombres_cliente}>'
     
     
-    # Método estático para obtener los clientes no eliminados
+    # Contexto de sesión para gestionar apertura y cierre automáticamente
     @staticmethod
-    def obtener_clientes():
+    @contextmanager
+    def session_scope():
         session = SessionLocal()
         try:
-            clientes = session.query(Clientes).filter_by(is_deleted=False).all()
-            return clientes
+            yield session
+            session.commit()
+        except SQLAlchemyError as e:
+            session.rollback()
+            print(f"Database error: {e}")
+            raise e
         finally:
             session.close()
-    #------------        
-    
-    # Método estático para agregar un cliente       
-    @staticmethod
-    def agregar_cliente(db_session, cliente):
-        try:
-            db_session.add(cliente)
-            db_session.commit()
-            return cliente
-        except Exception as e:
-            db_session.rollback()
-            raise e
-    #------------------
-        
-        
-    # Método estático para buscar un cliente usando una sesión existente
-    @staticmethod
-    def buscar_cliente_por_documento(db_session, tipo_documento, numero_documento):
-        cliente = db_session.query(Clientes).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento
-        ).first()
-        return cliente
 
-    #------------- 
-    
-    # Método estático para actualizar un cliente       
+    # Métodos CRUD
     @staticmethod
-    def actualizar_cliente(db_session, cliente, datos_actualizados):
-        try:
+    def crear_o_actualizar(db_session, cliente, datos_actualizados=None):
+        """Método genérico para crear o actualizar cliente"""
+        if datos_actualizados:
             for key, value in datos_actualizados.items():
                 setattr(cliente, key, value)
-            db_session.commit()
-            return cliente
-        except Exception as e:
-            db_session.rollback()
-            raise e
-    @staticmethod
-    def buscar_cliente_por_id(cliente_id):
-        session = SessionLocal()
-        try:
-            cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
-            return cliente
-        finally:
-            session.close()
-            
-    #-----------------
-            
-    # Método estático para actualizar el estado de un cliente        
-    @staticmethod
-    def toggle_estado_cliente(db_session, cliente):
-        try:
-            cliente.is_active = not cliente.is_active  # Cambia el estado (activo/inactivo)
-            db_session.commit()  # Guarda los cambios en la base de dato
-            return cliente
-        except Exception as e:
-            db_session.rollback()  # Revierte los cambios si hay algún error
-            raise e
-    #-----------
-    
-    #Metodo para eliminar cliente(eliminacion logica)
-    @staticmethod
-    def eliminar_cliente(db_session, cliente):
-        try:
-            cliente.is_deleted = True  # Marcamos el cliente como eliminado
-            db_session.commit()  # Guardamos los cambios
-        except Exception as e:
-            db_session.rollback()  # En caso de error, revertimos la transacción
-            raise e
-    #------------
+        db_session.add(cliente)
+        return cliente
 
-    # Método para buscar clientes por número de documento
+    @staticmethod
+    def obtener_clientes():
+        """Obtener todos los clientes no eliminados y convertirlos a diccionarios"""
+        with Clientes.session_scope() as session:
+            clientes = session.query(Clientes).filter_by(is_deleted=False).all()
+            # Convertir los objetos Cliente a diccionarios
+            return [{
+                'idclientes': cliente.idclientes,
+                'tipo_documento': cliente.tipo_documento,
+                'numero_documento': cliente.numero_documento,
+                'nombres_cliente': cliente.nombres_cliente,
+                'telefono': cliente.telefono,
+                'direccion': cliente.direccion,
+                'email': cliente.email,
+                'is_active': cliente.is_active
+            } for cliente in clientes]
+
+
+    
+    @staticmethod
+    def buscar_cliente_como_diccionario(**kwargs):
+        """Buscar cliente y devolverlo como un diccionario para mostrar en la vista"""
+        with Clientes.session_scope() as session:
+            cliente = session.query(Clientes).filter_by(**kwargs).first()
+            if cliente:
+                return {
+                    'idclientes': cliente.idclientes,
+                    'tipo_documento': cliente.tipo_documento,
+                    'numero_documento': cliente.numero_documento,
+                    'nombres_cliente': cliente.nombres_cliente,
+                    'telefono': cliente.telefono,
+                    'direccion': cliente.direccion,
+                    'email': cliente.email,
+                    'is_active': cliente.is_active,
+                    'is_deleted': cliente.is_deleted
+                }
+            return None
+        
+    @staticmethod
+    def buscar_cliente(**kwargs):
+        """Buscar cliente y devolver la instancia del modelo para manipulación directa"""
+        with Clientes.session_scope() as session:
+            return session.query(Clientes).filter_by(**kwargs).first()
+
+
+    @staticmethod
+    def actualizar_estado(db_session, cliente):
+        """Toggle de estado de cliente"""
+        cliente.is_active = not cliente.is_active
+        db_session.add(cliente)
+        return cliente
+
+    @staticmethod
+    def eliminar_cliente_logicamente(db_session, cliente):
+        """Eliminar cliente lógicamente"""
+        cliente.is_deleted = True
+        db_session.add(cliente)
+        return cliente
+
     @staticmethod
     def buscar_por_numero_documento(query):
-        db = SessionLocal()
-        try:
-            # Consulta para buscar clientes cuyo número de documento coincida parcialmente con 'query'
-            clientes = db.query(Clientes).filter(
-                Clientes.numero_documento.ilike(f"%{query}%")
-            ).all()
-
-            # Serializar los datos del cliente incluyendo el estado de actividad
+        """Búsqueda parcial por número de documento"""
+        with Clientes.session_scope() as session:
             return [{
                 'id': cliente.idclientes,
                 'nombre': cliente.nombres_cliente,
                 'numero_documento': cliente.numero_documento,
                 'direccion': cliente.direccion,
                 'telefono': cliente.telefono,
-                'is_active': cliente.is_active  # Añadir estado de actividad
-            } for cliente in clientes]
-        except Exception as e:
-            print(f"Error al buscar clientes: {e}")
-            return {'error': 'Error al buscar clientes'}
-        finally:
-            db.close()
-
-    #--------------
-
-    # Método de validación en Clientes
+                'is_active': cliente.is_active
+            } for cliente in session.query(Clientes)
+                .filter(Clientes.numero_documento.ilike(f"%{query}%"))
+                .all()]
+    
     @staticmethod
     def validar_datos(numero_documento=None, email=None):
-        session = SessionLocal()
+        """Validar unicidad de documento y email"""
         errores = {}
-
-        # Validación de número de documento único (solo si hay datos)
-        if numero_documento:
-            if session.query(Clientes).filter_by(numero_documento=numero_documento).first():
+        with Clientes.session_scope() as session:
+            if numero_documento and session.query(Clientes).filter_by(numero_documento=numero_documento).first():
                 errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
-
-        # Validación de email único (solo si hay datos)
-        if email:
-            if session.query(Clientes).filter_by(email=email).first():
+            if email and session.query(Clientes).filter_by(email=email).first():
                 errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
-
-        session.close()
         return errores
-    
-    #---------
 
