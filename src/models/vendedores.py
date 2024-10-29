@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import Base, SessionLocal
+from src.models import Base, SessionLocal, db_session_manager
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
@@ -26,99 +26,77 @@ class Vendedores(Base):
         return f'<Vendedor {self.nombres_vendedor}>'
     
     
-    
-    # Método estático para obtener los vendedores no eliminados
+   # Método para obtener los vendedores no eliminados
     @staticmethod
     def obtener_vendedores():
-        session = SessionLocal()
-        try:
-            vendedores = session.query(Vendedores).filter_by(is_deleted=False).all()
-            return vendedores
-        finally:
-            session.close()
+        return SessionLocal.query(Vendedores).filter_by(is_deleted=False).all()
+
     #------------     
 
     # Método estático para agregar un vendedor      
+    # Método para agregar un vendedor
     @staticmethod
-    def agregar_vendedor(db_session, vendedor):
-        try:
-            db_session.add(vendedor)
-            db_session.commit()
+    def agregar_vendedor(vendedor):
+        with db_session_manager() as session:
+            session.add(vendedor)
+            session.commit()  # Confirma los cambios
             return vendedor
-        except Exception as e:
-            db_session.rollback()
-            raise e
     #------------------
     
     # Método estático para buscar un vendedor usando una sesión existente
     @staticmethod
-    def buscar_vendedor_por_documento(db_session, tipo_documento, numero_documento):
-        vendedores = db_session.query(Vendedores).filter_by(
-            tipo_documento=tipo_documento,
-            numero_documento=numero_documento
+    def buscar_vendedor_por_documento(tipo_documento, numero_documento):
+        return SessionLocal.query(Vendedores).filter_by(
+            tipo_documento=tipo_documento, numero_documento=numero_documento
         ).first()
-        return vendedores
+
     #---------
     
     # Método estático para actualizar un vendedor     
     @staticmethod
-    def actualizar_vendedor(db_session, vendedor, datos_actualizados):
-        try:
+    def actualizar_vendedor(vendedor_id, datos_actualizados):
+        with db_session_manager() as session:
+            vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+
+            if not vendedor:
+                raise ValueError("Vendedor no encontrado")
+
+            # Actualizar los datos
             for key, value in datos_actualizados.items():
-                setattr(vendedor, key, value)  # Actualiza el campo del vendedor
-            
-            db_session.commit()  # Confirmar los cambios en la base de datos
+                setattr(vendedor, key, value)
+
+            session.commit()  # Confirma los cambios en la base de datos
             return vendedor
-        except Exception as e:
-            db_session.rollback()  # Deshacer cambios si ocurre un error
-            raise e
-    
     #--------------
 
     #Metodo estatico para buscar vendedor por id
     @staticmethod
     def buscar_vendedor_por_id(vendedor_id):
-        session = SessionLocal()
-        try:
-            vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
-            return vendedor
-        finally:
-            session.close()
-            
+        with db_session_manager() as session:
+            return session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+    
     #-----------------
     
-     # Método estático para eliminar un vendedor 
-      #----------------
+    # Método estático para eliminar un vendedor 
     @staticmethod
-    def eliminar_vendedor(db_session, vendedor):
-        try:
-            vendedor.is_deleted = True  # Marcamos el cliente como eliminado
-            db_session.commit()  # Guardamos los cambios
-        except Exception as e:
-            db_session.rollback()  # En caso de error, revertimos la transacción
-            raise e
+    def eliminar_vendedor(vendedor):
+        with db_session_manager() as session:
+            vendedor.is_deleted = True  # Marcamos el vendedor como eliminado
+            session.commit()  # Guardamos los cambios en la base de datos
+
     #------------    
 
     # Método de validación en Vendedores
     @staticmethod
     def validar_datos(numero_documento=None, email=None):
-        session = SessionLocal()
-        errores = {}
-
-        # Validación de número de documento único (solo si hay datos)
-        if numero_documento:
-            if session.query(Vendedores).filter_by(numero_documento=numero_documento).first():
+        with db_session_manager() as session:
+            errores = {}
+            if numero_documento and session.query(Vendedores).filter_by(numero_documento=numero_documento).first():
                 errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
-
-        # Validación de email único (solo si hay datos)
-        if email:
-            if session.query(Vendedores).filter_by(email=email).first():
+            if email and session.query(Vendedores).filter_by(email=email).first():
                 errores['emailVendedor'] = 'Este correo electrónico ya está registrado.'
+            return errores
 
-        session.close()
-        return errores
-
-    
     #---------
 
     

@@ -1,24 +1,22 @@
 from src.app import app 
 from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template, jsonify
-from src.models import SessionLocal
+from src.models import db_session_manager
 from src.models.vendedores import Vendedores
 
 class Vendedores_Controller(FlaskController):
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
     def ver_vendedores():
-        # Obtener los clientes desde el modelo Clientes
         vendedores = Vendedores.obtener_vendedores()
-        return render_template('form_ver_vendedor.html', titulo_pagina="Ver  Vendedores", vendedores=vendedores)
-    
+        return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
+
     #--------------
     
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
     def crear_vendedor():
         if request.method == 'POST':
-            db = SessionLocal()
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
             nombre_completo = request.form['nombreVendedor'].title()  # Usamos un solo campo para el nombre completo
@@ -46,21 +44,20 @@ class Vendedores_Controller(FlaskController):
             )
 
             try:
-                Vendedores.agregar_vendedor(db,nuevo_vendedor)
+                Vendedores.agregar_vendedor(nuevo_vendedor)
                 flash('Vendedor creado con éxito', 'success')
                 return redirect(url_for('ver_vendedores')) 
             except Exception as e:
-                db.rollback()
                 flash(f'Error al crear vendedor: {str(e)}', 'danger')
-            finally:
-                db.close()
+        
 
         # Si es GET, mostrar el formulario
         return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
     
     #------------
 
-   # Ruta para mostrar el formulario de edición (GET)
+   
+    # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
     def mostrar_formulario_editar_vendedor():
         tipo_documento = request.args.get('tipoDocumento')
@@ -71,12 +68,10 @@ class Vendedores_Controller(FlaskController):
             flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
             return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
 
-        db = SessionLocal()
-
         try:
-            # Usar la sesión en la función de búsqueda
-            vendedor = Vendedores.buscar_vendedor_por_documento(db, tipo_documento, numero_documento)
-
+            # Llamar al método del modelo para buscar el vendedor sin manejar la sesión
+            vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
+            
             if vendedor:
                 if vendedor.is_deleted:
                     flash('Este vendedor ha sido eliminado y no puede ser editado.', 'danger')
@@ -87,9 +82,8 @@ class Vendedores_Controller(FlaskController):
                 return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
         except Exception as e:
             flash(f'Error al buscar el vendedor: {str(e)}', 'danger')
-        finally:
-            db.close()  # Cerramos la sesión aquí después de obtener el vendedor
-            
+            return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Error al Editar Vendedor")
+
     #------------
 
     # Actualizar vendedor
@@ -103,68 +97,51 @@ class Vendedores_Controller(FlaskController):
         direccion = request.form['direccionVendedor']
         email = request.form['emailVendedor']
 
-        db = SessionLocal()  # Iniciar nueva sesión
+        # Diccionario de datos actualizados
+        datos_actualizados = {
+            'tipo_documento': tipo_documento,
+            'numero_documento': numero_documento,
+            'nombres_vendedor': nombre,
+            'telefono': telefono,
+            'direccion': direccion,
+            'email': email
+        }
 
         try:
-            # Rebuscar al vendedor por su idvendedores para asegurarse de que está asociado a esta sesión
-            vendedor = Vendedores.buscar_vendedor_por_id(vendedor_id)
-
-            if vendedor:
-                # Diccionario de datos actualizados
-                datos_actualizados = {
-                    'tipo_documento': tipo_documento,
-                    'numero_documento': numero_documento,
-                    'nombres_vendedor': nombre,
-                    'telefono': telefono,
-                    'direccion': direccion,
-                    'email': email
-                }
-
-                # Verificar si el vendedor está en la sesión actual, si no lo está, reasociarlo
-                if not db.object_session(vendedor):
-                    db.add(vendedor)
-                
-                # Actualizar el vendedor utilizando el método en el modelo
-                Vendedores.actualizar_vendedor(db, vendedor, datos_actualizados)
-                flash('Cambios guardados correctamente.', 'success')
-            else:
-                flash('Vendedor no encontrado.', 'danger')
-
+            Vendedores.actualizar_vendedor(vendedor_id, datos_actualizados)
+            flash('Cambios guardados correctamente.', 'success')
+        except ValueError:
+            flash('Vendedor no encontrado.', 'danger')
         except Exception as e:
-            db.rollback()  # Deshacer los cambios si hay un error
             flash(f'Error al guardar los cambios: {str(e)}', 'danger')
-        finally:
-            db.close()  # Asegurar que la sesión se cierra correctamente
 
         return redirect(url_for('ver_vendedores'))
-    
+        
     #------------------
     
+   
     # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
     def eliminar_vendedor():
         numero_documento = request.form.get('numeroDocumento')
         tipo_documento = request.form.get('tipoDocumento')
         
-        db = SessionLocal()  # Iniciamos la sesión de la base de datos
         try:
-            # Buscar el cliente usando la misma sesión
-            vendedor = Vendedores.buscar_vendedor_por_documento(db, tipo_documento, numero_documento)
+            # Buscar el cliente usando el método del modelo (sin necesidad de manejar la sesión)
+            vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
 
             if vendedor and not vendedor.is_deleted:
-                # Usar el método del modelo para eliminar al cliente
-                Vendedores.eliminar_vendedor(db, vendedor)
-                flash('vendedor  eliminado correctamente.', 'success')
+                # Llamamos al método del modelo para eliminar al vendedor
+                Vendedores.eliminar_vendedor(vendedor)
+                flash('Vendedor eliminado correctamente.', 'success')
             else:
-                flash('vendedor no encontrado o ya eliminado.', 'danger')
+                flash('Vendedor no encontrado o ya eliminado.', 'danger')
         except Exception as e:
-            db.rollback()  # Rollback si hay error
             flash(f'Error al eliminar el vendedor: {str(e)}', 'danger')
-        finally:
-            db.close()  # Cerrar la sesión después de la operación
 
-        # Redirigir a la página donde se ven todos los clientes
+        # Redirigir a la página donde se ven todos los vendedores
         return redirect(url_for('ver_vendedores'))
+
     
     #-----------
 
