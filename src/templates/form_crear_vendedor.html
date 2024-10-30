@@ -2,8 +2,8 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Registrar vendedor</h2>
-    <form action="/vendedores_crear" method="POST" id="formCrearVendedor">
-
+    <div id="mensajeErrorGeneral" class="text-danger"></div>
+    <form id="formCrearVendedor">
     <div class="mb-3">
         <label for="tipoDocumentoVendedor" class="form-label">Tipo de Documento:</label>
         <select class="form-control form-control-sm" id="tipoDocumentoVendedor" name="tipoDocumento" required>
@@ -47,6 +47,54 @@
     </form>
 </div>
 
+
+<!-- Código JavaScript para manejar el envío con AJAX  en la creacion-->
+<script>
+    $(document).ready(function () {
+        $('#formCrearVendedor').on('submit', function (event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            // Obtener los datos del formulario
+            var formData = $(this).serialize();
+
+            // Enviar datos con AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/vendedores_crear',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message); // Mensaje de éxito
+                        window.location.href = '/vendedores_ver';
+                    }
+                },
+                error: function (xhr) {
+                    const errores = xhr.responseJSON.errors || {};
+                    $('#numeroDocumentoError').text(errores.numeroDocumento || '');
+                    $('#emailVendedorError').text(errores.emailVendedor || '');
+
+                    // Mostrar mensaje de error general en caso de errores específicos
+                    if (Object.keys(errores).length > 0) {
+                        $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+                    } else if (xhr.responseJSON.message) {
+                        // Mostrar mensaje de error general si hay otro tipo de error
+                        $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+                    } else {
+                        $('#mensajeErrorGeneral').text('');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+<!-- Código JavaScript para validacion de datos del cliente -->
 <script>
     // Asignar la validación solo a los campos específicos
     $('#numeroDocumentoVendedor').on('blur', function() {

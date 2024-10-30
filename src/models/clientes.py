@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.exc import SQLAlchemyError
 from contextlib import contextmanager
-from src.models import Base, SessionLocal
+from src.models import Base, SessionLocal, db_session_manager
 
 class Clientes(Base):
     __tablename__ = 'clientes'
@@ -45,75 +45,70 @@ class Clientes(Base):
         finally:
             session.close()
 
-    # Métodos CRUD
-    @staticmethod
-    def crear_o_actualizar(db_session, cliente, datos_actualizados=None):
-        """Método genérico para crear o actualizar cliente"""
-        if datos_actualizados:
-            for key, value in datos_actualizados.items():
-                setattr(cliente, key, value)
-        db_session.add(cliente)
-        return cliente
-
+   
+    # Método para obtener los clientes no eliminados
     @staticmethod
     def obtener_clientes():
-        """Obtener todos los clientes no eliminados y convertirlos a diccionarios"""
-        with Clientes.session_scope() as session:
-            clientes = session.query(Clientes).filter_by(is_deleted=False).all()
-            # Convertir los objetos Cliente a diccionarios
-            return [{
-                'idclientes': cliente.idclientes,
-                'tipo_documento': cliente.tipo_documento,
-                'numero_documento': cliente.numero_documento,
-                'nombres_cliente': cliente.nombres_cliente,
-                'telefono': cliente.telefono,
-                'direccion': cliente.direccion,
-                'email': cliente.email,
-                'is_active': cliente.is_active
-            } for cliente in clientes]
-
-
+        """Obtener todos los clientes no eliminados."""
+        return SessionLocal.query(Clientes).filter_by(is_deleted=False).all()
     
+    #--------
+
+    # Método estático para agregar un cliente      
     @staticmethod
-    def buscar_cliente_como_diccionario(**kwargs):
-        """Buscar cliente y devolverlo como un diccionario para mostrar en la vista"""
-        with Clientes.session_scope() as session:
-            cliente = session.query(Clientes).filter_by(**kwargs).first()
-            if cliente:
-                return {
-                    'idclientes': cliente.idclientes,
-                    'tipo_documento': cliente.tipo_documento,
-                    'numero_documento': cliente.numero_documento,
-                    'nombres_cliente': cliente.nombres_cliente,
-                    'telefono': cliente.telefono,
-                    'direccion': cliente.direccion,
-                    'email': cliente.email,
-                    'is_active': cliente.is_active,
-                    'is_deleted': cliente.is_deleted
-                }
-            return None
-        
+    def agregar_cliente(cliente):
+        with db_session_manager() as session:
+            session.add(cliente)
+            session.commit()  # Confirma los cambios
+            return cliente
+    
+    #----------
+
+    # Método estático para buscar un cliente usando una sesión existente
     @staticmethod
-    def buscar_cliente(**kwargs):
-        """Buscar cliente y devolver la instancia del modelo para manipulación directa"""
-        with Clientes.session_scope() as session:
-            return session.query(Clientes).filter_by(**kwargs).first()
+    def buscar_cliente_por_documento(tipo_documento, numero_documento):
+        return SessionLocal.query(Clientes).filter_by(
+            tipo_documento=tipo_documento, numero_documento=numero_documento
+        ).first()
+
+    #---------
 
 
+    # Método estático para actualizar un vendedor     
+    @staticmethod
+    def actualizar_cliente(cliente_id, datos_actualizados):
+        with db_session_manager() as session:
+            cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
+
+            if not cliente:
+                raise ValueError("Vendedor no encontrado")
+
+            # Actualizar los datos
+            for key, value in datos_actualizados.items():
+                setattr(cliente, key, value)
+
+            session.commit()  # Confirma los cambios en la base de datos
+            return cliente
+    #--------------
+
+    # Método estático para actualizar estado del cliente 
     @staticmethod
     def actualizar_estado(db_session, cliente):
         """Toggle de estado de cliente"""
         cliente.is_active = not cliente.is_active
         db_session.add(cliente)
         return cliente
+    #--------
 
+    # Método estático para eliminar un cliente 
     @staticmethod
-    def eliminar_cliente_logicamente(db_session, cliente):
-        """Eliminar cliente lógicamente"""
-        cliente.is_deleted = True
-        db_session.add(cliente)
-        return cliente
+    def eliminar_cliente_logicamente(cliente):
+        with db_session_manager() as session:
+            cliente.is_deleted = True
+            session.commit()
+    #--------
 
+    # Método estático para buscar el cliente en la factura
     @staticmethod
     def buscar_por_numero_documento(query):
         """Búsqueda parcial por número de documento"""
@@ -128,7 +123,9 @@ class Clientes(Base):
             } for cliente in session.query(Clientes)
                 .filter(Clientes.numero_documento.ilike(f"%{query}%"))
                 .all()]
-    
+    #-----------
+
+    # Método estático para validar duplicaciones del cliente
     @staticmethod
     def validar_datos(numero_documento=None, email=None):
         """Validar unicidad de documento y email"""
@@ -139,4 +136,5 @@ class Clientes(Base):
             if email and session.query(Clientes).filter_by(email=email).first():
                 errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
         return errores
+    #--------
 

@@ -5,6 +5,7 @@ from src.models import db_session_manager
 from src.models.vendedores import Vendedores
 
 class Vendedores_Controller(FlaskController):
+
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
     def ver_vendedores():
@@ -16,6 +17,9 @@ class Vendedores_Controller(FlaskController):
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
     def crear_vendedor():
+        if request.method == 'GET':
+            return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
+
         if request.method == 'POST':
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
@@ -24,14 +28,12 @@ class Vendedores_Controller(FlaskController):
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
 
-             # Validar si hay datos duplicados antes de crear el cliente
+            # Validar si hay datos duplicados antes de crear el vendedor
             errores = Vendedores.validar_datos(numero_documento=numero_documento, email=email)
 
             if errores:
-                # Si hay errores de duplicados, mostrar un mensaje y no guardar
-                for campo, mensaje in errores.items():
-                    flash(f"{mensaje}", 'danger')
-                return redirect(url_for('crear_vendedor'))  # Redirige de vuelta al formulario
+                # Si hay errores de duplicados, devolverlos como JSON
+                return jsonify({'success': False, 'errors': errores}), 400
 
             # Creando el objeto del nuevo vendedor con el modelo que ya tienes en la base de datos
             nuevo_vendedor = Vendedores(
@@ -45,14 +47,9 @@ class Vendedores_Controller(FlaskController):
 
             try:
                 Vendedores.agregar_vendedor(nuevo_vendedor)
-                flash('Vendedor creado con éxito', 'success')
-                return redirect(url_for('ver_vendedores')) 
+                return jsonify({'success': True, 'message': 'Vendedor creado con éxito'}), 200
             except Exception as e:
-                flash(f'Error al crear vendedor: {str(e)}', 'danger')
-        
-
-        # Si es GET, mostrar el formulario
-        return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
+                return jsonify({'success': False, 'message': f'Error al crear vendedor: {str(e)}'}), 500
     
     #------------
 

@@ -34,7 +34,6 @@ class Vendedores(Base):
     #------------     
 
     # Método estático para agregar un vendedor      
-    # Método para agregar un vendedor
     @staticmethod
     def agregar_vendedor(vendedor):
         with db_session_manager() as session:

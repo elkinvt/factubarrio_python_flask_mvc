@@ -20,15 +20,16 @@ class Clientes_Controller(FlaskController):
             return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
         
         if request.method == 'POST':
-            data = request.get_json()
-            tipo_documento = data.get('tipoDocumento')
-            numero_documento = data.get('numeroDocumento')
-            nombres_cliente = data.get('nombreCliente').title()
-            telefono = data.get('telefonoCliente')
-            direccion = data.get('direccionCliente')
-            email = data.get('emailCliente')
-
+            tipo_documento = request.form['tipoDocumento']
+            numero_documento = request.form['numeroDocumento']
+            nombres_cliente = request.form['nombreCliente'].title()
+            telefono = request.form['telefonoCliente']
+            direccion = request.form['direccionCliente']
+            email = request.form['emailCliente']
+            
+            # Validar si hay datos duplicados antes de crear el cliente
             errores = Clientes.validar_datos(numero_documento=numero_documento, email=email)
+
             if errores:
                 return jsonify({'status': 'error', 'errores': errores}), 400
 
@@ -43,10 +44,12 @@ class Clientes_Controller(FlaskController):
                 is_deleted=False
             )
 
-            with Clientes.session_scope() as db:
-                Clientes.crear_o_actualizar(db, nuevo_cliente)
-                return jsonify({'status': 'success', 'message': 'Cliente creado con éxito'}), 200
-
+            try:
+                Clientes.agregar_cliente(nuevo_cliente)
+                return jsonify({'success': True, 'message': 'cliente creado con éxito'}), 200
+            except Exception as e:
+                return jsonify({'success': False, 'message': f'Error al crear cliente: {str(e)}'}), 500
+        
     #------------------------
 
     # Ruta para mostrar el formulario de edición (GET)  
@@ -59,17 +62,22 @@ class Clientes_Controller(FlaskController):
             flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
             return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
-        # Utilizamos el método que devuelve un diccionario
-        cliente = Clientes.buscar_cliente_como_diccionario(tipo_documento=tipo_documento, numero_documento=numero_documento)
-        
-        if cliente:
-            if cliente['is_deleted']:
-                flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
-                return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
-            return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
-        else:
-            flash('Cliente no encontrado. Verifique los datos ingresados.', 'danger')
-            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
+        try:
+            # Llamar al método del modelo para buscar el cliente sin manejar la sesión
+            cliente = Clientes.buscar_cliente_por_documento(tipo_documento, numero_documento)
+            
+            if cliente:
+                if cliente.is_deleted:
+                    flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
+                    return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
+                return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
+            else:
+                flash('Cliente no encontrado. Verifique los datos ingresados.', 'danger')
+                return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
+            
+        except Exception as e:
+            flash(f'Error al buscar el cliente: {str(e)}', 'danger')
+            return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Error al Editar cliente")
 
     #---------------------------------
 
@@ -77,30 +85,38 @@ class Clientes_Controller(FlaskController):
     @app.route('/clientes_actualizar', methods=['POST'])
     def actualizar_cliente():
         cliente_id = request.form['clienteId']
+        tipo_documento = request.form['tipoDocumento']
+        numero_documento = request.form['numeroDocumento']
+        nombres_cliente = request.form['nombreCliente'].title()
+        telefono = request.form['telefonoCliente']
+        direccion = request.form['direccionCliente']
+        email = request.form['emailCliente']
+        is_active = request.form['estadoCliente'].lower() == 'activo'
+
+        # Diccionario de datos actualizados
         datos_actualizados = {
-            'tipo_documento': request.form['tipoDocumento'],
-            'numero_documento': request.form['numeroDocumento'],
-            'nombres_cliente': request.form['nombreCliente'].title(),
-            'telefono': request.form['telefonoCliente'],
-            'direccion': request.form['direccionCliente'],
-            'email': request.form['emailCliente'],
-            'is_active': request.form['estadoCliente'].lower() == 'activo'
+            'tipo_documento': tipo_documento,
+            'numero_documento': numero_documento,
+            'nombres_vendedor': nombres_cliente,
+            'telefono': telefono,
+            'direccion': direccion,
+            'email': email,
+            'estadoCliente': is_active
         }
 
-        # Usamos el método que devuelve la instancia del modelo
-        cliente = Clientes.buscar_cliente(idclientes=cliente_id)
+        try:
+            Clientes.actualizar_cliente(cliente_id, datos_actualizados)
+            flash('Cambios guardados correctamente.', 'success')
+        except ValueError:
+            flash('cliente no encontrado.', 'danger')
+        except Exception as e:
+            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
 
-        if cliente:
-            with Clientes.session_scope() as db:
-                Clientes.crear_o_actualizar(db, cliente, datos_actualizados)
-                flash('Cambios guardados correctamente', 'success')
-            return redirect(url_for('ver_clientes'))
-        else:
-            flash('Cliente no encontrado', 'danger')
-            return redirect(url_for('mostrar_formulario_editar_cliente', tipoDocumento=datos_actualizados['tipo_documento'], numeroDocumento=datos_actualizados['numero_documento']))
-
+        return redirect(url_for('ver_clientes'))
+        
     #--------------------
 
+    
     # Ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
     def toggle_estado_cliente():
@@ -112,8 +128,8 @@ class Clientes_Controller(FlaskController):
             cliente = db.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
             
             if cliente:
-                cliente.is_active = not cliente.is_active  # Cambiar el estado directamente en la sesión activa
-                db.add(cliente)  # Asegurarse de que el cliente esté adjunto a la sesión
+                # Usar el método estático para cambiar el estado
+                Clientes.actualizar_estado(db, cliente)
                 flash(f'Cliente {"activado" if cliente.is_active else "desactivado"} con éxito.', 'success')
             else:
                 flash('Cliente no encontrado.', 'danger')

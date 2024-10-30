@@ -44,52 +44,43 @@
 
 <!-- Código JavaScript para manejar el envío con AJAX  en la creacion-->
 <script>
-    $('#formCliente').on('submit', function(event) {
-        event.preventDefault();  // Evitar el envío estándar del formulario
+    $(document).ready(function () {
+        $('#formCliente').on('submit', function (event) {
+            event.preventDefault(); // Evitar el envío estándar del formulario
 
-        // Recopilar datos del formulario
-        const tipoDocumento = $('#tipoDocumento').val();
-        const numeroDocumento = $('#numeroDocumento').val();
-        const nombreCliente = $('#nombreCliente').val();
-        const telefonoCliente = $('#telefonoCliente').val();
-        const direccionCliente = $('#direccionCliente').val();
-        const emailCliente = $('#emailCliente').val();
+            // Serializar datos del formulario
+            var formData = $(this).serialize();
 
-        // Enviar datos al backend con AJAX
-        $.ajax({
-            type: 'POST',
-            url: '/clientes_crear',
-            contentType: 'application/json',  // Especifica que el contenido es JSON
-            data: JSON.stringify({
-                tipoDocumento: tipoDocumento,
-                numeroDocumento: numeroDocumento,
-                nombreCliente: nombreCliente,
-                telefonoCliente: telefonoCliente,
-                direccionCliente: direccionCliente,
-                emailCliente: emailCliente
-            }),
-            success: function(response) {
-                alert(response.message);
-                window.location.href = '/clientes_ver';
-            },
-            error: function(xhr) {
-            const errores = xhr.responseJSON.errores || {};
-            $('#numeroDocumentoError').text(errores.numeroDocumento || '');
-            $('#emailClienteError').text(errores.emailCliente || '');
+            // Enviar datos al backend con AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/clientes_crear',
+                data: formData,
+                dataType: 'json', // Especifica que el backend responde en JSON
+                success: function (response) {
+                    alert(response.message); // Mensaje de éxito
+                    window.location.href = '/clientes_ver';
+                },
+                error: function (xhr) {
+                    const errores = xhr.responseJSON.errores || {};
+                    $('#numeroDocumentoError').text(errores.numeroDocumento || '');
+                    $('#emailClienteError').text(errores.emailCliente || '');
 
-            // Mostrar mensaje de error general en caso de errores específicos
-            if (Object.keys(errores).length > 0) {
-                $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
-            } else if (xhr.responseJSON.message) {
-                // Mostrar mensaje de error general si hay otro tipo de error
-                $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
-            } else {
-                $('#mensajeErrorGeneral').text('');
-            }
-        }
+                    // Mostrar mensaje de error general en caso de errores específicos
+                    if (Object.keys(errores).length > 0) {
+                        $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+                    } else if (xhr.responseJSON.message) {
+                        // Mostrar mensaje de error general si hay otro tipo de error
+                        $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+                    } else {
+                        $('#mensajeErrorGeneral').text('');
+                    }
+                }
+            });
+        });
     });
-});
 </script>
+
 
 
 <!-- Código JavaScript para validacion de datos del cliente -->
