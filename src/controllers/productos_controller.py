@@ -85,8 +85,6 @@ class Productos_Controller(FlaskController):
 
     #------------------
     
-  
-
     # Ruta para buscar o seleccionar el producto
     @app.route('/productos_editar', methods=['GET'])
     def editar_producto():

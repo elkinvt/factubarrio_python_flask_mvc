@@ -1,10 +1,8 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm import Session
+from src.models import Base,SessionLocal
 from src.models.productos import Productos
-
-from . import Base
 
 class DetalleProducto(Base):
     __tablename__ = 'detalle_producto'
@@ -28,13 +26,14 @@ class DetalleProducto(Base):
     def __repr__(self):
         return f'<DetalleProducto Factura {self.factura_id} Producto {self.productos_idproductos}>'
     
-    #Metodo estatico para agregar productos al detalle de la factura
-    @classmethod
-    def agregar_detalles(cls, factura_id, productos, db_session: Session):
+     # Método estático para agregar productos al detalle de la factura
+    @staticmethod
+    def agregar_detalles(factura_id, productos):
+        session = SessionLocal()
         try:
             for producto in productos:
                 # Verificar que el producto existe y tiene suficiente stock
-                producto_db = db_session.query(Productos).filter_by(idproductos=producto['id']).first()
+                producto_db = session.query(Productos).filter_by(idproductos=producto['id']).first()
                 if not producto_db:
                     raise ValueError(f"El producto con ID {producto['id']} no existe.")
                 
@@ -45,22 +44,25 @@ class DetalleProducto(Base):
                 producto_db.cantidad_stock -= producto['cantidad']
 
                 # Crear el detalle de la factura
-                detalle = cls(
+                detalle = DetalleProducto(
                     factura_idfactura=factura_id,
                     productos_idproductos=producto['id'],
                     cantidad=producto['cantidad'],
                     precio_unitario=producto['precio'],
                     total_precio=producto['subtotal']
                 )
-                db_session.add(detalle)
+                session.add(detalle)
 
             # Confirmar las operaciones de detalle y reducción de stock
-            db_session.commit()
+            session.commit()
+            return True
         except (SQLAlchemyError, ValueError) as e:
-            db_session.rollback()
+            session.rollback()
             print(f"Error al agregar detalles: {str(e)}")
             return False
-        return True
+        finally:
+            session.close()
+        
     #----------
 
    

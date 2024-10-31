@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
-from datetime import datetime
-
-from . import Base, SessionLocal
+from src.models import Base, SessionLocal
 
 class Factura(Base):
     __tablename__ = 'factura'
@@ -43,10 +41,11 @@ class Factura(Base):
         return f'<Factura {self.id}>'
     
     # Método para crear una factura
-    @classmethod
-    def crear_factura(cls, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio , db_session):
+    @staticmethod
+    def crear_factura(clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio):
+        session = SessionLocal()
         try:
-            nueva_factura = cls(
+            nueva_factura =Factura(
                 clientes_idclientes=clientes_idclientes,
                 vendedores_idvendedores=vendedores_idvendedores,
                 fecha=fecha,
@@ -57,13 +56,19 @@ class Factura(Base):
                 monto_pagado=monto_pagado,
                 cambio=cambio
             )
-            db_session.add(nueva_factura)
-            db_session.commit()
+            session.add(nueva_factura)
+            session.commit()
+
+            # Refresca la instancia desde la base de datos
+            session.refresh(nueva_factura)
+
             return nueva_factura
         except SQLAlchemyError as e:
-            db_session.rollback()
+            session.rollback()
             print(f"Error al crear la factura: {str(e)}")
             return None
+        finally:
+            session.close()
     #--------------------------
 
     #Metodo para búsqueda de facturas por fecha

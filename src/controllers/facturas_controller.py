@@ -23,8 +23,6 @@ class Facturas_Controller(FlaskController):
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
     def factura_crear():
-        db = SessionLocal()
-
         if request.method == 'POST':
             try:
                 
@@ -35,20 +33,12 @@ class Facturas_Controller(FlaskController):
             
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
-                print(f"Total Valor: {total_valor}")  # Log del total calculado
-
                 impuesto = total_valor * 0.19  # Impuesto del 19%
-                print(f"Impuesto: {impuesto}")  # Log del impuesto calculado
-
                 descuento = float(request.form.get('descuentoFactura', 0))
-                print(f"Descuento: {descuento}")  # Log del descuento recibido
-
                 total_final = total_valor + impuesto - descuento
 
                 # Recibir los valores de pago y calcular el cambio
                 monto_pagado = float(request.form.get('monto_pagado'))
-                print(f"Monto Pagado: {monto_pagado}")  # Log del monto pagado recibido
-                
                 if monto_pagado < total_final:
                     raise ValueError("El monto pagado es insuficiente para cubrir el total de la factura.")
                 
@@ -65,7 +55,7 @@ class Facturas_Controller(FlaskController):
                     descuento,
                     monto_pagado,
                     cambio,
-                    db
+                    
                 )
 
                 if not nueva_factura:
@@ -73,7 +63,7 @@ class Facturas_Controller(FlaskController):
                     return redirect(url_for('factura_crear'))
 
                 # Agregar detalles de los productos
-                if not DetalleProducto.agregar_detalles(nueva_factura.id, productos, db):
+                if not DetalleProducto.agregar_detalles(nueva_factura.id, productos):
                     flash('Error al agregar productos a la factura', 'danger')
                     return redirect(url_for('factura_crear'))
 
@@ -81,12 +71,9 @@ class Facturas_Controller(FlaskController):
                 return redirect(url_for('factura_crear'))
 
             except Exception as e:
-                db.rollback()
                 flash(f'Error al crear la factura: {str(e)}', 'danger')
 
-            finally:
-                db.close()
-
+          
         # GET: Cargar datos para el formulario
         try:
             vendedores = Vendedores.obtener_vendedores()
