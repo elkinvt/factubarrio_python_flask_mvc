@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from src.models import Base
+from src.models import Base, SessionLocal
 
 class UnidadMedida(Base):
     __tablename__ = 'unidad_medida'
@@ -22,11 +22,15 @@ class UnidadMedida(Base):
 
     #Metodo estatico para obtener las unidades de medida
     @staticmethod
-    def obtener_todas_con_subunidades(db_session):
+    def obtener_todas_con_subunidades():
+        session = SessionLocal()
         try:
-            unidades_padre = db_session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()
-            subunidades = db_session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
+            unidades_padre = session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()
+            subunidades = session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
             return unidades_padre, subunidades
         except Exception as e:
             raise e
+        
+        finally:
+            session.close()
     #------------------

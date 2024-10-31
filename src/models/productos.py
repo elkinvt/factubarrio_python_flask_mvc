@@ -54,21 +54,26 @@ class Productos(Base):
     
     # Método estático para agregar un producto
     @staticmethod
-    def agregar_producto(db_session, producto):
+    def agregar_producto(producto):
+        session = SessionLocal()
         try:
-            db_session.add(producto)
-            db_session.commit()
+            session.add(producto)
+            session.commit()
             return producto
         except Exception as e:
-            db_session.rollback()
+            session.rollback()
             raise e
+        finally:
+            session.close()  # Cerramos la sesión después de la operación
+
     #--------
 
     # Método para buscar productos por código o nombre
     @staticmethod
-    def buscar_por_codigo_o_nombre(termino, db_session):
+    def buscar_por_codigo_o_nombre(termino):
+        session = SessionLocal()
         try:
-            productos = db_session.query(Productos).filter(
+            productos = session.query(Productos).filter(
                 (Productos.codigo.ilike(f'%{termino}%')) |
                 (Productos.nombre.ilike(f'%{termino}%')),
                 Productos.is_deleted == False
@@ -76,56 +81,142 @@ class Productos(Base):
             return productos
         except Exception as e:
             raise e
+        finally:
+            session.close()
     #---------
     
     # Método para obtener un producto por su ID
     @staticmethod
-    def obtener_por_id(id, db_session):
+    def obtener_por_id(id):
+        session = SessionLocal()
         try:
-            producto = db_session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
+            producto = session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
             return producto
         except Exception as e:
             raise e
+        finally:
+            session.close()
         
     #-----------
     
     # Método para actualizar los datos de un producto
     @staticmethod
-    def actualizar_producto(producto, datos_actualizados, db_session):
+    def actualizar_producto(id, datos_actualizados):
+        session = SessionLocal()
         try:
-            for key, value in datos_actualizados.items():
-                setattr(producto, key, value)
-            db_session.commit()
-            return producto
+            producto = session.query(Productos).get(id)
+            if producto:
+                for key, value in datos_actualizados.items():
+                    setattr(producto, key, value)
+                session.commit()
+                return producto
+            else:
+                return None  # Retorna None si el producto no se encontró
         except Exception as e:
-            db_session.rollback()
+            session.rollback()
             raise e
+        finally:
+            session.close()
     
     #-------------
-    # Ruta para verificar producto y stock
-    @app.route('/verificar_producto')
-    def verificar_producto():
-        codigo = request.args.get('codigo')
-        cantidad = int(request.args.get('cantidad'))
-        session = SessionLocal()  # Inicia la sesión
-
+    
+    # Método para actualizar el estado de un producto
+    @staticmethod
+    def toggle_estado(id):
+        session = SessionLocal()
         try:
+            # Buscar el producto por ID
+            producto = session.query(Productos).filter_by(idproductos=id).first()
+            if producto:
+                # Cambiar el estado de `is_active`
+                producto.is_active = not producto.is_active
+                session.commit()
+                return producto.is_active # Retornar el nuevo estado
+            else:
+                return None  # Retornar None si el producto no se encuentra
+        except Exception as e:
+            session.rollback()
+            raise e  # Propaga la excepción para que la ruta pueda manejarla
+        finally:
+            session.close()
+
+    #--------------------
+
+    # Método para eliminar(logica) el producto
+    @staticmethod
+    def eliminar_producto(id):
+        session = SessionLocal()
+        try:
+            # Obtener el producto por su ID
+            producto = session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
+            if producto:
+                # Realizar eliminación lógica
+                producto.is_deleted = True
+                session.commit()
+                return True  # Indica que la eliminación fue exitosa
+            else:
+                return False  # Indica que no se encontró el producto
+        except Exception as e:
+            session.rollback()
+            raise e  # Propaga la excepción para que la ruta pueda manejarla
+        finally:
+            session.close()
+
+    #-----------------
+
+
+    # Método para buscar producto por nombre en la factura
+    @staticmethod
+    def buscar_productos_por_nombre(query):
+        session = SessionLocal()
+        try:
+            productos = session.query(Productos).filter(
+                Productos.nombre.ilike(f'%{query}%'),
+                Productos.is_deleted == False
+            ).all()
+            # Retornamos la lista de productos en formato de diccionario
+            return [
+                {
+                    'id': producto.idproductos,
+                    'codigo': producto.codigo,
+                    'nombre': producto.nombre,
+                    'descripcion': producto.descripcion,
+                    'precio_unitario': float(producto.precio_unitario)
+                }
+                for producto in productos
+            ]
+        finally:
+            session.close()
+    
+    #---------------------
+
+    # Método para verificar la cantidad de un producto
+    @staticmethod
+    def verificar_stock_producto(codigo, cantidad):
+        session = SessionLocal()
+        try:
+            # Busca el producto por su código
             producto = session.query(Productos).filter_by(codigo=codigo).first()
             
+            # Verifica si el producto existe y si tiene suficiente stock
             if not producto:
-                return jsonify({'error': 'Producto no encontrado', 'error_type': 'not_found'}), 200
+                return {'error': 'Producto no encontrado', 'error_type': 'not_found'}
             elif producto.cantidad_stock < cantidad:
-                return jsonify({'error': 'Stock insuficiente para la cantidad solicitada', 'error_type': 'insufficient_stock'}), 200
+                return {'error': 'Stock insuficiente para la cantidad solicitada', 'error_type': 'insufficient_stock'}
             else:
-                return jsonify({
+                return {
                     'id': producto.idproductos,
                     'codigo': producto.codigo,
                     'nombre': producto.nombre,
                     'precio_unitario': producto.precio_unitario,
                     'cantidad_stock': producto.cantidad_stock
-                })
+                }
         finally:
-            session.close()  # Cierra la sesión
+            session.close()
+
+
+
+  
 
 
     

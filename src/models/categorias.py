@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from src.models import Base
+from src.models import Base,SessionLocal
 
 class Categoria(Base):
     __tablename__ = 'categoria'
@@ -16,10 +16,13 @@ class Categoria(Base):
     
     #Metodo estatico para obtener las categorias
     @staticmethod
-    def obtener_todas(db_session):
+    def obtener_todas():
+        session = SessionLocal()
         try:
-            categorias = db_session.query(Categoria).all()
+            categorias = session.query(Categoria).all()
             return categorias
         except Exception as e:
             raise e
+        finally:
+            session.close()
     #-------------------
