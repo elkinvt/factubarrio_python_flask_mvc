@@ -1,7 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.exc import SQLAlchemyError
-from contextlib import contextmanager
-from src.models import Base, SessionLocal, db_session_manager, to_dict
+from src.models import Base, db_session_manager, to_dict
 
 class Clientes(Base):
     __tablename__ = 'clientes'

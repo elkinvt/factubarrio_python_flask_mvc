@@ -1,7 +1,6 @@
 from src.app import app 
 from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template, jsonify
-from src.models import db_session_manager
 from src.models.vendedores import Vendedores
 
 class Vendedores_Controller(FlaskController):
