@@ -67,7 +67,7 @@ class Clientes_Controller(FlaskController):
             cliente = Clientes.buscar_cliente_por_documento(tipo_documento, numero_documento)
             
             if cliente:
-                if cliente.is_deleted:
+                if cliente['is_deleted']:
                     flash('Este cliente ha sido eliminado y no puede ser editado.', 'danger')
                     return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Cliente Eliminado")
                 return render_template('form_editar_cliente.html', cliente=cliente, titulo_pagina="Editar Cliente")
@@ -112,7 +112,7 @@ class Clientes_Controller(FlaskController):
         except Exception as e:
             flash(f'Error al guardar los cambios: {str(e)}', 'danger')
 
-        return redirect(url_for('ver_clientes'))
+        return redirect(url_for('clientes_ver'))
         
     #--------------------
 
@@ -123,18 +123,14 @@ class Clientes_Controller(FlaskController):
         tipo_documento = request.form['tipoDocumento']
         numero_documento = request.form['numeroDocumento']
 
-        with Clientes.session_scope() as db:
-            # Recuperar el cliente en la misma sesión
-            cliente = db.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
-            
-            if cliente:
-                # Usar el método estático para cambiar el estado
-                Clientes.actualizar_estado(db, cliente)
-                flash(f'Cliente {"activado" if cliente.is_active else "desactivado"} con éxito.', 'success')
-            else:
-                flash('Cliente no encontrado.', 'danger')
+        nuevo_estado = Clientes.actualizar_estado(tipo_documento, numero_documento)
 
-        return redirect(url_for('mostrar_formulario_editar_cliente', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
+        if nuevo_estado is not None:
+            flash(f'Cliente {"activado" if nuevo_estado else "desactivado"} con éxito.', 'success')
+        else:
+            flash('Cliente no encontrado.', 'danger')
+
+        return redirect(url_for('clientes_editar', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
 
     #----------
 
@@ -144,18 +140,16 @@ class Clientes_Controller(FlaskController):
         tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')
 
-        with Clientes.session_scope() as db:
-            # Recuperar el cliente en la misma sesión
-            cliente = db.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
+        try:
 
-            if cliente and not cliente.is_deleted:
-                cliente.is_deleted = True  # Marcamos el cliente como eliminado (eliminación lógica)
-                db.add(cliente)  # Asegurarse de que el cliente esté adjunto a la sesión
+            if Clientes.eliminar_cliente_logicamente(tipo_documento, numero_documento):
                 flash('Cliente eliminado correctamente.', 'success')
             else:
                 flash('Cliente no encontrado o ya eliminado.', 'danger')
+        except Exception as e:
+            flash(f'Error al eliminar l cliente: {str(e)}', 'danger')
 
-        return redirect(url_for('ver_clientes'))
+        return redirect(url_for('clientes_ver'))
 
 
     #-----------

@@ -30,7 +30,7 @@
     <h2>Editar Cliente</h2>
     <form id="formEditarCliente" action="/clientes_actualizar" method="POST">
         <!-- Incluye el ID del cliente como un campo oculto -->
-        <input type="hidden" id="clienteId" name="clienteId" value="{{ cliente.idclientes }}">
+        <input type="hidden" id="clienteId" name="clienteId" value="{{ cliente['idclientes'] }}">
 
         <div class="mb-3">
             <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>

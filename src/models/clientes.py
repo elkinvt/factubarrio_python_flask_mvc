@@ -55,9 +55,10 @@ class Clientes(Base):
     @staticmethod
     def buscar_cliente_por_documento(tipo_documento, numero_documento):
         with db_session_manager() as session:
-            return session.query(Clientes).filter_by(
-                tipo_documento=tipo_documento, numero_documento=numero_documento
-            ).first()
+            cliente = session.query(Clientes).filter_by(
+                tipo_documento = tipo_documento, numero_documento = numero_documento).first()
+            
+            return to_dict(cliente) if cliente else None 
 
     #---------
 
@@ -81,20 +82,32 @@ class Clientes(Base):
 
     # Método estático para actualizar estado del cliente 
     @staticmethod
-    def actualizar_estado(db_session, cliente):
+    def actualizar_estado(tipo_documento, numero_documento):
         """Toggle de estado de cliente"""
-        cliente.is_active = not cliente.is_active
-        db_session.add(cliente)
-        return cliente
+        with db_session_manager() as session:
+            cliente = session.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
+            
+            if cliente:
+                 # Cambiar el estado activo/inactivo
+                cliente.is_active = not cliente.is_active
+                session.commit()
+            return cliente.is_active
+        return None
     #--------
 
     # Método estático para eliminar un cliente 
     @staticmethod
-    def eliminar_cliente_logicamente(cliente):
+    def eliminar_cliente_logicamente(tipo_documento, numero_documento):
         with db_session_manager() as session:
-            cliente.is_deleted = True
-            session.commit()
-    #--------
+            cliente = session.query(Clientes).filter_by(tipo_documento= tipo_documento, numero_documento= numero_documento).first()
+
+            if cliente and not cliente.is_deleted:
+                cliente.is_deleted = True
+                session.commit()
+                return True
+            return False
+        
+    #------------
 
     # Método estático para buscar el cliente en la factura
     @staticmethod

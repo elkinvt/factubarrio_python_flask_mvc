@@ -70,7 +70,7 @@ class Vendedores_Controller(FlaskController):
             vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
             
             if vendedor:
-                if vendedor.is_deleted:
+                if vendedor['is_deleted']:
                     flash('Este vendedor ha sido eliminado y no puede ser editado.', 'danger')
                     return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Vendedor Eliminado")
                 return render_template('form_editar_vendedor.html', vendedor=vendedor, titulo_pagina="Editar Vendedor")
@@ -112,7 +112,7 @@ class Vendedores_Controller(FlaskController):
         except Exception as e:
             flash(f'Error al guardar los cambios: {str(e)}', 'danger')
 
-        return redirect(url_for('ver_vendedores'))
+        return redirect(url_for('vendedores_ver'))
         
     #------------------
     
@@ -125,11 +125,9 @@ class Vendedores_Controller(FlaskController):
         
         try:
             # Buscar el cliente usando el método del modelo (sin necesidad de manejar la sesión)
-            vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
+            vendedor = Vendedores.eliminar_vendedor_logicamente(tipo_documento, numero_documento)
 
-            if vendedor and not vendedor.is_deleted:
-                # Llamamos al método del modelo para eliminar al vendedor
-                Vendedores.eliminar_vendedor(vendedor)
+            if vendedor:
                 flash('Vendedor eliminado correctamente.', 'success')
             else:
                 flash('Vendedor no encontrado o ya eliminado.', 'danger')
@@ -137,7 +135,7 @@ class Vendedores_Controller(FlaskController):
             flash(f'Error al eliminar el vendedor: {str(e)}', 'danger')
 
         # Redirigir a la página donde se ven todos los vendedores
-        return redirect(url_for('ver_vendedores'))
+        return redirect(url_for('vendedores_ver'))
 
     
     #-----------
