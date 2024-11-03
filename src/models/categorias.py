@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from src.models import Base,SessionLocal
+from src.models import Base, db_session_manager, to_dict
 
 class Categoria(Base):
     __tablename__ = 'categoria'
@@ -17,12 +17,18 @@ class Categoria(Base):
     #Metodo estatico para obtener las categorias
     @staticmethod
     def obtener_todas():
-        session = SessionLocal()
-        try:
-            categorias = session.query(Categoria).all()
-            return categorias
-        except Exception as e:
-            raise e
-        finally:
-            session.close()
+        with db_session_manager() as session:
+            try:
+                categorias = session.query(Categoria).all()
+                # Convertimos cada categoría en un diccionario para no depender de la sesión
+                categorias_dict = [to_dict(c) for c in categorias]
+                return categorias_dict
+            except KeyError as e:
+                print(f"Error: Clave faltante en obtener_todas - {e}")
+                return []
+            except Exception as e:
+                print(f"Error en obtener_todas: {e}")  # Log de error para depuración
+                return []  # Retorna una lista vacía en caso de error
+           
+            
     #-------------------

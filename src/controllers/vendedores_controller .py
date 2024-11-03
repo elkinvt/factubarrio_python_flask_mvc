@@ -8,7 +8,7 @@ class Vendedores_Controller(FlaskController):
 
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
-    def ver_vendedores():
+    def vendedores_ver():
         vendedores = Vendedores.obtener_vendedores()
         return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
 
@@ -16,7 +16,7 @@ class Vendedores_Controller(FlaskController):
     
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
-    def crear_vendedor():
+    def vendedores_crear():
         if request.method == 'GET':
             return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
 
@@ -56,7 +56,7 @@ class Vendedores_Controller(FlaskController):
    
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
-    def mostrar_formulario_editar_vendedor():
+    def vendedores_editar():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
 

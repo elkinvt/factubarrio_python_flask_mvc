@@ -138,44 +138,45 @@
             <a class="nav-link dropdown-toggle" id="dropdownClientes" data-bs-toggle="dropdown" href="#" role="button"
                 aria-expanded="false">Clientes</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownClientes">
-                <li><a class="dropdown-item" href="clientes_ver">Ver Clientes</a></li>
-                <li><a class="dropdown-item" href="clientes_crear">Crear Cliente</a></li>
-                <li><a class="dropdown-item" href="clientes_editar">Editar Cliente</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('clientes_ver') }}">Ver Clientes</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('clientes_crear') }}">Crear Cliente</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('clientes_editar') }}">Editar Cliente</a></li>
+
             </ul>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="dropdownVendedores" data-bs-toggle="dropdown" href="#" role="button"
                 aria-expanded="false">Vendedores</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownVendedores">
-                <li><a class="dropdown-item" href="vendedores_ver">Ver Vendedores</a></li>
-                <li><a class="dropdown-item" href="vendedores_crear">Crear Vendedor</a></li>
-                <li><a class="dropdown-item" href="vendedores_editar">Editar Vendedor</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('vendedores_ver') }}">Ver Vendedores</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('vendedores_crear') }}">Crear Vendedor</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('vendedores_editar') }}">Editar Vendedor</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="dropdownProductos" data-bs-toggle="dropdown" href="#" role="button"
                 aria-expanded="false">Productos</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownProductos">
-                <li><a class="dropdown-item" href="productos_ver">Ver Productos</a></li>
-                <li><a class="dropdown-item" href="productos_crear">Crear Producto</a></li>
-                <li><a class="dropdown-item" href="productos_editar">Editar producto</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('productos_ver') }}">Ver Productos</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('productos_crear') }}">Crear Producto</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('productos_editar') }}">Editar producto</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
                 aria-expanded="false">Facturas</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
-                <li><a class="dropdown-item" href="ver_factura">Ver Facturas</a></li>
-                <li><a class="dropdown-item" href="generar_factura">Generar Factura</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('ver_factura') }}">Ver Facturas</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('generar_factura') }}">Generar Factura</a></li>
             </ul>
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="dropdownFacturas" data-bs-toggle="dropdown" href="#" role="button"
                 aria-expanded="false">Usuario</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownFacturas">
-                <li><a class="dropdown-item" href="usuarios_ver">Ver usuarios</a></li>
-                <li><a class="dropdown-item" href="usuarios_crear">Crear usuario</a></li>
-                <li><a class="dropdown-item" href="usuarios_editar">Editar usuario</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('usuarios_ver') }}">Ver usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('usuarios_crear') }}">Crear usuario</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('usuarios_editar') }}">Editar usuario</a></li>
             </ul>
         </li>
     </ul>

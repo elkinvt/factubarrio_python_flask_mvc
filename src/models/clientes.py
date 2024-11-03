@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.exc import SQLAlchemyError
 from contextlib import contextmanager
-from src.models import Base, SessionLocal, db_session_manager
+from src.models import Base, SessionLocal, db_session_manager, to_dict
 
 class Clientes(Base):
     __tablename__ = 'clientes'
@@ -29,28 +29,15 @@ class Clientes(Base):
     def __repr__(self):
         return f'<Cliente {self.nombres_cliente}>'
     
-    
-    # Contexto de sesión para gestionar apertura y cierre automáticamente
-    @staticmethod
-    @contextmanager
-    def session_scope():
-        session = SessionLocal()
-        try:
-            yield session
-            session.commit()
-        except SQLAlchemyError as e:
-            session.rollback()
-            print(f"Database error: {e}")
-            raise e
-        finally:
-            session.close()
 
-   
     # Método para obtener los clientes no eliminados
     @staticmethod
     def obtener_clientes():
         """Obtener todos los clientes no eliminados."""
-        return SessionLocal.query(Clientes).filter_by(is_deleted=False).all()
+        with db_session_manager() as session:
+            clientes = session.query(Clientes).filter_by(is_deleted=False).all()
+
+            return [to_dict(cliente) for cliente in clientes] 
     
     #--------
 
@@ -67,9 +54,10 @@ class Clientes(Base):
     # Método estático para buscar un cliente usando una sesión existente
     @staticmethod
     def buscar_cliente_por_documento(tipo_documento, numero_documento):
-        return SessionLocal.query(Clientes).filter_by(
-            tipo_documento=tipo_documento, numero_documento=numero_documento
-        ).first()
+        with db_session_manager() as session:
+            return session.query(Clientes).filter_by(
+                tipo_documento=tipo_documento, numero_documento=numero_documento
+            ).first()
 
     #---------
 
@@ -112,7 +100,7 @@ class Clientes(Base):
     @staticmethod
     def buscar_por_numero_documento(query):
         """Búsqueda parcial por número de documento"""
-        with Clientes.session_scope() as session:
+        with db_session_manager() as session:
             return [{
                 'id': cliente.idclientes,
                 'nombre': cliente.nombres_cliente,
@@ -128,13 +116,13 @@ class Clientes(Base):
     # Método estático para validar duplicaciones del cliente
     @staticmethod
     def validar_datos(numero_documento=None, email=None):
-        """Validar unicidad de documento y email"""
-        errores = {}
-        with Clientes.session_scope() as session:
+        with db_session_manager() as session:
+            errores = {}
+            
             if numero_documento and session.query(Clientes).filter_by(numero_documento=numero_documento).first():
                 errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
             if email and session.query(Clientes).filter_by(email=email).first():
                 errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
-        return errores
-    #--------
+            return errores
+        #--------
 

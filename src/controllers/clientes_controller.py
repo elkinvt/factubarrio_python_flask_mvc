@@ -7,7 +7,7 @@ class Clientes_Controller(FlaskController):
     
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
-    def ver_clientes():
+    def clientes_ver():
         clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
 
@@ -15,7 +15,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para crear el cliente
     @app.route('/clientes_crear', methods=['GET', 'POST'])
-    def crear_cliente():
+    def clientes_crear():
         if request.method == 'GET':
             return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
         
@@ -54,7 +54,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición (GET)  
     @app.route('/clientes_editar', methods=['GET'])
-    def mostrar_formulario_editar_cliente():
+    def clientes_editar():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
 

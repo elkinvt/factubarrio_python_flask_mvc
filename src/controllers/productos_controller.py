@@ -10,7 +10,7 @@ class Productos_Controller(FlaskController):
 
     # Ruta para ver productos
     @app.route('/productos_ver', methods=['GET'])
-    def ver_productos():
+    def productos_ver():
         try:
             # Usar el método que obtienes con el JOIN de productos, categorías y unidades de medida
             productos = Productos.obtener_productos()
@@ -33,7 +33,7 @@ class Productos_Controller(FlaskController):
 
     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
-    def crear_producto():
+    def productos_crear():
         if request.method == 'POST':
             # Recibe los datos enviados desde el formulario
             codigo = request.form['codigoProducto']
@@ -47,7 +47,7 @@ class Productos_Controller(FlaskController):
                 precio = round(precio, 2)  # Redondeamos a dos decimales
             except ValueError:
                 flash('Precio no válido', 'danger')
-                return redirect(url_for('crear_producto'))
+                return redirect(url_for('productos_crear'))
 
             unidad_medida = request.form['unidadMedidaProducto']
             presentacion = request.form['presentacionProducto']
@@ -72,7 +72,7 @@ class Productos_Controller(FlaskController):
                 flash(f'Error al crear producto: {str(e)}', 'danger')
 
             return redirect(url_for('ver_productos'))
-
+        
         try:
             # Usar los métodos del modelo para obtener las categorías y unidades de medida
             categorias = Categoria.obtener_todas()  # Método en el modelo Categoria
@@ -87,7 +87,7 @@ class Productos_Controller(FlaskController):
     
     # Ruta para buscar o seleccionar el producto
     @app.route('/productos_editar', methods=['GET'])
-    def editar_producto():
+    def productos_editar():
         
         # Obtener el término de búsqueda (si existe)
         termino = request.args.get('termino', '').lower()

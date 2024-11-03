@@ -22,7 +22,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
-    def factura_crear():
+    def generar_factura():
         if request.method == 'POST':
             try:
                 

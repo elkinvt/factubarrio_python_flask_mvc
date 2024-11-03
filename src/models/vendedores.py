@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import Base, SessionLocal, db_session_manager
+from src.models import Base, SessionLocal, db_session_manager, to_dict
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
@@ -29,7 +29,9 @@ class Vendedores(Base):
    # Método para obtener los vendedores no eliminados
     @staticmethod
     def obtener_vendedores():
-        return SessionLocal.query(Vendedores).filter_by(is_deleted=False).all()
+        with db_session_manager() as session:
+            vendedores = session.query(Vendedores).filter_by(is_deleted=False).all()
+            return [to_dict(vendedor) for vendedor in vendedores]
 
     #------------     
 

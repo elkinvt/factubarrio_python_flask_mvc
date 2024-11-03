@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Generar Factura</h2>
-    <form id="formFactura" method="POST" action="{{ url_for('factura_crear') }}">
+    <form id="formFactura" method="POST" action="{{ url_for('generar_factura') }}">
 
         <!-- Campo oculto para almacenar productos -->
         <input type="hidden" id="productosFactura" name="productosFactura">
