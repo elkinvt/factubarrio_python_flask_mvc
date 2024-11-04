@@ -1,125 +1,39 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Crear Usuario de Vendedor</h2>
-    <form id="formCrearUsuario" onsubmit="guardarUsuario(event)">
+    <h2>Crear Usuario</h2>
+    <form method="POST" action="{{ url_for('usuarios_crear') }}">
         <div class="mb-3">
-            <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
-            <select id="tipoDocumento" class="form-control form-control-sm mb-2" required>
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC">Cédula de Ciudadanía</option>
-                <option value="CE">Cédula de Extranjería</option>
-                <option value="TI">Tarjeta de Identidad</option>
-                <option value="PAS">Pasaporte</option>
+            <label for="nombre">Nombre de usuario:</label>
+            <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" placeholder="Ej. Juan Pérez" required>
+            <small>Por favor, ingresa solo tu primer nombre y primer apellido.</small>
+
+        </div>
+
+        <div class="mb-3">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control form-control-sm" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" class="form-control form-control-sm" id="contraseña" name="contraseña" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="rol">Rol:</label>
+            <select id="rol" name="rol" class="form-control form-control-sm" required>
+                <option value="">Seleccione un rol</option>
+                <option value="admin">Admin</option>
+                <option value="vendedor">Vendedor</option>
             </select>
         </div>
-        <div class="mb-3">
-            <label for="cedulaVendedor" class="form-label">Número de Documento</label>
-            <input type="text" placeholder="Ingrese número de documento y presione enter"
-                class="form-control form-control-sm mb-2" id="cedulaVendedor" required
-                onkeypress="cargarDatosVendedor(event, true)">
-            <button type="button" class="btn btn-primary form-control-sm"
-                onclick="cargarDatosVendedor()">Buscar</button>
-        </div>
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control form-control-sm" id="nombre" disabled>
-        </div>
-        <div class="mb-3">
-            <label for="apellido" class="form-label">Apellido</label>
-            <input type="text" class="form-control form-control-sm" id="apellido" disabled>
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-sm" id="email" disabled>
-        </div>
-        <div class="mb-3">
-            <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
-            <input type="text" class="form-control form-control-sm" id="nombreUsuario" required>
-        </div>
-        <div class="mb-3">
-            <label for="contrasenaUsuario" class="form-label">Contraseña</label>
-            <input type="password" class="form-control form-control-sm" id="contrasenaUsuario" required>
-        </div>
-        <button type="submit" class="btn btn-primary form-control-sm" onclick="guardarUsuario()">Guardar
-            Usuario</button>
+        
+        <button type="submit" class="btn btn-primary form-control-sm">Crear Usuario</button>
     </form>
 </div>
 
-<script>
-    function cargarDatosVendedor(event, isKeyPress) {
-        if (isKeyPress && event.key !== 'Enter') {
-            return;
-        }
 
-        event?.preventDefault();  // Previene el comportamiento por defecto si es un evento
-        var tipoDocumento = document.getElementById('tipoDocumento').value;
-        var numeroDocumento = document.getElementById('cedulaVendedor').value;
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var vendedor = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento);
-
-        if (vendedor) {
-            document.getElementById('nombre').value = vendedor.nombre;
-            document.getElementById('apellido').value = vendedor.apellido;
-            document.getElementById('email').value = vendedor.email;
-            document.getElementById('nombre').disabled = false;
-            document.getElementById('apellido').disabled = false;
-            document.getElementById('email').disabled = false;
-        } else {
-            alert('No se encontró un vendedor con esos datos');
-            document.getElementById('nombre').value = '';
-            document.getElementById('apellido').value = '';
-            document.getElementById('email').value = '';
-        }
-    }
-
-</script>
-<script>
-    function guardarUsuario(event) {
-        event.preventDefault(); // Previene el envío automático del formulario
-
-        var nombreUsuario = document.getElementById('nombreUsuario').value.trim();
-        var contrasenaUsuario = document.getElementById('contrasenaUsuario').value.trim();
-        var tipoDocumento = document.getElementById('tipoDocumento').value;
-        var numeroDocumento = document.getElementById('cedulaVendedor').value.trim();
-
-        if (!nombreUsuario || !contrasenaUsuario || !tipoDocumento || !numeroDocumento) {
-            alert('Por favor, complete todos los campos requeridos, incluyendo tipo y número de documento.');
-            return; // Detener la función si los campos están vacíos
-        }
-
-        var vendedores = JSON.parse(localStorage.getItem('Vendedores')) || [];
-        var vendedor = vendedores.find(v => v.tipoDocumento === tipoDocumento && v.numeroDocumento === numeroDocumento);
-
-        if (vendedor && vendedor.username) {
-            alert('Este vendedor ya tiene un usuario asignado.');
-            return; // Detiene la función si el vendedor ya tiene usuario
-        }
-
-        if (vendedor) {
-            vendedor.username = nombreUsuario;
-            vendedor.password = contrasenaUsuario;
-            localStorage.setItem('Vendedores', JSON.stringify(vendedores));
-            alert('Usuario guardado con éxito!');
-            document.getElementById('formCrearUsuario').reset(); // Limpia el formulario después de guardar exitosamente
-        } else {
-            alert('No se encontró un vendedor con los datos de identificación proporcionados.');
-        }
-    }
-</script>
-
-<script>
-    function limpiarFormulario(idFormulario) {
-        var formulario = document.getElementById(idFormulario);
-        var inputs = formulario.getElementsByTagName('input');
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type === 'text' || inputs[i].type === 'password' || inputs[i].type === 'email') {
-                inputs[i].value = '';
-            }
-        }
-    }
-
-</script>
 {% endblock %}
 
 

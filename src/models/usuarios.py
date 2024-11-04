@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import Base
+from src.models import Base, db_session_manager, to_dict
 
 class Usuarios(Base):
     __tablename__ = 'usuarios'
@@ -13,7 +13,6 @@ class Usuarios(Base):
     is_active = Column(Boolean, default=True)  # Campo de activación
 
     def __init__(self,nombre_usuario, email, contraseña, rol,is_active=True, is_deleted=False):
-        print(f"Creando instancia de Usuarios: {nombre_usuario}, {email}")
         self.nombres_usuario = nombre_usuario
         self.email = email
         self.contraseña = contraseña
@@ -23,3 +22,21 @@ class Usuarios(Base):
 
     def __repr__(self):
             return f'<Usuario {self.nombres_usuario}>'
+    
+    # Método para obtener los usuarios no eliminados
+    @staticmethod
+    def obtener_usuarios():
+        with db_session_manager() as session:
+            usuarios = session.query(Usuarios).filter_by(is_deleted=False).all()
+            return [to_dict(usuario) for usuario in usuarios]
+
+    #------------ 
+
+    # Método estático para agregar un usuario      
+    @staticmethod
+    def agregar_usuario(usuario):
+        with db_session_manager() as session:
+            session.add(usuario)
+            session.commit()  # Confirma los cambios
+            return usuario
+    #------------------

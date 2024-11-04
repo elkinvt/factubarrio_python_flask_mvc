@@ -1,46 +1,45 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Usuarios Registrados</h2>
+    <h2>Lista de usuarios</h2>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Documento</th>
+                    <th>ID</th>
                     <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Email</th>
-                    <th>Usuario</th>
+                    <th>email</th>
+                    <th>rol</th>
+                    <th>Estado</th>
                 </tr>
             </thead>
 
-            <tbody id="usuariosTable">
-                <!-- Los usuarios se cargarán aquí -->
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id_usuarios }}</td> 
+                    <td>{{ usuario.nombres_usuario }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td>{{ usuario.rol  }}</td>
+                    <td>
+                        {% if usuario.is_active %}
+                        Activo
+                        {% else %}
+                        Inactivo
+                        {% endif %}
+                    </td>
+                    
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">No hay usuarios registrados</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <script>
-        function cargarUsuarios() {
-            const usuarios = JSON.parse(localStorage.getItem('Vendedores')) || [];
-            const tableBody = document.getElementById('usuariosTable');
-            tableBody.innerHTML = '';
-
-            usuarios.forEach(user => {
-                const documento = `${user.tipoDocumento} - ${user.numeroDocumento}`; // Combina tipo y número de documento
-                const row = `<tr>
-                    <td>${documento}</td>
-                    <td>${user.nombre}</td>
-                    <td>${user.apellido}</td>
-                    <td>${user.email}</td>
-                    <td>${user.username || 'No asignado'}</td>
-                </tr>`;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        window.onload = cargarUsuarios; // Carga los usuarios cuando la página está lista
-    </script>
+    
 
 </div>
 {% endblock %}
