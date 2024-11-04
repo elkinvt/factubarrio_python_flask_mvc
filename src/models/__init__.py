@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from sqlalchemy.inspection import inspect
 
 # Creación del motor de la base de datos para conectarse con PostgreSQL
-engine = create_engine("postgresql+psycopg2://postgres:KDOSQZTR024@localhost/factu_barrio_4")
+engine = create_engine("postgresql+psycopg2://postgres:KDOSQZTR024@localhost/factu_barrio_5")
 
 # Declarative base: esto será usado más adelante para definir los modelos
 Base = declarative_base()

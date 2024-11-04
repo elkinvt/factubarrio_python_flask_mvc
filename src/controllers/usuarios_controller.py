@@ -1,6 +1,7 @@
 from src.app import app 
 from flask import render_template
 from flask_controller import FlaskController
+from src.models.usuarios import Usuarios  
 
 class Usuarios_Controller(FlaskController):
     
