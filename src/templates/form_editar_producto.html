@@ -60,27 +60,27 @@
     <form action="{% if producto %}{{ url_for('actualizar_producto', id=producto.idproductos) }}{% else %}#{% endif %}" method="POST">
         <div class="mb-3">
             <label for="codigoProducto" class="form-label">Código</label>
-            <input type="text" class="form-control" id="codigoProducto" name="codigo" value="{{ producto.codigo if producto else '' }}" required>
+            <input type="text" class="form-control" id="codigoProducto" name="codigo" value="{{ producto['codigo'] if producto else '' }}" required>
         </div>
         <div class="mb-3">
             <label for="nombreProducto" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombreProducto" name="nombre" value="{{ producto.nombre if producto else '' }}" required>
+            <input type="text" class="form-control" id="nombreProducto" name="nombre" value="{{ producto['nombre'] if producto else '' }}" required>
         </div>
         <div class="mb-3">
             <label for="descripcionProducto" class="form-label">Descripción</label>
-            <textarea class="form-control" id="descripcionProducto" name="descripcion" required>{{ producto.descripcion if producto else '' }}</textarea>
+            <textarea class="form-control" id="descripcionProducto" name="descripcion" required>{{ producto['descripcion'] if producto else '' }}</textarea>
         </div>
         <div class="mb-3">
             <label for="categoriaProducto" class="form-label">Categoría</label>
             <select class="form-select" id="categoriaProducto" name="categoria_id" required>
                 {% for categoria in categorias %}
-                    <option value="{{ categoria.idcategoria }}" {% if producto and producto.categoria_idcategoria == categoria.idcategoria %}selected{% endif %}>{{ categoria.nombre }}</option>
+                    <option value="{{ categoria['idcategoria'] }}" {% if producto and producto.categoria_idcategoria == categoria.idcategoria %}selected{% endif %}>{{ categoria.nombre }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="mb-3">
             <label for="precioProducto" class="form-label">Precio</label>
-            <input type="number" class="form-control" id="precioProducto" name="precio" value="{{ producto.precio_unitario if producto else '' }}" required>
+            <input type="number" class="form-control" id="precioProducto" name="precio" value="{{ producto['precio_unitario'] if producto else '' }}" required>
         </div>
         <div class="mb-3">
             <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
@@ -88,13 +88,13 @@
                 {% for unidad in unidades_padre %}
                     <optgroup label="{{ unidad.unidad_medida }}">
                         <!-- Verificamos si la unidad padre está seleccionada -->
-                        <option value="{{ unidad.idunidad_medida }}" {% if producto and producto.unidad_medida_idunidad_medida == unidad.idunidad_medida %}selected{% endif %}>
+                        <option value="{{ unidad['idunidad_medida'] }}" {% if producto and producto.unidad_medida_idunidad_medida == unidad.idunidad_medida %}selected{% endif %}>
                             {{ unidad.unidad_medida }}
                         </option>
                         <!-- Verificamos si alguna subunidad está seleccionada -->
                         {% for subunidad in subunidades %}
                             {% if subunidad.unidad_padre_id == unidad.idunidad_medida %}
-                                <option value="{{ subunidad.idunidad_medida }}" {% if producto and producto.unidad_medida_idunidad_medida == subunidad.idunidad_medida %}selected{% endif %}>
+                                <option value="{{ subunidad['idunidad_medida'] }}" {% if producto and producto.unidad_medida_idunidad_medida == subunidad.idunidad_medida %}selected{% endif %}>
                                     - {{ subunidad.unidad_medida }}
                                 </option>
                             {% endif %}
@@ -106,11 +106,11 @@
         
         <div class="mb-3">
             <label for="presentacionProducto" class="form-label">Presentación</label>
-            <input type="text" class="form-control" id="presentacionProducto" name="presentacion" value="{{ producto.presentacion if producto else '' }}" required>
+            <input type="text" class="form-control" id="presentacionProducto" name="presentacion" value="{{ producto['presentacion'] if producto else '' }}" required>
         </div>
         <div class="mb-3">
             <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
-            <input type="number" class="form-control" id="cantidadStockProducto" name="cantidad_stock" value="{{ producto.cantidad_stock if producto else '' }}" required>
+            <input type="number" class="form-control" id="cantidadStockProducto" name="cantidad_stock" value="{{ producto['cantidad_stock'] if producto else '' }}" required>
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
     </form>
@@ -119,7 +119,7 @@
     <form action="/productos_toggle_estado" method="POST" class="mt-3">
         <input type="hidden" name="idproducto" value="{{ producto.idproductos }}">
         <button type="submit" class="btn btn-warning mb-2">
-            {% if producto.is_active %}
+            {% if producto['is_active'] %}
                 Desactivar Producto
             {% else %}
                 Activar Producto
@@ -129,7 +129,7 @@
 
     <!-- Eliminar Producto -->
     <form id="eliminarProductoForm" action="/productos_eliminar" method="POST" class="mt-2">
-        <input type="hidden" name="idProducto" value="{{ producto.idproductos }}">
+        <input type="hidden" name="idProducto" value="{{ producto['idproductos'] }}">
         <button type="button" class="btn btn-danger" onclick="confirmarEliminarProducto()">Eliminar Producto</button>
     </form>
 

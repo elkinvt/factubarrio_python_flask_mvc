@@ -1,7 +1,6 @@
 from src.app import app 
 from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template, jsonify
-from src.models import SessionLocal
 from src.models.productos import Productos  # Importa el modelo de Productos
 from src.models.categorias import Categoria #Importar el modelo de categorias
 from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
@@ -16,11 +15,12 @@ class Productos_Controller(FlaskController):
             productos = Productos.obtener_productos()
 
             # Formatear el precio con separadores de miles y dos decimales
-            for producto, categoria, unidad_medida in productos:
-                if producto.precio_unitario is not None:
-                    producto.precio_unitario_formateado = "{:,.2f}".format(producto.precio_unitario)
+            for producto_dict in productos:
+                producto = producto_dict['producto']
+                if producto['precio_unitario'] is not None:
+                    producto['precio_unitario_formateado'] = "{:,.2f}".format(producto['precio_unitario'])
                 else:
-                    producto.precio_unitario_formateado = "N/A"
+                    producto['precio_unitario_formateado'] = "N/A"
 
         except Exception as e:
             flash(f'Error al obtener productos: {str(e)}', 'danger')
@@ -71,7 +71,7 @@ class Productos_Controller(FlaskController):
             except Exception as e:
                 flash(f'Error al crear producto: {str(e)}', 'danger')
 
-            return redirect(url_for('ver_productos'))
+            return redirect(url_for('productos_ver'))
         
         try:
             # Usar los métodos del modelo para obtener las categorías y unidades de medida
@@ -144,11 +144,11 @@ class Productos_Controller(FlaskController):
             subunidades=subunidades, titulo_pagina="Editar Producto ")
             else:
                 flash('Producto no encontrado.', 'danger')
-                return redirect(url_for('buscar_producto'))
+                return redirect(url_for('productos_editar'))
             
         except Exception as e:
             flash(f'Error al cargar datos: {str(e)}', 'danger')
-            return redirect(url_for('buscar_producto'))
+            return redirect(url_for('productos_editar'))
         
     #--------------------------
 
@@ -178,7 +178,7 @@ class Productos_Controller(FlaskController):
         except Exception as e:
             flash(f'Error al actualizar producto: {str(e)}', 'danger')
 
-        return redirect(url_for('ver_productos'))
+        return redirect(url_for('productos_ver'))
 
     
     #---------------
@@ -200,7 +200,7 @@ class Productos_Controller(FlaskController):
         except Exception as e:
             flash(f'Error al cambiar el estado del producto: {str(e)}', 'danger')
         
-        return redirect(url_for('ver_productos'))
+        return redirect(url_for('productos_ver'))
     
     #------------------
     
@@ -224,7 +224,7 @@ class Productos_Controller(FlaskController):
             flash(f'Error al eliminar el producto: {str(e)}', 'danger')
 
 
-        return redirect(url_for('ver_productos'))
+        return redirect(url_for('productos_ver'))
     
     #------------------
     

@@ -25,6 +25,8 @@ def db_session_manager():
         raise e
     finally:
         session.close()
+        
+#-------------
 
 #Convierte cualquier objeto SQLAlchemy en un diccionario.
 def to_dict(obj):

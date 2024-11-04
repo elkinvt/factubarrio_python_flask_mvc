@@ -6,7 +6,6 @@ from src.models.vendedores import Vendedores  # Importar la clase Vendedores
 from src.models.productos import Productos  # Importar la clase Productos
 from src.models.facturas import Factura  # Importar la clase Factura
 from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
-from src.models import SessionLocal # Importar la sesión para interactuar con la base de datos
 from datetime import datetime
 import json
 
@@ -60,15 +59,15 @@ class Facturas_Controller(FlaskController):
 
                 if not nueva_factura:
                     flash('Error al crear la factura', 'danger')
-                    return redirect(url_for('factura_crear'))
+                    return redirect(url_for('generar_factura'))
 
                 # Agregar detalles de los productos
-                if not DetalleProducto.agregar_detalles(nueva_factura.id, productos):
+                if not DetalleProducto.agregar_detalles(nueva_factura['id'], productos):
                     flash('Error al agregar productos a la factura', 'danger')
-                    return redirect(url_for('factura_crear'))
+                    return redirect(url_for('generar_factura'))
 
                 flash('Factura creada exitosamente', 'success')
-                return redirect(url_for('factura_crear'))
+                return redirect(url_for('generar_factura'))
 
             except Exception as e:
                 flash(f'Error al crear la factura: {str(e)}', 'danger')
@@ -77,22 +76,8 @@ class Facturas_Controller(FlaskController):
         # GET: Cargar datos para el formulario
         try:
             vendedores = Vendedores.obtener_vendedores()
-            productos_data = Productos.obtener_productos()
-            productos = [
-                {
-                    "id": producto.Productos.idproductos,
-                    "codigo": producto.Productos.codigo,
-                    "nombre": producto.Productos.nombre,
-                    "descripcion": producto.Productos.descripcion,
-                    "categoria": producto.Categoria.nombre,
-                    "unidad_medida": producto.UnidadMedida.unidad_medida,
-                    "precio_unitario": float(producto.Productos.precio_unitario),
-                    "cantidad_stock": producto.Productos.cantidad_stock,
-                    "is_active": producto.Productos.is_active
-                }
-                for producto in productos_data
-            ]
-
+            productos = Productos.obtener_productos()
+           
         except Exception as e:
             flash(f'Error al cargar los datos: {str(e)}', 'danger')
 

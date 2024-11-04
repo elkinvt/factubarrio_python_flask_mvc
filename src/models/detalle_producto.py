@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Numeric
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
-from src.models import Base,SessionLocal
+from src.models import Base,db_session_manager
 from src.models.productos import Productos
 
 class DetalleProducto(Base):
@@ -29,39 +29,37 @@ class DetalleProducto(Base):
      # Método estático para agregar productos al detalle de la factura
     @staticmethod
     def agregar_detalles(factura_id, productos):
-        session = SessionLocal()
-        try:
-            for producto in productos:
-                # Verificar que el producto existe y tiene suficiente stock
-                producto_db = session.query(Productos).filter_by(idproductos=producto['id']).first()
-                if not producto_db:
-                    raise ValueError(f"El producto con ID {producto['id']} no existe.")
-                
-                if producto_db.cantidad_stock < producto['cantidad']:
-                    raise ValueError(f"El producto {producto_db.nombre} no tiene suficiente stock para cubrir la venta.")
-                
-                # Reducir el stock del producto
-                producto_db.cantidad_stock -= producto['cantidad']
+        with db_session_manager() as session:
+            try:
+                for producto in productos:
+                    # Verificar que el producto existe y tiene suficiente stock
+                    producto_db = session.query(Productos).filter_by(idproductos=producto['id']).first()
+                    if not producto_db:
+                        raise ValueError(f"El producto con ID {producto['id']} no existe.")
+                    
+                    if producto_db.cantidad_stock < producto['cantidad']:
+                        raise ValueError(f"El producto {producto_db.nombre} no tiene suficiente stock para cubrir la venta.")
+                    
+                    # Reducir el stock del producto
+                    producto_db.cantidad_stock -= producto['cantidad']
 
-                # Crear el detalle de la factura
-                detalle = DetalleProducto(
-                    factura_idfactura=factura_id,
-                    productos_idproductos=producto['id'],
-                    cantidad=producto['cantidad'],
-                    precio_unitario=producto['precio'],
-                    total_precio=producto['subtotal']
-                )
-                session.add(detalle)
+                    # Crear el detalle de la factura
+                    detalle = DetalleProducto(
+                        factura_idfactura=factura_id,
+                        productos_idproductos=producto['id'],
+                        cantidad=producto['cantidad'],
+                        precio_unitario=producto['precio'],
+                        total_precio=producto['subtotal']
+                    )
+                    session.add(detalle)
 
-            # Confirmar las operaciones de detalle y reducción de stock
-            session.commit()
-            return True
-        except (SQLAlchemyError, ValueError) as e:
-            session.rollback()
-            print(f"Error al agregar detalles: {str(e)}")
-            return False
-        finally:
-            session.close()
+                # Confirmar las operaciones de detalle y reducción de stock
+                session.commit()
+                return True
+            except (SQLAlchemyError, ValueError) as e:
+                print(f"Error al agregar detalles: {str(e)}")
+                return False
+           
         
     #----------
 
