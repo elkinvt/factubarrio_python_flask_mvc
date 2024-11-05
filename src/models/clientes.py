@@ -61,14 +61,14 @@ class Clientes(Base):
     #---------
 
 
-    # Método estático para actualizar un vendedor     
+    # Método estático para actualizar un cliente     
     @staticmethod
     def actualizar_cliente(cliente_id, datos_actualizados):
         with db_session_manager() as session:
             cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
 
             if not cliente:
-                raise ValueError("Vendedor no encontrado")
+                raise ValueError("cliente no encontrado")
 
             # Actualizar los datos
             for key, value in datos_actualizados.items():

@@ -147,7 +147,7 @@ class Clientes_Controller(FlaskController):
             else:
                 flash('Cliente no encontrado o ya eliminado.', 'danger')
         except Exception as e:
-            flash(f'Error al eliminar l cliente: {str(e)}', 'danger')
+            flash(f'Error al eliminar el cliente: {str(e)}', 'danger')
 
         return redirect(url_for('clientes_ver'))
 

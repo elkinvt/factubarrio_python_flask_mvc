@@ -1,10 +1,11 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from src.models import Base, db_session_manager, to_dict
+from sqlalchemy import func
 
 class Usuarios(Base):
     __tablename__ = 'usuarios'
 
-    id_usuarios = Column(Integer, primary_key=True, autoincrement=True)
+    id_usuario = Column(Integer, primary_key=True, autoincrement=True)
     nombres_usuario = Column(String(100), nullable=False)
     email = Column(String(100),nullable=False, unique=True)
     contraseña = Column(String(128),nullable=False)
@@ -40,3 +41,60 @@ class Usuarios(Base):
             session.commit()  # Confirma los cambios
             return usuario
     #------------------
+
+    # Método estático para buscar usuario por nombre
+    @staticmethod
+    def buscar_usuario_por_nombre(nombre_usuario):
+        with db_session_manager() as session:
+            usuario =session.query(Usuarios).filter(func.lower(Usuarios.nombres_usuario)==nombre_usuario.lower().strip()).first()
+            return to_dict(usuario) if usuario else None
+
+    #-----------------
+
+    # Método estático para actualizar un usuario     
+    @staticmethod
+    def actualizar_usuario(usuario_id, datos_actualizados):
+        with db_session_manager() as session:
+            usuario = session.query(Usuarios).filter_by(id_usuario=usuario_id).first()
+
+            if not usuario:
+                raise ValueError("usuario no encontrado")
+
+            # Actualizar los datos
+            for key, value in datos_actualizados.items():
+                setattr(usuario, key, value)
+
+            session.commit()  # Confirma los cambios en la base de datos
+            return usuario
+    #--------------
+
+     # Método estático para actualizar estado del usuario
+    @staticmethod
+    def actualizar_estado(nombres_usuario):
+        """Toggle de estado de usuario"""
+        with db_session_manager() as session:
+            usuario = session.query(Usuarios).filter_by(nombres_usuario=nombres_usuario).first()
+            
+            if usuario:
+                 # Cambiar el estado activo/inactivo
+                usuario.is_active = not usuario.is_active
+                session.commit()
+            return usuario.is_active
+        return None
+    #--------
+
+    # Método estático para eliminar un cliente 
+    @staticmethod
+    def eliminar_usuario_logicamente(nombres_usuario):
+
+        with db_session_manager() as session:
+            
+            usuario = session.query(Usuarios).filter(func.lower(Usuarios.nombres_usuario) == nombres_usuario.lower()).first()
+            
+            if usuario and not usuario.is_deleted:
+                usuario.is_deleted = True
+                session.commit()
+                return True
+            return False
+        
+    #------------
