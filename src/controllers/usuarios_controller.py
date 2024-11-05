@@ -123,7 +123,7 @@ class Usuarios_Controller(FlaskController):
             return jsonify({'exists': usuario_existente is not None})
         
     #---------
-     # Ruta para actualizar el estado de un usuario
+    # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])
     def toggle_estado_usuario():
         nombres_usuario = request.form['nombreUsuario']
@@ -136,7 +136,7 @@ class Usuarios_Controller(FlaskController):
         else:
             flash('Usuario no encontrado.', 'danger')
 
-        return redirect(url_for('usuarios_ver', nombreUsuario=nombres_usuario))
+        return redirect(url_for('usuarios_editar', nombre=nombres_usuario))
 
     #----------
 
