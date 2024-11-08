@@ -26,13 +26,50 @@ class Clientes_Controller(FlaskController):
             telefono = request.form['telefonoCliente']
             direccion = request.form['direccionCliente']
             email = request.form['emailCliente']
-            
-            # Validar si hay datos duplicados antes de crear el cliente
-            errores = Clientes.validar_datos(numero_documento=numero_documento, email=email)
 
+            # Validaciones y mensajes de error
+            errores = {}
+            if not tipo_documento:
+                errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+            if not numero_documento:
+                errores['numeroDocumento'] = 'El número de documento es obligatorio.'
+            elif not numero_documento.isdigit():
+                errores['numeroDocumento'] = 'Debe contener solo números.'
+            elif len(numero_documento) < 6 or len(numero_documento) > 15:
+                errores['numeroDocumento'] = 'Debe tener entre 6 y 15 dígitos.'
+            
+            if not nombres_cliente:
+                errores['nombreCliente'] = 'El nombre es obligatorio.'
+            elif len(nombres_cliente) < 3 or len(nombres_cliente) > 50:
+                errores['nombreCliente'] = 'Debe tener entre 3 y 50 caracteres.'
+
+            if not telefono:
+                errores['telefonoCliente'] = 'El teléfono es obligatorio.'
+            elif not telefono.isdigit():
+                errores['telefonoCliente'] = 'Debe contener solo números.'
+            elif len(telefono) < 10:
+                errores['telefonoCliente'] = 'Debe tener al menos 10 dígitos.'
+
+            if not direccion:
+                errores['direccionCliente'] = 'La dirección es obligatoria.'
+            elif len(direccion) < 10:
+                errores['direccionCliente'] = 'Debe tener al menos 10 caracteres.'
+
+            if not email:
+                errores['emailCliente'] = 'El email es obligatorio.'
+            elif "@" not in email or "." not in email.split("@")[-1]:
+                errores['emailCliente'] = 'Debe ser un email válido.'
+
+            # Validación de duplicados
+            duplicados = Clientes.validar_datos(numero_documento=numero_documento, email=email)
+            if duplicados:
+                errores.update(duplicados)
+
+            # Si hay errores, devolvemos JSON con errores
             if errores:
                 return jsonify({'status': 'error', 'errores': errores}), 400
 
+            # Si todas las validaciones pasan, intentamos crear el cliente
             nuevo_cliente = Clientes(
                 tipo_documento=tipo_documento,
                 numero_documento=numero_documento,
@@ -46,10 +83,11 @@ class Clientes_Controller(FlaskController):
 
             try:
                 Clientes.agregar_cliente(nuevo_cliente)
-                return jsonify({'success': True, 'message': 'cliente creado con éxito'}), 200
+                return jsonify({'success': True, 'message': 'Cliente creado con éxito'}), 200
             except Exception as e:
                 return jsonify({'success': False, 'message': f'Error al crear cliente: {str(e)}'}), 500
-        
+
+
     #------------------------
 
     # Ruta para mostrar el formulario de edición (GET)  
