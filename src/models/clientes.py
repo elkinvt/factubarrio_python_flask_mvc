@@ -126,14 +126,24 @@ class Clientes(Base):
 
     # Método estático para validar duplicaciones del cliente
     @staticmethod
-    def validar_datos(numero_documento=None, email=None):
+    def validar_datos(numero_documento=None, email=None, cliente_id=None):
         with db_session_manager() as session:
             errores = {}
             
-            if numero_documento and session.query(Clientes).filter_by(numero_documento=numero_documento).first():
-                errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
-            if email and session.query(Clientes).filter_by(email=email).first():
-                errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
+            # Validar duplicado de número de documento, excluyendo el cliente actual si cliente_id está presente
+            if numero_documento:
+                cliente_doc = session.query(Clientes).filter_by(numero_documento=numero_documento).first()
+                if cliente_doc and (cliente_id is not None and cliente_doc.idclientes != int(cliente_id)):
+                    errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
+
+            # Validar duplicado de email, excluyendo el cliente actual si cliente_id está presente
+            if email:
+                cliente_email = session.query(Clientes).filter_by(email=email).first()
+                if cliente_email and (cliente_id is not None and cliente_email.idclientes != int(cliente_id)):
+                    errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
+
             return errores
+
+
         #--------
 
