@@ -27,12 +27,47 @@ class Vendedores_Controller(FlaskController):
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
 
-            # Validar si hay datos duplicados antes de crear el vendedor
-            errores = Vendedores.validar_datos(numero_documento=numero_documento, email=email)
+             # Validaciones y mensajes de error
+            errores = {}
+            if not tipo_documento:
+                errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+            if not numero_documento:
+                errores['numeroDocumento'] = 'El número de documento es obligatorio.'
+            elif not numero_documento.isdigit():
+                errores['numeroDocumento'] = 'Debe contener solo números.'
+            elif len(numero_documento) < 6 or len(numero_documento) > 15:
+                errores['numeroDocumento'] = 'Debe tener entre 6 y 15 dígitos.'
+            
+            if not nombre_completo:
+                errores['nombrevendedor'] = 'El nombre es obligatorio.'
+            elif len(nombre_completo) < 3 or len(nombre_completo) > 50:
+                errores['nombrevendedor'] = 'Debe tener entre 3 y 50 caracteres.'
 
+            if not telefono:
+                errores['telefonoVendedor'] = 'El teléfono es obligatorio.'
+            elif not telefono.isdigit():
+                errores['telefonoVendedor'] = 'Debe contener solo números.'
+            elif len(telefono) < 10:
+                errores['telefonoVendedor'] = 'Debe tener al menos 10 dígitos.'
+
+            if not direccion:
+                errores['direccionVendedor'] = 'La dirección es obligatoria.'
+            elif len(direccion) < 10:
+                errores['direccionVendedor'] = 'Debe tener al menos 10 caracteres.'
+
+            if not email:
+                errores['emailVendedor'] = 'El email es obligatorio.'
+            elif "@" not in email or "." not in email.split("@")[-1]:
+                errores['emailVendedor'] = 'Debe ser un email válido.'
+
+            # Validación de duplicados
+            duplicados = Vendedores.validar_datos(numero_documento=numero_documento, email=email)
+            if duplicados :
+                errores.update(duplicados)
+            
+            # Si hay errores, devolvemos JSON con errores
             if errores:
-                # Si hay errores de duplicados, devolverlos como JSON
-                return jsonify({'success': False, 'errors': errores}), 400
+                return jsonify({'status': 'error', 'errores': errores}), 400
 
             # Creando el objeto del nuevo vendedor con el modelo que ya tienes en la base de datos
             nuevo_vendedor = Vendedores(

@@ -22,7 +22,7 @@
             
         </div>
         <div class="mb-3">
-            <label for="nombreCliente" class="form-label">Nombre</label>
+            <label for="nombreCliente" class="form-label">Nombre completo</label>
             <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente" required>
             <div id="nombreClienteError" class="text-danger"></div>
         </div>
@@ -115,9 +115,9 @@
 
 
 
-<!-- Código JavaScript para validacion de datos del cliente -->
+<!-- Código JavaScript para validacion de datos duplicados(numero_docuemnto, email) del cliente -->
 <script>
-    // Asignar la validación solo a los campos específicos
+   // Asignar la validación solo a los campos específicos
     $('#numeroDocumento').on('blur', function() {
         validarCliente('numeroDocumento');
     });

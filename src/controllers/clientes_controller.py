@@ -22,7 +22,7 @@ class Clientes_Controller(FlaskController):
         if request.method == 'POST':
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
-            nombres_cliente = request.form['nombreCliente'].title()
+            nombre_completo = request.form['nombreCliente'].title()
             telefono = request.form['telefonoCliente']
             direccion = request.form['direccionCliente']
             email = request.form['emailCliente']
@@ -38,9 +38,9 @@ class Clientes_Controller(FlaskController):
             elif len(numero_documento) < 6 or len(numero_documento) > 15:
                 errores['numeroDocumento'] = 'Debe tener entre 6 y 15 dígitos.'
             
-            if not nombres_cliente:
+            if not nombre_completo:
                 errores['nombreCliente'] = 'El nombre es obligatorio.'
-            elif len(nombres_cliente) < 3 or len(nombres_cliente) > 50:
+            elif len(nombre_completo) < 3 or len(nombre_completo) > 50:
                 errores['nombreCliente'] = 'Debe tener entre 3 y 50 caracteres.'
 
             if not telefono:
@@ -73,7 +73,7 @@ class Clientes_Controller(FlaskController):
             nuevo_cliente = Clientes(
                 tipo_documento=tipo_documento,
                 numero_documento=numero_documento,
-                nombres_cliente=nombres_cliente,
+                nombres_cliente=nombre_completo,
                 telefono=telefono,
                 direccion=direccion,
                 email=email,

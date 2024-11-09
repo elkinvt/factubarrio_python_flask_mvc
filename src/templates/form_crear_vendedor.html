@@ -14,6 +14,7 @@
             <option value="PA">Pasaporte</option>
             <option value="NIT">NIT</option>
         </select>
+        <div id="tipoDocumentoError" class="text-danger"></div>
     </div>
     
     <div class="mb-3">
@@ -25,16 +26,19 @@
     <div class="mb-3">
         <label for="nombreVendedor" class="form-label">Nombre Completo</label>
         <input type="text" class="form-control form-control-sm" id="nombreVendedor" name="nombreVendedor" required>
+        <div id="nombreVendedorError" class="text-danger"></div>
     </div>
     
     <div class="mb-3">
         <label for="telefonoVendedor" class="form-label">Teléfono</label>
         <input type="tel" class="form-control form-control-sm" id="telefonoVendedor" name="telefonoVendedor" required>
+        <div id="telefonoVendedorError" class="text-danger"></div>
     </div>
 
     <div class="mb-3">
         <label for="direccionVendedor" class="form-label">Dirección</label>
         <input type="text" class="form-control form-control-sm" id="direccionVendedor" name="direccionVendedor" required>
+        <div id="direccionVendedorError" class="text-danger"></div>
     </div>
 
     <div class="mb-3">
@@ -70,18 +74,48 @@
                     }
                 },
                 error: function (xhr) {
-                    const errores = xhr.responseJSON.errors || {};
-                    $('#numeroDocumentoError').text(errores.numeroDocumento || '');
-                    $('#emailVendedorError').text(errores.emailVendedor || '');
+                     // Procesar errores específicos y mostrar mensajes en el HTML
+                     const errores = xhr.responseJSON ? xhr.responseJSON.errores  : {};
 
-                    // Mostrar mensaje de error general en caso de errores específicos
+                   
+                    // Limpiar mensajes de error previos
+                    $('#tipoDocumentoError').text('');
+                    $('#numeroDocumentoError').text('');
+                    $('#nombreVnededorError').text('');
+                    $('#telefonoVendedorError').text('');
+                    $('#direccionVendedorError').text('');
+                    $('#emailVendedorError').text('');
+                    $('#mensajeErrorGeneral').text('');
+
+                    // Mostrar mensajes de error específicos;
+                    if (errores.tipoDocumento) {
+                        $('#tipoDocumentoError').text(errores.tipoDocumento);
+                    }
+                    if (errores.numeroDocumento) {
+                        $('#numeroDocumentoError').text(errores.numeroDocumento);
+                    }
+                    if (errores.nombreVendedor) {
+                        $('#nombreVendedorError').text(errores.nombreVendedor);
+                    }
+                    if (errores.telefonoVendedor) {
+                        $('#telefonoVendedorError').text(errores.telefonoVendedor);
+                    }
+                    if (errores.direccionVendedor) {
+                        $('#direccionVendedorError').text(errores.direccionVendedor);
+                    }
+                    if (errores.emailVendedor) {
+                        $('#emailVendedorError').text(errores.emailVendedor);
+                    }
+
+                    
+
+                    // Mostrar mensaje de error general si existen otros errores
                     if (Object.keys(errores).length > 0) {
                         $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
-                    } else if (xhr.responseJSON.message) {
-                        // Mostrar mensaje de error general si hay otro tipo de error
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
                         $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
                     } else {
-                        $('#mensajeErrorGeneral').text('');
+                        $('#mensajeErrorGeneral').text('Ocurrió un error inesperado. Inténtalo nuevamente.');
                     }
                 }
             });
@@ -94,7 +128,7 @@
 
 
 
-<!-- Código JavaScript para validacion de datos del cliente -->
+<!-- Código JavaScript para validacion de datos duplicados(numero_documento,email) del vendedor -->
 <script>
     // Asignar la validación solo a los campos específicos
     $('#numeroDocumentoVendedor').on('blur', function() {
