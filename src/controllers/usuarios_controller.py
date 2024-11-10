@@ -17,29 +17,64 @@ class Usuarios_Controller(FlaskController):
     # Ruta para crear el usuario
     @app.route('/usuarios_crear', methods=['GET', 'POST'])
     def usuarios_crear():
+        if request.method == 'GET':
+            return render_template('form_crear_usuario.html', titulo_pagina="Crear usuario")
+
         if request.method == 'POST':
             # Extrae los datos del formulario
-            nombre = request.form.get('nombre'). title()
+            nombre = request.form.get('nombre').title()
             email = request.form.get('email')
-            contraseña = request.form.get('contraseña')
+            contrasena = request.form.get('contraseña')
             rol = request.form.get('rol')
+
+            # Diccionario para almacenar errores de validación
+            errores = {}
+
+            # Validaciones de los campos
+            if not nombre:
+                errores['nombre'] = 'El nombre es obligatorio.'
+            elif len(nombre) < 3 or len(nombre) > 50:
+                errores['nombre'] = 'Debe tener entre 3 y 50 caracteres.'
+
+            if not email:
+                errores['email'] = 'El email es obligatorio.'
+            elif "@" not in email or "." not in email.split("@")[-1]:
+                errores['email'] = 'Debe ser un email válido.'
+            else:
+                # Verificación de duplicados de email
+                if Usuarios.validar_datos(email=email):  # Método que verifica si el email ya existe
+                    errores['email'] = 'El email ya está registrado.'
+
+            if not contrasena:
+                errores['contrasena'] = 'La contraseña es obligatoria.'
+            elif len(contrasena) < 8:
+                errores['contrasena'] = 'Debe tener al menos 8 caracteres.'
+
+            if not rol:
+                errores['rol'] = 'El rol es obligatorio.'
+            elif rol not in ['administrador', 'vendedor']:
+                errores['rol'] = 'El rol debe ser "administrador" o "vendedor".'
+
+            # Si hay errores, devolvemos JSON con errores
+            if errores:
+                return jsonify({'status': 'error', 'errores': errores}), 400
 
             # Crear el objeto usuario con los datos del formulario
             nuevo_usuario = Usuarios(
                 nombre_usuario=nombre,
                 email=email,
-                contraseña=contraseña,
+                contraseña=contrasena,
                 rol=rol
             )
 
-            # Llama al método agregar_usuario para guardar el usuario en la base de datos
-            Usuarios.agregar_usuario(nuevo_usuario)
+            try:
+                # Llama al método agregar_usuario para guardar el usuario en la base de datos
+                Usuarios.agregar_usuario(nuevo_usuario)
+                return jsonify({'success': True, 'message': 'Usuario creado exitosamente'}), 200
+            except Exception as e:
+                return jsonify({'success': False, 'message': f'Error al crear usuario: {str(e)}'}), 500
 
-            flash("Usuario creado exitosamente",'success')
-            return redirect(url_for('usuarios_ver'))
         
-        # Si el método es GET, simplemente renderiza el formulario
-        return render_template('form_crear_usuario.html', titulo_pagina="Crear usuario")
     
     #-------------
 

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import Base, db_session_manager, to_dict
+from src.models import  Base, db_session_manager, to_dict
 from sqlalchemy import func
+from src.models.vendedores import Vendedores
 
 class Usuarios(Base):
     __tablename__ = 'usuarios'
@@ -98,3 +99,19 @@ class Usuarios(Base):
             return False
         
     #------------
+
+    
+    # Método de validación en Usuarios
+    @staticmethod
+    def validar_datos(email=None, usuario_id=None):
+        with db_session_manager() as session:
+            errores = {}
+
+            # Validar duplicado de email solo en Usuarios, excluyendo el usuario actual si usuario_id está presente
+            if email:
+                usuario_email = session.query(Usuarios).filter_by(email=email).first()
+                if usuario_email and (usuario_id is None or usuario_email.idusuarios != int(usuario_id)):
+                    errores['emailUsuario'] = 'Este correo electrónico ya está registrado en Usuarios.'
+
+            return errores
+
