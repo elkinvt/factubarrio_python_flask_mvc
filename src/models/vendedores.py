@@ -94,13 +94,23 @@ class Vendedores(Base):
 
     # Método de validación en Vendedores
     @staticmethod
-    def validar_datos(numero_documento=None, email=None):
+    def validar_datos(numero_documento=None, email=None,vendedor_id=None):
         with db_session_manager() as session:
             errores = {}
-            if numero_documento and session.query(Vendedores).filter_by(numero_documento=numero_documento).first():
-                errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
-            if email and session.query(Vendedores).filter_by(email=email).first():
-                errores['emailVendedor'] = 'Este correo electrónico ya está registrado.'
+
+            # Validar duplicado de número de documento, excluyendo el cliente actual si cliente_id está presente
+            if numero_documento:
+                vendedor_doc= session.query(Vendedores).filter_by(numero_documento=numero_documento).first()
+                if vendedor_doc and (vendedor_id is not None and vendedor_doc.idvendedores != int(vendedor_id)):
+                    errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
+
+
+            # Validar duplicado de email, excluyendo el cliente actual si cliente_id está presente   
+            if email:
+                vendedor_email = session.query(Vendedores).filter_by(email=email).first()
+                if vendedor_email and (vendedor_id is not None and vendedor_email.idvendedores != int(vendedor_id)):
+                    errores['emailVendedor'] = 'Este correo electrónico ya está registrado.'
+                    
             return errores
 
     #---------

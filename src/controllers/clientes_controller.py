@@ -184,7 +184,6 @@ class Clientes_Controller(FlaskController):
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}), 500
 
-        return redirect(url_for('clientes_ver'))
         
     #--------------------
 

@@ -26,7 +26,7 @@
 {% if vendedor %}
 <div class="container mt-5">
     <h2>Editar Vendedor</h2>
-    <form action="/vendedores_actualizar" method="POST">
+    <form id="formEditarVendedor">
         <input type="hidden" name="vendedorId" value="{{ vendedor.idvendedores }}">
 
         <div class="mb-3">
@@ -41,32 +41,38 @@
                 <option value="NIT" {% if vendedor.tipo_documento == 'NIT' %} selected {% endif %}>NIT</option>
             </select>
             <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
+            <div id="tipoDocumentoError" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label for="numeroDocumentoVendedor" class="form-label">Número de Documento</label>
             <input type="text" class="form-control form-control-sm" name="numeroDocumento" value="{{ vendedor.numero_documento }}" readonly>
+            <div id="numeroDocumentoError" class="text-danger"></div> <!-- Error en tiempo real -->
         </div>
         
 
         <div class="mb-3">
             <label for="nombreVendedor" class="form-label">Nombre</label>
             <input type="text" class="form-control form-control-sm" name="nombreVendedor" value="{{ vendedor.nombres_vendedor }}" required>
+            <div id="nombreVendedorError" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label for="telefonoVendedor" class="form-label">Teléfono</label>
             <input type="tel" class="form-control form-control-sm" name="telefonoVendedor" value="{{ vendedor.telefono }}">
+            <div id="telefonoVendedorError" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label for="direccionVendedor" class="form-label">Dirección</label>
             <input type="text" class="form-control form-control-sm" name="direccionVendedor" value="{{ vendedor.direccion }}" required>
+            <div id="direccionVendedorError" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label for="emailVendedor" class="form-label">Email</label>
             <input type="email" class="form-control form-control-sm" name="emailVendedor" value="{{ vendedor.email }}" required>
+            <div id="emailVendedorError" class="text-danger"></div> <!-- Error en tiempo real -->
         </div>
 
         <div class="d-flex justify-content-center">
@@ -81,6 +87,70 @@
         <button type="submit" class="btn btn-danger">Eliminar Vendedor</button>
     
     </form>
+
+    <script>
+        $(document).ready(function () {
+            $('#formEditarVendedor').on('submit', function (event) {
+                event.preventDefault(); // Evitar el envío estándar del formulario
+
+                // Serializar datos del formulario
+                var formData = $(this).serialize();
+
+                // Enviar datos al backend con AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/vendedores_actualizar',
+                    data: formData,
+                    dataType: 'json', // Especifica que el backend responde en JSON
+                    success: function (response) {
+                        alert(response.message); // Mensaje de éxito
+                        window.location.href = '/vendedores_ver';
+                    },
+
+                    error: function (xhr) {
+                        const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+
+
+                        // Limpiar mensajes de error previos
+                        $('#nombreVendedorError').text('');
+                        $('#numeroDocumentoError').text('');
+                        $('#telefonoVendedorError').text('');
+                        $('#direccionVendedorError').text('');
+                        $('#emailVendedorError').text('');
+                        $('#mensajeErrorGeneral').text('');
+
+                        // Mostrar mensajes de error específicos
+                        if (errores.nombrevendedor) {
+                            $('#nombreVendedorError').text(errores.nombreVendedor);
+                        }
+                        if (errores.numeroDocumento) {
+                            $('#numeroDocumentoError').text(errores.numeroDocumento);
+                        }
+                        if (errores.telefonoVendedor) {
+                            $('#telefonoVendedorError').text(errores.telefonoVendedor);
+                        }
+                        if (errores.direccionVendedor) {
+                            $('#direccionVendedorError').text(errores.direccionVendedor);
+                        }
+                        if (errores.emailVendedor) {
+                            $('#emailVendedorError').text(errores.emailVendedor);
+                        }
+
+                        // Mostrar mensaje de error general si existen errores
+                        if (Object.keys(errores).length > 0) {
+                            $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+                        } else {
+                            $('#mensajeErrorGeneral').text('Ocurrió un error inesperado. Inténtalo nuevamente.');
+                        }
+
+                    }
+                });
+            });
+        });
+
+    </script>
 
     <script>
         function confirmarEliminacion() {

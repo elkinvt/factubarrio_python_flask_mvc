@@ -48,17 +48,17 @@
         </div>
 
         <div class="mb-3">
+            <label for="cedulaCliente" class="form-label">Número de Documento</label>
+            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="numeroDocumento"
+                value="{{ cliente['numero_documento'] }}" readonly>
+            <div id="numeroDocumentoError" class="text-danger"></div> <!-- Error en tiempo real -->
+        </div>
+
+        <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre</label>
             <input type="text" class="form-control form-control-sm" id="nombreCliente" name="nombreCliente"
                 value="{{ cliente['nombres_cliente'] }}" required>
                 <div id="nombreClienteError" class="text-danger"></div>
-        </div>
-
-        <div class="mb-3">
-            <label for="cedulaCliente" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control form-control-sm" id="cedulaCliente" name="numeroDocumento"
-                value="{{ cliente['numero_documento'] }}" readonly>
-                <div id="numeroDocumentoError" class="text-danger"></div> <!-- Error en tiempo real -->
         </div>
 
         <div class="mb-3">
