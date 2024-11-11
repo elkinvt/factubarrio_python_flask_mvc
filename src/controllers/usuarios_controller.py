@@ -24,7 +24,7 @@ class Usuarios_Controller(FlaskController):
             # Extrae los datos del formulario
             nombre = request.form.get('nombre').title()
             email = request.form.get('email')
-            contrasena = request.form.get('contraseña')
+            contraseña = request.form.get('contraseña')
             rol = request.form.get('rol')
 
             # Diccionario para almacenar errores de validación
@@ -45,10 +45,10 @@ class Usuarios_Controller(FlaskController):
                 if Usuarios.validar_datos(email=email):  # Método que verifica si el email ya existe
                     errores['email'] = 'El email ya está registrado.'
 
-            if not contrasena:
-                errores['contrasena'] = 'La contraseña es obligatoria.'
-            elif len(contrasena) < 8:
-                errores['contrasena'] = 'Debe tener al menos 8 caracteres.'
+            if not contraseña:
+                errores['contraseña'] = 'La contraseña es obligatoria.'
+            elif len(contraseña) < 8:
+                errores['contraseña'] = 'Debe tener al menos 8 caracteres.'
 
             if not rol:
                 errores['rol'] = 'El rol es obligatorio.'
@@ -63,7 +63,7 @@ class Usuarios_Controller(FlaskController):
             nuevo_usuario = Usuarios(
                 nombre_usuario=nombre,
                 email=email,
-                contraseña=contrasena,
+                contraseña=contraseña,
                 rol=rol
             )
 
@@ -119,6 +119,34 @@ class Usuarios_Controller(FlaskController):
         nueva_contraseña = request.form.get('nuevaContraseña')
         confirmar_contraseña = request.form.get('confirmarContraseña')
 
+         # Diccionario de errores específicos por campo
+        errores = {}
+
+        # Validaciones
+        if not nombre_usuario:
+            errores['nombreUsuario'] = 'El nombre es obligatorio.'
+        elif len(nombre_usuario) < 3 or len(nombre_usuario) > 50:
+            errores['nombreUsuario'] = 'Debe tener entre 3 y 50 caracteres.'
+        
+        if not email:
+            errores['emailUsuario'] = 'El email es obligatorio.'
+        elif "@" not in email or "." not in email.split("@")[-1]:
+            errores['emailUsuario'] = 'Debe ser un email válido.'
+
+        if nueva_contraseña:
+            if nueva_contraseña != confirmar_contraseña:
+                errores['confirmarContraseña'] = 'Las contraseñas no coinciden.'
+            elif len(nueva_contraseña) < 8:
+                errores['nuevaContraseña'] = 'La contraseña debe tener al menos 8 caracteres.'
+
+        # Validación de duplicados, excluyendo el usuario actual
+        duplicados = Usuarios.validar_datos(email=email, usuario_id=usuario_id)
+        if duplicados:
+            errores.update(duplicados)
+
+        # Si hay errores, devolver un JSON con los errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
 
         # Diccionario de datos actualizados
         datos_actualizados = {
@@ -128,23 +156,13 @@ class Usuarios_Controller(FlaskController):
             'is_active': is_active
         }
 
-        # Verificar si se ingresó una nueva contraseña y si coincide con la confirmación
-        if nueva_contraseña:
-            if nueva_contraseña == confirmar_contraseña:
-                datos_actualizados['contraseña'] = nueva_contraseña  # Almacena la contraseña sin encriptar por ahora
-            else:
-                flash('Las contraseñas no coinciden.', 'danger')
-                return redirect(url_for('usuarios_editar'))  # Redirigir en caso de error
-
         try:
             Usuarios.actualizar_usuario(usuario_id, datos_actualizados)
-            flash('Cambios guardados correctamente.', 'success')
+            return jsonify({'status': 'success', 'message': 'Usuario actualizado con éxito'}), 200
         except ValueError:
-            flash('Usuario no encontrado.', 'danger')
+            return jsonify({'status': 'error', 'message': 'Usuario no encontrado.'}), 404
         except Exception as e:
-            flash(f'Error al guardar los cambios: {str(e)}', 'danger')
-
-        return redirect(url_for('usuarios_ver'))
+            return jsonify({'status': 'error', 'message': f'Error al actualizar usuario: {str(e)}'}), 500
 
         
     #--------------------
@@ -153,10 +171,17 @@ class Usuarios_Controller(FlaskController):
     @app.route('/usuarios/verificar_email', methods=['GET'])
     def verificar_email():
         email = request.args.get('email')
-        with db_session_manager() as session:
-            usuario_existente = session.query(Usuarios).filter_by(email=email).first()
-            return jsonify({'exists': usuario_existente is not None})
+        usuario_id = request.args.get('usuario_id')  # Opcional, si quieres excluir un usuario específico
+
+        # Usa el método `validar_datos` para comprobar si el email ya está en uso
+        duplicados = Usuarios.validar_datos(email=email, usuario_id=usuario_id)
         
+        # Comprueba si hay errores relacionados con el email en `duplicados`
+        if 'emailUsuario' in duplicados:
+            return jsonify({'exists': True})
+        else:
+            return jsonify({'exists': False})
+
     #---------
     # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])

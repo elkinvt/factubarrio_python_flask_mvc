@@ -20,7 +20,7 @@
         <div class="mb-3">
             <label for="contraseña">Contraseña:</label>
             <input type="password" class="form-control form-control-sm" id="contraseña" name="contraseña" required>
-            <div class="text-danger" id="contrasenaError"></div>
+            <div class="text-danger" id="contraseñaError"></div>
         </div>
 
         <div class="mb-3">
@@ -45,7 +45,7 @@
             // Limpiar mensajes de error previos
             $('#nombreError').text('');
             $('#emailError').text('');
-            $('#contrasenaError').text('');
+            $('#contraseñaError').text('');
             $('#rolError').text('');
             $('#mensajeErrorGeneral').text('');
 
@@ -75,8 +75,8 @@
                     if (errores.email) {
                         $('#emailError').text(errores.email);
                     }
-                    if (errores.contrasena) {
-                        $('#contrasenaError').text(errores.contrasena);
+                    if (errores.contraseña) {
+                        $('#contraseñaError').text(errores.contraseña);
                     }
                     if (errores.rol) {
                         $('#rolError').text(errores.rol);

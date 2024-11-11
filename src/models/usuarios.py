@@ -56,7 +56,10 @@ class Usuarios(Base):
     @staticmethod
     def actualizar_usuario(usuario_id, datos_actualizados):
         with db_session_manager() as session:
+
             usuario = session.query(Usuarios).filter_by(id_usuario=usuario_id).first()
+            
+
 
             if not usuario:
                 raise ValueError("usuario no encontrado")
@@ -110,8 +113,10 @@ class Usuarios(Base):
             # Validar duplicado de email solo en Usuarios, excluyendo el usuario actual si usuario_id está presente
             if email:
                 usuario_email = session.query(Usuarios).filter_by(email=email).first()
-                if usuario_email and (usuario_id is None or usuario_email.idusuarios != int(usuario_id)):
+                if usuario_email and (usuario_id is None or usuario_email.id_usuario != int(usuario_id)):
                     errores['emailUsuario'] = 'Este correo electrónico ya está registrado en Usuarios.'
 
             return errores
+        
+    #--------------
 
