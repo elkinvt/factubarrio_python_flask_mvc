@@ -32,3 +32,14 @@ class Categoria(Base):
            
             
     #-------------------
+
+    # Método para verificar categoria existe del producto
+    @staticmethod
+    def existe_categoria(id_categoria):
+        with db_session_manager() as session:
+            try:
+                # Verifica si la categoría existe en la base de datos
+                categoria_existe = session.query(Categoria).filter_by(idcategoria=id_categoria).first() is not None
+                return categoria_existe
+            except Exception as e:
+                raise e

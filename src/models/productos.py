@@ -211,8 +211,18 @@ class Productos(Base):
                 raise e 
     #-----------------
 
+    # Método para verificar codigo existe del producto
+    @staticmethod
+    def existe_codigo(codigo):
+        with db_session_manager() as session:
+            try:
+                # Realiza la consulta para verificar si el código existe
+                producto_existe = session.query(Productos).filter_by(codigo=codigo).first() is not None
+                return producto_existe  # Retorna True si existe, False si no
+            except Exception as e:
+                raise e  # Propaga la excepción para manejo externo
 
-  
+    
 
 
     

@@ -34,6 +34,7 @@ class Productos_Controller(FlaskController):
     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
     def productos_crear():
+        
         if request.method == 'POST':
             # Recibe los datos enviados desde el formulario
             codigo = request.form['codigoProducto']
@@ -41,18 +42,66 @@ class Productos_Controller(FlaskController):
             descripcion = request.form['descripcionProducto'].capitalize()
             categoria = request.form['categoriaProducto']
 
-            # Convertimos el precio a flotante y lo redondeamos a 2 decimales
+            # Validaciones y mensajes de error
+            errores = {}
+
+            # Validación de Código
+            if not codigo:
+                errores['codigoProducto'] = 'El código del producto es obligatorio.'
+            elif Productos.existe_codigo(codigo):
+                errores['codigoProducto'] = 'El código del producto ya existe.'
+
+            # Validación de Nombre
+            if not nombre:
+                errores['nombreProducto'] = 'El nombre del producto es obligatorio.'
+            elif len(nombre) < 3 or len(nombre) > 50:
+                errores['nombreProducto'] = 'El nombre debe tener entre 3 y 50 caracteres.'
+
+
+            # Validación de Descripción
+            presentacion = request.form.get('presentacionProducto')
+            if not descripcion:
+                errores['descripcionProducto'] = 'La descripción es obligatoria.'
+            elif len(descripcion) > 250:
+                errores['descripcionProducto'] = 'La descripción no debe exceder los 250 caracteres.'
+
+            # Validación de Precio
             try:
                 precio = float(request.form['precioProducto'].replace(',', ''))
-                precio = round(precio, 2)  # Redondeamos a dos decimales
+                if precio <= 0 or precio > 10000:
+                    errores['precioProducto'] = 'El precio debe ser mayor a 0 y menor a 10,000.'
+                else:
+                    # Redondeamos a dos decimales si el precio es válido
+                    precio = round(precio, 2)
             except ValueError:
-                flash('Precio no válido', 'danger')
-                return redirect(url_for('productos_crear'))
+                errores['precioProducto'] = 'Precio no válido.'
 
-            unidad_medida = request.form['unidadMedidaProducto']
-            presentacion = request.form['presentacionProducto']
-            cantidad_stock = int(request.form['cantidadStockProducto'])  # Convertimos a int
+            # Validación de Cantidad en Stock
+            try:
+                cantidad_stock = int(request.form['cantidadStockProducto'])
+                if cantidad_stock <= 0:
+                    errores['cantidadStockProducto'] = 'La cantidad en stock debe ser mayor a cero.'
+            except ValueError:
+                errores['cantidadStockProducto'] = 'Cantidad en stock no válida.'
+            
+            # Validación de Categoría
+            if not categoria:
+                errores['categoriaProducto'] = 'La categoría es obligatoria.'
+            elif not Categoria.existe_categoria(categoria):
+                errores['categoriaProducto'] = 'La categoría seleccionada no es válida.'
 
+            # Validación de Unidad de Medida
+            unidad_medida = request.form.get('unidadMedidaProducto')
+            if not unidad_medida:
+                errores['unidadMedidaProducto'] = 'La unidad de medida es obligatoria.'
+            elif not UnidadMedida.existe_unidad(unidad_medida):
+                errores['unidadMedidaProducto'] = 'La unidad de medida seleccionada no es válida.'
+
+            # Si hay errores, devolvemos JSON con errores
+            if errores:
+                return jsonify({'status': 'error', 'errores': errores}), 400
+
+            
             # Crea una nueva instancia de Productos
             nuevo_producto = Productos(
                 codigo=codigo,
@@ -67,11 +116,10 @@ class Productos_Controller(FlaskController):
 
             try:
                 Productos.agregar_producto(nuevo_producto)
-                flash('Producto creado con éxito', 'success')
+                return jsonify({'success': True, 'message': 'Producto creado con éxito'}), 200
             except Exception as e:
-                flash(f'Error al crear producto: {str(e)}', 'danger')
+                 return jsonify({'success': False, 'message': f'Error al crear producto: {str(e)}'}), 500
 
-            return redirect(url_for('productos_ver'))
         
         try:
             # Usar los métodos del modelo para obtener las categorías y unidades de medida

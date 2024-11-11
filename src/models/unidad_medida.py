@@ -39,3 +39,13 @@ class UnidadMedida(Base):
             
            
     #------------------
+
+    @staticmethod
+    def existe_unidad(id_unidad):
+        with db_session_manager() as session:
+            try:
+                # Verifica si la unidad de medida existe en la base de datos
+                unidad_existe = session.query(UnidadMedida).filter_by(idunidad_medida=id_unidad).first() is not None
+                return unidad_existe
+            except Exception as e:
+                raise e

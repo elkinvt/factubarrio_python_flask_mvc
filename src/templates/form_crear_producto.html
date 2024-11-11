@@ -2,18 +2,22 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Registrar Producto</h2>
-    <form id="formCrearProducto" action="{{ url_for('productos_crear') }}" method="POST">
+    <div id="mensajeErrorGeneral" class="text-danger"></div>
+    <form id="formCrearProducto">
         <div class="mb-3">
             <label for="codigoProducto" class="form-label">Código</label>
             <input type="text" class="form-control form-control-sm" id="codigoProducto" name="codigoProducto" required>
+            <div id="codigoProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="nombreProducto" class="form-label">Nombre</label>
             <input type="text" class="form-control form-control-sm" id="nombreProducto" name="nombreProducto" required>
+            <div id="nombreProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="descripcionProducto" class="form-label">Descripción</label>
             <textarea class="form-control form-control-sm" id="descripcionProducto" name="descripcionProducto" rows="3" required></textarea>
+            <div id="descripcionProductoError" class="text-danger"></div>
         </div>
         
         <div class="mb-3">
@@ -28,11 +32,13 @@
                     <option disabled>No hay categorías disponibles</option>
                 {% endif %}
             </select>
+            <div id="categoriaProductoError" class="text-danger"></div>
         </div>
         
         <div class="mb-3">
             <label for="precioProducto" class="form-label">Precio</label>
             <input type="number" class="form-control form-control-sm" id="precioProducto" name="precioProducto" required step="0.01">
+            <div id="precioProductoError" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
@@ -50,20 +56,100 @@
                     </optgroup>
                 {% endfor %}
             </select>
+            <div id="unidadMedidaProductoError" class="text-danger"></div>
         </div>
         
         
         <div class="mb-3">
             <label for="presentacionProducto" class="form-label">Presentación</label>
             <input type="text" class="form-control form-control-sm" id="presentacionProducto" name="presentacionProducto" required>
+            <div id="presentacionProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
             <input type="number" class="form-control form-control-sm" id="cantidadStockProducto" name="cantidadStockProducto" required>
+            <div id="cantidadStockProductoError" class="text-danger"></div>
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Producto</button>
     </form>
 </div>
+
+<!-- JavaScript para manejar el envío con AJAX -->
+<script>
+    $(document).ready(function () {
+        $('#formCrearProducto').on('submit', function (event) {
+            event.preventDefault(); // Evitar el envío tradicional del formulario
+
+            // Obtener los datos del formulario
+            var formData = $(this).serialize();
+
+            // Enviar datos con AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/productos_crear',
+                data: formData,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message); // Mensaje de éxito
+                        window.location.href = '/productos_ver';
+                    }
+                },
+                error: function (xhr) {
+                    // Procesar errores específicos y mostrar mensajes en el HTML
+                    const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+
+                    // Limpiar mensajes de error previos
+                    $('#codigoProductoError').text('');
+                    $('#nombreProductoError').text('');
+                    $('#descripcionProductoError').text('');
+                    $('#categoriaProductoError').text('');
+                    $('#precioProductoError').text('');
+                    $('#unidadMedidaProductoError').text('');
+                    $('#presentacionProductoError').text('');
+                    $('#cantidadStockProductoError').text('');
+                    $('#mensajeErrorGeneral').text('');
+
+                    // Mostrar mensajes de error específicos
+                    if (errores.codigoProducto) {
+                        $('#codigoProductoError').text(errores.codigoProducto);
+                    }
+                    if (errores.nombreProducto) {
+                        $('#nombreProductoError').text(errores.nombreProducto);
+                    }
+                    if (errores.descripcionProducto) {
+                        $('#descripcionProductoError').text(errores.descripcionProducto);
+                    }
+                    if (errores.categoriaProducto) {
+                        $('#categoriaProductoError').text(errores.categoriaProducto);
+                    }
+                    if (errores.precioProducto) {
+                        $('#precioProductoError').text(errores.precioProducto);
+                    }
+                    if (errores.unidadMedidaProducto) {
+                        $('#unidadMedidaProductoError').text(errores.unidadMedidaProducto);
+                    }
+                    if (errores.presentacionProducto) {
+                        $('#presentacionProductoError').text(errores.presentacionProducto);
+                    }
+                    if (errores.cantidadStockProducto) {
+                        $('#cantidadStockProductoError').text(errores.cantidadStockProducto);
+                    }
+
+                    // Mostrar mensaje de error general si existen otros errores
+                    if (Object.keys(errores).length > 0) {
+                        $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+                    } else {
+                        $('#mensajeErrorGeneral').text('Ocurrió un error inesperado. Inténtalo nuevamente.');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}
 
     
