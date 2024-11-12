@@ -41,6 +41,11 @@ class Productos_Controller(FlaskController):
             nombre = request.form['nombreProducto'].capitalize()
             descripcion = request.form['descripcionProducto'].capitalize()
             categoria = request.form['categoriaProducto']
+            precio_unitario = float(request.form['precioProducto'].replace(',', ''))
+            unidad_medida = request.form['unidadMedidaProducto']
+            presentacion = request.form['presentacionProducto']
+            cantidad_stock = int(request.form['cantidadStockProducto'])
+            
 
             # Validaciones y mensajes de error
             errores = {}
@@ -59,7 +64,6 @@ class Productos_Controller(FlaskController):
 
 
             # Validación de Descripción
-            presentacion = request.form.get('presentacionProducto')
             if not descripcion:
                 errores['descripcionProducto'] = 'La descripción es obligatoria.'
             elif len(descripcion) > 250:
@@ -67,18 +71,16 @@ class Productos_Controller(FlaskController):
 
             # Validación de Precio
             try:
-                precio = float(request.form['precioProducto'].replace(',', ''))
-                if precio <= 0 or precio > 10000:
-                    errores['precioProducto'] = 'El precio debe ser mayor a 0 y menor a 10,000.'
+                if precio_unitario <= 0 or precio_unitario > 20000000:
+                    errores['precioProducto'] = 'El precio debe ser mayor a 0 y menor a 20,000,000.'
                 else:
                     # Redondeamos a dos decimales si el precio es válido
-                    precio = round(precio, 2)
+                    precio_unitario = round(precio_unitario, 2)
             except ValueError:
                 errores['precioProducto'] = 'Precio no válido.'
 
             # Validación de Cantidad en Stock
             try:
-                cantidad_stock = int(request.form['cantidadStockProducto'])
                 if cantidad_stock <= 0:
                     errores['cantidadStockProducto'] = 'La cantidad en stock debe ser mayor a cero.'
             except ValueError:
@@ -91,7 +93,6 @@ class Productos_Controller(FlaskController):
                 errores['categoriaProducto'] = 'La categoría seleccionada no es válida.'
 
             # Validación de Unidad de Medida
-            unidad_medida = request.form.get('unidadMedidaProducto')
             if not unidad_medida:
                 errores['unidadMedidaProducto'] = 'La unidad de medida es obligatoria.'
             elif not UnidadMedida.existe_unidad(unidad_medida):
@@ -111,7 +112,7 @@ class Productos_Controller(FlaskController):
                 unidad_medida_idunidad_medida=unidad_medida,
                 presentacion=presentacion,
                 cantidad_stock=cantidad_stock,
-                precio_unitario=precio  # Guardamos el precio redondeado
+                precio_unitario=precio_unitario  # Guardamos el precio redondeado
             )
 
             try:
@@ -200,33 +201,90 @@ class Productos_Controller(FlaskController):
         
     #--------------------------
 
-    # Ruta para actualizar el producto (POST)
+    # Ruta para actualizar el producto (POST) usando AJAX
     @app.route('/productos_actualizar/<int:id>', methods=['POST'])
     def actualizar_producto(id):
+
+        errores = {}  # Diccionario para almacenar errores específicos de cada campo
         try:
+            # Validaciones de los datos recibidos
+            codigo = request.form['codigo']
+            nombre = request.form['nombre'].capitalize()
+            descripcion = request.form['descripcion'].capitalize()
+            categoria_id = request.form['categoria_id']
+            precio_unitario = float(request.form['precio'])
+            unidad_medida_id = request.form['unidadMedidaProducto']
+            presentacion = request.form['presentacion']
+            cantidad_stock = int(request.form['cantidad_stock'])
+
+            # Validación de Código
+            if not codigo:
+                errores['codigo'] = 'El código es obligatorio.'
+            elif Productos.existe_codigo(codigo) and Productos.obtener_por_id(id)['codigo'] != codigo:
+                errores['codigo'] = 'El código ya está en uso por otro producto.'
+
+            # Validación de Nombre
+            if not nombre:
+                errores['nombre'] = 'El nombre es obligatorio.'
+
+            # Validación de Descripción
+            if not descripcion:
+                errores['descripcion'] = 'La descripción es obligatoria.'
+
+            # Validación de Categoría y Unidad de Medida
+            if not Categoria.existe_categoria(categoria_id):
+                errores['categoria_id'] = 'La categoría seleccionada no existe.'
+            if not UnidadMedida.existe_unidad(unidad_medida_id):
+                errores['unidadMedidaProducto'] = 'La unidad de medida seleccionada no existe.'
+
+            # Validación de Presentación
+            if not presentacion:
+                errores['presentacion'] = 'La presentación es obligatoria.'
+
+            # Validación de Cantidad en Stock
+            try:
+                if cantidad_stock < 1:
+                    errores['cantidad_stock'] = 'La cantidad en stock debe ser mayor a cero.'
+            except ValueError:
+                errores['cantidad_stock'] = 'Cantidad en stock no válida.'
+
+            # Validación de Precio Unitario
+            try:
+                if precio_unitario <= 0 or precio_unitario > 20000000:
+                    errores['precio'] = 'El precio unitario debe ser mayor a cero.'
+                else:
+                    # Redondeamos a dos decimales si el precio es válido
+                    precio_unitario = round(precio_unitario, 2)
+            except ValueError:
+                errores['precio'] = 'Precio unitario no válido.'
+
+
+            # Verificación de errores antes de proceder con la actualización
+            if errores:
+                return jsonify({'success': False, 'errors': errores}), 400  # Enviamos los errores específicos como respuesta JSON
+
             # Diccionario de datos actualizados
             datos_actualizados = {
-                'codigo': request.form['codigo'],
-                'nombre': request.form['nombre'].capitalize(),
-                'descripcion': request.form['descripcion'].capitalize(),
-                'categoria_idcategoria': request.form['categoria_id'],
-                'unidad_medida_idunidad_medida': request.form['unidadMedidaProducto'],
-                'presentacion': request.form['presentacion'],
-                'cantidad_stock': request.form['cantidad_stock'],
-                'precio_unitario': request.form['precio']
+                'codigo': codigo,
+                'nombre': nombre,
+                'descripcion': descripcion,
+                'categoria_idcategoria': categoria_id,
+                'unidad_medida_idunidad_medida': unidad_medida_id,
+                'presentacion': presentacion,
+                'cantidad_stock': cantidad_stock,
+                'precio_unitario': precio_unitario
             }
 
             # Usamos el método del modelo para actualizar el producto
             producto = Productos.actualizar_producto(id, datos_actualizados)
             if producto:
-                flash('Producto actualizado correctamente.', 'success')
+                return jsonify({'success': True, 'message': 'Producto actualizado correctamente.'}), 200
             else:
-                flash('Producto no encontrado.', 'danger')
+                return jsonify({'success': False, 'errors': {'general': 'Producto no encontrado.'}}), 404
 
         except Exception as e:
-            flash(f'Error al actualizar producto: {str(e)}', 'danger')
+            return jsonify({'success': False, 'errors': {'general': f'Error al actualizar producto: {str(e)}'}}), 500
 
-        return redirect(url_for('productos_ver'))
 
     
     #---------------

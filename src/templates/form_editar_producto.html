@@ -57,18 +57,22 @@
 {% if producto %}
 <div class="container mt-5">
     <h2>Editar Producto</h2>
-    <form action="{% if producto %}{{ url_for('actualizar_producto', id=producto.idproductos) }}{% else %}#{% endif %}" method="POST">
+    <div id="mensajeErrorGeneral" class="text-danger"></div>
+    <form id="formEditarProducto">
         <div class="mb-3">
             <label for="codigoProducto" class="form-label">Código</label>
             <input type="text" class="form-control" id="codigoProducto" name="codigo" value="{{ producto['codigo'] if producto else '' }}" required>
+            <div id="codigoProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="nombreProducto" class="form-label">Nombre</label>
             <input type="text" class="form-control" id="nombreProducto" name="nombre" value="{{ producto['nombre'] if producto else '' }}" required>
+            <div id="nombreProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="descripcionProducto" class="form-label">Descripción</label>
             <textarea class="form-control" id="descripcionProducto" name="descripcion" required>{{ producto['descripcion'] if producto else '' }}</textarea>
+            <div id="descripcionProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="categoriaProducto" class="form-label">Categoría</label>
@@ -77,10 +81,12 @@
                     <option value="{{ categoria['idcategoria'] }}" {% if producto and producto.categoria_idcategoria == categoria.idcategoria %}selected{% endif %}>{{ categoria.nombre }}</option>
                 {% endfor %}
             </select>
+            <div id="categoriaProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="precioProducto" class="form-label">Precio</label>
             <input type="number" class="form-control" id="precioProducto" name="precio" value="{{ producto['precio_unitario'] if producto else '' }}" required>
+            <div id="precioProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="unidadMedidaProducto" class="form-label">Unidad de Medida</label>
@@ -102,15 +108,18 @@
                     </optgroup>
                 {% endfor %}
             </select>
+            <div id="unidadMedidaProductoError" class="text-danger"></div>
         </div>
         
         <div class="mb-3">
             <label for="presentacionProducto" class="form-label">Presentación</label>
             <input type="text" class="form-control" id="presentacionProducto" name="presentacion" value="{{ producto['presentacion'] if producto else '' }}" required>
+            <div id="presentacionProductoError" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="cantidadStockProducto" class="form-label">Cantidad en Stock</label>
             <input type="number" class="form-control" id="cantidadStockProducto" name="cantidad_stock" value="{{ producto['cantidad_stock'] if producto else '' }}" required>
+            <div id="cantidadStockProductoError" class="text-danger"></div>
         </div>
         <button type="submit" class="btn btn-primary form-control-sm">Guardar Cambios</button>
     </form>
@@ -132,6 +141,85 @@
         <input type="hidden" name="idProducto" value="{{ producto['idproductos'] }}">
         <button type="button" class="btn btn-danger" onclick="confirmarEliminarProducto()">Eliminar Producto</button>
     </form>
+
+    <script>
+        $(document).ready(function () {
+            $('#formEditarProducto').on('submit', function (event) {
+                event.preventDefault(); // Evita el envío tradicional del formulario
+        
+                // Serializar los datos del formulario
+                var formData = $(this).serialize();
+        
+                // Enviar datos con AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/productos_actualizar/{{ producto.idproductos }}', // Usa el ID del producto para la ruta
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message); // Mensaje de éxito
+                            window.location.href = '/productos_ver'; // Redirige a la lista de productos
+                        }
+                    },
+                    error: function (xhr) {
+                        // Limpiar mensajes de error previos
+                        $('#codigoProductoError').text('');
+                        $('#nombreProductoError').text('');
+                        $('#descripcionProductoError').text('');
+                        $('#categoriaProductoError').text('');
+                        $('#precioProductoError').text('');
+                        $('#unidadMedidaProductoError').text('');
+                        $('#presentacionProductoError').text('');
+                        $('#cantidadStockProductoError').text('');
+                        $('#mensajeErrorGeneral').text('');
+
+                        console.log(xhr.responseJSON); // Esto imprimirá los errores en la consola
+
+        
+                        // Procesar errores específicos y mostrar mensajes en el HTML
+                        const errores = xhr.responseJSON ? xhr.responseJSON.errors : {};
+        
+                        // Mostrar mensajes de error específicos
+                        if (errores.codigo) {
+                            $('#codigoProductoError').text(errores.codigo);
+                        }
+                        if (errores.nombre) {
+                            $('#nombreProductoError').text(errores.nombre);
+                        }
+                        if (errores.descripcion) {
+                            $('#descripcionProductoError').text(errores.descripcion);
+                        }
+                        if (errores.categoria_id) {
+                            $('#categoriaProductoError').text(errores.categoria_id);
+                        }
+                        if (errores.precio) {
+                            $('#precioProductoError').text(errores.precio);
+                        }
+                        if (errores.unidadMedidaProducto) {
+                            $('#unidadMedidaProductoError').text(errores.unidadMedidaProducto);
+                        }
+                        if (errores.presentacion) {
+                            $('#presentacionProductoError').text(errores.presentacion);
+                        }
+                        if (errores.cantidad_stock) {
+                            $('#cantidadStockProductoError').text(errores.cantidad_stock);
+                        }
+        
+                        // Mostrar mensaje de error general si existen otros errores
+                        if (Object.keys(errores).length > 0) {
+                            $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
+                        } else {
+                            $('#mensajeErrorGeneral').text('Ocurrió un error inesperado. Inténtalo nuevamente.');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+        
 
     <script>
         function confirmarEliminarProducto() {
