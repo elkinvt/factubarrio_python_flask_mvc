@@ -66,8 +66,8 @@ class Productos_Controller(FlaskController):
             # Validación de Descripción
             if not descripcion:
                 errores['descripcionProducto'] = 'La descripción es obligatoria.'
-            elif len(descripcion) > 250:
-                errores['descripcionProducto'] = 'La descripción no debe exceder los 250 caracteres.'
+            elif len(descripcion) <3 or len(descripcion) > 250:
+                errores['descripcionProducto'] = 'la descripcion debe tener entre 3 y 50 caracteres.'
 
             # Validación de Precio
             try:
@@ -226,10 +226,14 @@ class Productos_Controller(FlaskController):
             # Validación de Nombre
             if not nombre:
                 errores['nombre'] = 'El nombre es obligatorio.'
+            elif len(nombre) < 3 or len(nombre) > 50:
+                errores['nombre'] = 'El nombre debe tener entre 3 y 50 caracteres.'
 
             # Validación de Descripción
             if not descripcion:
-                errores['descripcion'] = 'La descripción es obligatoria.'
+                errores['descripcionProducto'] = 'La descripción es obligatoria.'
+            elif len(descripcion) <3 or len(descripcion) > 250:
+                errores['descripcion'] = 'la descripcion debe tener entre 3 y 50 caracteres.'
 
             # Validación de Categoría y Unidad de Medida
             if not Categoria.existe_categoria(categoria_id):

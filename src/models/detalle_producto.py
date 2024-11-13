@@ -26,7 +26,7 @@ class DetalleProducto(Base):
     def __repr__(self):
         return f'<DetalleProducto Factura {self.factura_id} Producto {self.productos_idproductos}>'
     
-     # Método estático para agregar productos al detalle de la factura
+    # Método estático para agregar productos al detalle de la factura
     @staticmethod
     def agregar_detalles(factura_id, productos):
         with db_session_manager() as session:

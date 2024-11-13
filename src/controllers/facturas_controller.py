@@ -24,23 +24,47 @@ class Facturas_Controller(FlaskController):
     def generar_factura():
         if request.method == 'POST':
             try:
+
+                # Depuración: Imprimir todos los datos recibidos desde el formulario
+                print("Datos recibidos desde el formulario:", request.form)
                 
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
                 vendedores_idvendedores = request.form.get('vendedorFactura')
                 productos = json.loads(request.form.get('productosFactura'))
-            
+
+                # Validación del cliente y vendedor
+                if not clientes_idclientes:
+                    return jsonify({"error": "Debe seleccionar un cliente válido."}), 400
+                if not vendedores_idvendedores:
+                    return jsonify({"error": "Debe seleccionar un vendedor válido."}), 400
+
+                # Validación de productos
+                if not productos or not isinstance(productos, list):
+                    return jsonify({"error": "Debe agregar al menos un producto a la factura."}), 400
+                for item in productos: 
+                    if 'precio' not in item or 'cantidad' not in item:
+                        return jsonify({"error": "Cada producto debe tener un precio y una cantidad."}), 400
+                    if float(item['precio']) <= 0 or float(item['precio']) > 20000000:
+                        return jsonify({"error": f"El precio de {item['producto']} debe ser mayor a cero y menor a 20,000,000."}), 400
+                    if int(item['cantidad']) <= 0:
+                        return jsonify({"error": "La cantidad de cada producto debe ser mayor a cero."}), 400
+
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
                 impuesto = total_valor * 0.19  # Impuesto del 19%
                 descuento = float(request.form.get('descuentoFactura', 0))
+                if descuento < 0 or descuento > total_valor:
+                    return jsonify({"error": "El descuento no puede ser negativo ni mayor al subtotal."}), 400
                 total_final = total_valor + impuesto - descuento
 
                 # Recibir los valores de pago y calcular el cambio
-                monto_pagado = float(request.form.get('monto_pagado'))
+                monto_pagado = float(request.form.get('monto_pagado', 0))
+                if monto_pagado <= 0:
+                    return jsonify({"error": "Debe ingresar un monto pagado mayor a cero."}), 400
                 if monto_pagado < total_final:
-                    raise ValueError("El monto pagado es insuficiente para cubrir el total de la factura.")
-                
+                    return jsonify({"error": "El monto pagado es insuficiente para cubrir el total de la factura."}), 400
+                    
                 cambio = monto_pagado - total_final
 
                 # Crear la factura usando el método del modelo
@@ -58,19 +82,22 @@ class Facturas_Controller(FlaskController):
                 )
 
                 if not nueva_factura:
-                    flash('Error al crear la factura', 'danger')
-                    return redirect(url_for('generar_factura'))
+                    return jsonify({"error": "Error al crear la factura."}), 500
+                
 
                 # Agregar detalles de los productos
                 if not DetalleProducto.agregar_detalles(nueva_factura['id'], productos):
-                    flash('Error al agregar productos a la factura', 'danger')
-                    return redirect(url_for('generar_factura'))
+                    return jsonify({"error": "Error al agregar productos a la factura."}), 500
+                    
 
-                flash('Factura creada exitosamente', 'success')
-                return redirect(url_for('generar_factura'))
+                return jsonify({
+                    "success": True,
+                    "message": "Factura creada exitosamente",
+                    "cambio": cambio
+                }), 200
 
             except Exception as e:
-                flash(f'Error al crear la factura: {str(e)}', 'danger')
+                return jsonify({"error": f"Error al crear la factura: {str(e)}"}), 500
 
           
         # GET: Cargar datos para el formulario
