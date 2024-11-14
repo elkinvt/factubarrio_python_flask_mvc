@@ -81,12 +81,13 @@
     </form>
 
     <!-- Eliminar Vendedor -->
-    <form id="eliminarVendedorForm" action="/vendedores_eliminar" method="POST" class="mt-2" onsubmit="return confirmarEliminacion();">
+    <form id="eliminarVendedorForm"  class="mt-2">
         <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
         <input type="hidden" name="numeroDocumento" value="{{ vendedor.numero_documento }}">
         <button type="submit" class="btn btn-danger">Eliminar Vendedor</button>
     
     </form>
+    <div id="eliminarvendedorMensaje" class="mt-2"></div>
 
     <script>
         $(document).ready(function () {
@@ -153,11 +154,61 @@
     </script>
 
     <script>
-        function confirmarEliminacion() {
-            // Mostrar el mensaje de confirmación
-            return confirm("¿Estás seguro de que deseas eliminar este vendedor?");
-        }
+        $(document).ready(function () {
+            $('#eliminarVendedorForm').on('submit', function (event) {
+                event.preventDefault(); // Evitar el envío estándar del formulario
+        
+                // Solicitar confirmación al usuario
+                if (!confirm("¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se puede deshacer.")) {
+                    // Si el usuario cancela, no hace nada
+                    return;
+                }
+        
+                // Serializar datos del formulario
+                var formData = $(this).serialize();
+        
+                // Limpiar mensajes de error previos
+                $('#eliminarvendedorMensaje').empty();
+        
+                // Enviar datos al backend con AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/vendedores_eliminar',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        // Mostrar mensaje de éxito
+                        $('#eliminarvendedorMensaje').html(`<p class="text-success">${response.message}</p>`);
+                        
+                        // Opcional: redirigir después de eliminar para actualizar la lista de vendedores
+                        setTimeout(function() {
+                            window.location.href = '/vendedores_ver'; // Redirige a la lista de clientes
+                        }, 1500);
+                    },
+                    error: function (xhr) {
+                        const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+        
+                        // Mostrar mensajes de error específicos
+                        if (errores.tipoDocumento) {
+                            $('#eliminarvendedorMensaje').append(`<p class="text-danger">${errores.tipoDocumento}</p>`);
+                        }
+                        if (errores.numeroDocumento) {
+                            $('#eliminarvendedorMensaje').append(`<p class="text-danger">${errores.numeroDocumento}</p>`);
+                        }
+        
+                        // Mostrar mensaje de error general si no hay errores específicos
+                        if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
+                            $('#eliminarvendedorMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);
+                        } else if (Object.keys(errores).length === 0) {
+                            $('#eliminarvendedorMensaje').html('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
+                        }
+                    }
+                });
+            });
+        });
     </script>
+
+    
 
     
 </div>

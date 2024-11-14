@@ -196,24 +196,40 @@ class Vendedores_Controller(FlaskController):
     # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
     def eliminar_vendedor():
-        numero_documento = request.form.get('numeroDocumento')
         tipo_documento = request.form.get('tipoDocumento')
+        numero_documento = request.form.get('numeroDocumento')
         
+         # Validaciones y mensajes de error
+        errores = {}
+
+         # Validación del tipo de documento
+        if not tipo_documento:
+            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+        elif not tipo_documento.isalpha():
+            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
+
+        # Validación del número de documento
+        if not numero_documento:
+            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
+        elif not numero_documento.isdigit():
+            errores['numeroDocumento'] = 'Debe contener solo números.'
+        elif len(numero_documento) < 6 or len(numero_documento) > 12:
+            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
+
+        # Si hay errores, devolvemos JSON con errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de eliminación del vendedor
         try:
-            # Buscar el cliente usando el método del modelo (sin necesidad de manejar la sesión)
-            vendedor = Vendedores.eliminar_vendedor_logicamente(tipo_documento, numero_documento)
-
-            if vendedor:
-                flash('Vendedor eliminado correctamente.', 'success')
+            if Vendedores.eliminar_vendedor_logicamente(tipo_documento, numero_documento):
+                 return jsonify({'success': True, 'message': 'vendedor eliminado correctamente.'}), 200
             else:
-                flash('Vendedor no encontrado o ya eliminado.', 'danger')
+                return jsonify({'success': False, 'message': 'vendedor no encontrado o ya eliminado.'}), 404
         except Exception as e:
-            flash(f'Error al eliminar el vendedor: {str(e)}', 'danger')
+            return jsonify({'success': False, 'message': f'Error al eliminar el vendedor: {str(e)}'}), 500
 
-        # Redirigir a la página donde se ven todos los vendedores
-        return redirect(url_for('vendedores_ver'))
-
-    
+        
     #-----------
 
     #Ruta para validar los datos de un cliente
