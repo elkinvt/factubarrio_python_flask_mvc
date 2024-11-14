@@ -29,8 +29,14 @@ class Vendedores_Controller(FlaskController):
 
             # Validaciones y mensajes de error
             errores = {}
+
+            # Validación del tipo de documento
             if not tipo_documento:
                 errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+            elif not tipo_documento.isalpha():
+                errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
+
+             # Validación del número de documento
             if not numero_documento:
                 errores['numeroDocumento'] = 'El número de documento es obligatorio.'
             elif not numero_documento.isdigit():
@@ -38,11 +44,13 @@ class Vendedores_Controller(FlaskController):
             elif len(numero_documento) < 6 or len(numero_documento) > 15:
                 errores['numeroDocumento'] = 'Debe tener entre 6 y 15 dígitos.'
             
+            # Validación del nombre completo
             if not nombre_completo:
                 errores['nombrevendedor'] = 'El nombre es obligatorio.'
             elif len(nombre_completo) < 3 or len(nombre_completo) > 50:
                 errores['nombrevendedor'] = 'Debe tener entre 3 y 50 caracteres.'
-
+            
+             # Validación del teléfono
             if not telefono:
                 errores['telefonoVendedor'] = 'El teléfono es obligatorio.'
             elif not telefono.isdigit():
@@ -50,11 +58,13 @@ class Vendedores_Controller(FlaskController):
             elif len(telefono) < 10:
                 errores['telefonoVendedor'] = 'Debe tener al menos 10 dígitos.'
 
+            # Validación de la dirección
             if not direccion:
                 errores['direccionVendedor'] = 'La dirección es obligatoria.'
             elif len(direccion) < 10:
                 errores['direccionVendedor'] = 'Debe tener al menos 10 caracteres.'
 
+            # Validación del email
             if not email:
                 errores['emailVendedor'] = 'El email es obligatorio.'
             elif "@" not in email or "." not in email.split("@")[-1]:

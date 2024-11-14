@@ -201,17 +201,43 @@ class Clientes_Controller(FlaskController):
     # Ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
     def toggle_estado_cliente():
-        tipo_documento = request.form['tipoDocumento']
-        numero_documento = request.form['numeroDocumento']
+        tipo_documento = request.form.get('tipoDocumento')
+        numero_documento = request.form.get('numeroDocumento')
 
-        nuevo_estado = Clientes.actualizar_estado(tipo_documento, numero_documento)
+        # Validaciones y mensajes de error
+        errores = {}
 
-        if nuevo_estado is not None:
-            flash(f'Cliente {"activado" if nuevo_estado else "desactivado"} con éxito.', 'success')
-        else:
-            flash('Cliente no encontrado.', 'danger')
+        # Validación del tipo de documento
+        if not tipo_documento:
+            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+        elif not tipo_documento.isalpha():
+            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
 
-        return redirect(url_for('clientes_editar', tipoDocumento=tipo_documento, numeroDocumento=numero_documento))
+        # Validación del número de documento
+        if not numero_documento:
+            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
+        elif not numero_documento.isdigit():
+            errores['numeroDocumento'] = 'Debe contener solo números.'
+        elif len(numero_documento) < 6 or len(numero_documento) > 12:
+            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
+
+        # Si hay errores, devolvemos JSON con errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de actualización del estado
+        try:
+            nuevo_estado = Clientes.actualizar_estado(tipo_documento, numero_documento)
+            
+            if nuevo_estado is None:
+                return jsonify({'success': False, 'message': 'Cliente no encontrado.'}), 404
+            
+            estado_texto = 'activado' if nuevo_estado else 'desactivado'
+            return jsonify({'success': True, 'message': f'Cliente {estado_texto} con éxito.'}), 200
+        
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Ocurrió un error al intentar cambiar el estado del cliente: {str(e)}'}), 500
+
 
     #----------
 
@@ -221,19 +247,38 @@ class Clientes_Controller(FlaskController):
         tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')
 
+        # Validaciones y mensajes de error
+        errores = {}
+
+        # Validación del tipo de documento
+        if not tipo_documento:
+            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
+        elif not tipo_documento.isalpha():
+            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
+
+        # Validación del número de documento
+        if not numero_documento:
+            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
+        elif not numero_documento.isdigit():
+            errores['numeroDocumento'] = 'Debe contener solo números.'
+        elif len(numero_documento) < 6 or len(numero_documento) > 12:
+            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
+
+        # Si hay errores, devolvemos JSON con errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de eliminación del cliente
         try:
-
             if Clientes.eliminar_cliente_logicamente(tipo_documento, numero_documento):
-                flash('Cliente eliminado correctamente.', 'success')
+                return jsonify({'success': True, 'message': 'Cliente eliminado correctamente.'}), 200
             else:
-                flash('Cliente no encontrado o ya eliminado.', 'danger')
+                return jsonify({'success': False, 'message': 'Cliente no encontrado o ya eliminado.'}), 404
         except Exception as e:
-            flash(f'Error al eliminar el cliente: {str(e)}', 'danger')
-
-        return redirect(url_for('clientes_ver'))
-
+            return jsonify({'success': False, 'message': f'Error al eliminar el cliente: {str(e)}'}), 500
 
     #-----------
+
 
     # Ruta para buscar cliente por numero de documento
     @app.route('/buscar_clientes_por_numero_documento')
