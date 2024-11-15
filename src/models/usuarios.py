@@ -58,9 +58,6 @@ class Usuarios(Base):
         with db_session_manager() as session:
 
             usuario = session.query(Usuarios).filter_by(id_usuario=usuario_id).first()
-            
-
-
             if not usuario:
                 raise ValueError("usuario no encontrado")
 
@@ -72,7 +69,7 @@ class Usuarios(Base):
             return usuario
     #--------------
 
-     # Método estático para actualizar estado del usuario
+    # Método estático para actualizar estado del usuario
     @staticmethod
     def actualizar_estado(nombres_usuario):
         """Toggle de estado de usuario"""

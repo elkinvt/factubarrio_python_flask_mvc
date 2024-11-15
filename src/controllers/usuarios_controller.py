@@ -2,7 +2,7 @@ from src.app import app
 from flask import render_template, request, url_for, flash,redirect, jsonify
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios  
-from src.models import db_session_manager
+import re
 
 class Usuarios_Controller(FlaskController):
 
@@ -183,20 +183,39 @@ class Usuarios_Controller(FlaskController):
             return jsonify({'exists': False})
 
     #---------
+
     # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])
     def toggle_estado_usuario():
-        nombres_usuario = request.form['nombreUsuario']
+        nombre_usuario = request.form.get('nombreUsuario')
+        #print("Nombre de usuario recibido:", nombre_usuario)
+
+        # Validaciones y mensajes de error
+        errores = {}
+
+        # Validación del nombre de usuario
+        if not nombre_usuario:
+            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
+        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
+            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
+
+
+        # Si hay errores, devolvemos JSON con errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de actualización del estado
+        try:
+            nuevo_estado = Usuarios.actualizar_estado(nombre_usuario)
+            
+            if nuevo_estado is None:
+                return jsonify({'success': False, 'message': 'Usuario no encontrado.'}), 404
+            
+            estado_texto = 'activado' if nuevo_estado else 'desactivado'
+            return jsonify({'success': True, 'message': f'Usuario {estado_texto} con éxito.'}), 200
         
-
-        nuevo_estado = Usuarios.actualizar_estado(nombres_usuario)
-
-        if nuevo_estado is not None:
-            flash(f'Usuario {"activado" if nuevo_estado else "desactivado"} con éxito.', 'success')
-        else:
-            flash('Usuario no encontrado.', 'danger')
-
-        return redirect(url_for('usuarios_editar', nombre=nombres_usuario))
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Ocurrió un error al intentar cambiar el estado del usuario: {str(e)}'}), 500
 
     #----------
 

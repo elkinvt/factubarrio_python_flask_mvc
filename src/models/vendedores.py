@@ -98,14 +98,14 @@ class Vendedores(Base):
         with db_session_manager() as session:
             errores = {}
 
-            # Validar duplicado de número de documento, excluyendo el cliente actual si cliente_id está presente
+            # Validar duplicado de número de documento, excluyendo el vendedor actual si vendedor_id está presente
             if numero_documento:
                 vendedor_doc= session.query(Vendedores).filter_by(numero_documento=numero_documento).first()
                 if vendedor_doc and (vendedor_id is not None and vendedor_doc.idvendedores != int(vendedor_id)):
                     errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
 
 
-            # Validar duplicado de email, excluyendo el cliente actual si cliente_id está presente   
+            # Validar duplicado de email, excluyendo el vendedor actual si vendedor_id está presente   
             if email:
                 vendedor_email = session.query(Vendedores).filter_by(email=email).first()
                 if vendedor_email and (vendedor_id is not None and vendedor_email.idvendedores != int(vendedor_id)):

@@ -232,7 +232,7 @@ class Vendedores_Controller(FlaskController):
         
     #-----------
 
-    #Ruta para validar los datos de un cliente
+    #Ruta para validar los datos de un vendedor
     @app.route('/validar_vendedor', methods=['POST'])
     def validar_vendedor():
         data = request.get_json()
