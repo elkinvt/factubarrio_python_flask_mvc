@@ -113,13 +113,15 @@
         <input type="hidden" name="tipoDocumento" value="{{ cliente['tipo_documento'] }}">
         <button type="submit" class="btn btn-danger">Eliminar Cliente</button>
     </form>
-    <div id="eliminarClienteMensaje" class="mt-2"></div>+
+    <div id="eliminarClienteMensaje" class="mt-2"></div>
 
 </div>
 
+<script src="{{ url_for('static', filename='js/clientes/editar_cliente.js') }}"></script>
+
 {% endif %}
 
-<script src="{{ url_for('static', filename='js/clientes/editar_cliente.js') }}"></script>
+
 
 {% endblock %}
 
