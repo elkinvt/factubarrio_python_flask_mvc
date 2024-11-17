@@ -121,6 +121,7 @@ class Clientes(Base):
             } for cliente in session.query(Clientes)
                 .filter(Clientes.numero_documento.ilike(f"%{query}%"))
                 .all()]
+        
     #-----------
 
     # Método estático para validar duplicaciones del cliente
@@ -132,13 +133,13 @@ class Clientes(Base):
             # Validar duplicado de número de documento, excluyendo el cliente actual si cliente_id está presente
             if numero_documento:
                 cliente_doc = session.query(Clientes).filter_by(numero_documento=numero_documento).first()
-                if cliente_doc and (cliente_id is not None and cliente_doc.idclientes != int(cliente_id)):
+                if cliente_doc and (cliente_id is None or cliente_doc.idclientes != int(cliente_id)):
                     errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
 
             # Validar duplicado de email, excluyendo el cliente actual si cliente_id está presente
             if email:
                 cliente_email = session.query(Clientes).filter_by(email=email).first()
-                if cliente_email and (cliente_id is not None and cliente_email.idclientes != int(cliente_id)):
+                if cliente_email and (cliente_id is None or cliente_email.idclientes != int(cliente_id)):
                     errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
 
             return errores

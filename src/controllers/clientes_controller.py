@@ -18,7 +18,6 @@ class Clientes_Controller(FlaskController):
     def clientes_crear():
         if request.method == 'GET':
             return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
-        
         if request.method == 'POST':
             tipo_documento = request.form['tipoDocumento']
             numero_documento = request.form['numeroDocumento']
