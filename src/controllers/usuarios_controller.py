@@ -219,25 +219,34 @@ class Usuarios_Controller(FlaskController):
 
     #----------
 
-    # Ruta para eliminar usuario (lógica)
+   # Ruta para eliminar usuario (lógica)
     @app.route('/usuario_eliminar', methods=['POST'])
     def eliminar_usuario():
-        nombres_usuario = request.form.get('nombreUsuario')
+        nombre_usuario = request.form.get('nombreUsuario')
 
-        if not nombres_usuario:
-            flash('Error: Nombre de usuario no proporcionado.', 'danger')
-            return redirect(url_for('usuarios_ver'))
+        # Validaciones y mensajes de error
+        errores = {}
 
+        # Validación del nombre de usuario
+        if not nombre_usuario:
+            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
+        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
+            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
+
+        # Si hay errores, devolvemos JSON con errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de eliminación lógica del usuario
         try:
-
-            if Usuarios.eliminar_usuario_logicamente(nombres_usuario):
-                flash('usuario eliminado correctamente.', 'success')
-            else:
-                flash('usuario no encontrado o ya eliminado.', 'danger')
+            eliminado = Usuarios.eliminar_usuario_logicamente(nombre_usuario)
+            
+            if not eliminado:
+                return jsonify({'success': False, 'message': 'Usuario no encontrado o ya eliminado.'}), 404
+            
+            return jsonify({'success': True, 'message': 'Usuario eliminado correctamente.'}), 200
+        
         except Exception as e:
-            flash(f'Error al eliminar el usuario: {str(e)}', 'danger')
-
-        return redirect(url_for('usuarios_ver'))
-
+            return jsonify({'success': False, 'message': f'Ocurrió un error al intentar eliminar el usuario: {str(e)}'}), 500
 
     #-----------

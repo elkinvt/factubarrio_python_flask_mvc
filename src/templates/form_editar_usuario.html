@@ -83,13 +83,11 @@
     <div id="toggleEstadoUsuarioMensaje" class="mt-2"></div>
 
    <!-- Eliminar usuario -->
-    <form id="eliminarUsuarioForm" action="/usuario_eliminar" method="POST" class="mt-2">
+    <form id="eliminarUsuarioForm"  class="mt-2">
         <input type="hidden" name="nombreUsuario" value="{{ usuario['nombres_usuario'] }}">
-        <button type="button" class="btn btn-danger" onclick="confirmarEliminarUsuario()">Eliminar usuario</button>
+        <button type="submit" class="btn btn-danger">Eliminar usuario</button>
     </form>
-
-
-
+    <div id="EliminarUsuarioMensaje" class="mt-2"></div>
 
     <script>
         $(document).ready(function () {
@@ -152,7 +150,6 @@
         });
     </script>
 
-
     <script>
             // AJAX para verificar el email en tiempo real
             function verificarEmail(email) {
@@ -171,7 +168,6 @@
                 });
         }
     </script>
-
 
     <script>
         $(document).ready(function () {
@@ -223,22 +219,58 @@
     </script>
 
     <script>
-        // Confirmación antes de eliminar al usuario
-        function confirmarEliminarUsuario() {
-        const nombreUsuario = document.querySelector("input[name='nombreUsuario']");
-        
-        if (nombreUsuario) {
-            console.log("Nombre de usuario a eliminar:", nombreUsuario.value);
-            alert("Nombre de usuario a eliminar: " + nombreUsuario.value);  // Verifica el valor
-        } else {
-            console.log("El elemento con name='nombreUsuario' no se encontró.");
-        }
+        $(document).ready(function () {
+            $('#eliminarUsuarioForm').on('submit', function (event) {
+                event.preventDefault(); // Evitar el envío estándar del formulario
 
-        if (confirm("¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.")) {
-            document.getElementById('eliminarUsuarioForm').submit();
-        }
-    }
+                // Solicitar confirmación al usuario
+                if (!confirm("¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.")) {
+                    // Si el usuario cancela, no hace nada
+                    return;
+                }
+
+                // Serializar datos del formulario
+                var formData = $(this).serialize();
+
+                // Limpiar mensajes de error previos
+                $('#EliminarUsuarioMensaje').empty();
+
+                // Enviar datos al backend con AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: '/usuario_eliminar',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        // Mostrar mensaje de éxito
+                        $('#EliminarUsuarioMensaje').html(`<p class="text-success">${response.message}</p>`);
+
+                        // Opcional: redirigir después de eliminar para actualizar la lista de usuarioss
+                        setTimeout(function() {
+                            window.location.href = '/usuarios_ver'; // Redirige a la lista de usuarios
+                        }, 1500);
+                    },
+                    error: function (xhr) {
+                        const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+
+                        // Mostrar mensajes de error específicos
+                        if (errores.nombreUsuario) {
+                            $('#EliminarUsuarioMensaje').append(`<p class="text-danger">${errores.nombreUsuario}</p>`);
+                        }
+
+                        // Mostrar mensaje de error general si no hay errores específicos
+                        if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
+                            $('#EliminarUsuarioMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);
+                        } else if (Object.keys(errores).length === 0) {
+                            $('#EliminarUsuarioMensaje').html('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
+                        }
+                    }
+                });
+            });
+        });
     </script>
+
+    
 
 
 </div>
