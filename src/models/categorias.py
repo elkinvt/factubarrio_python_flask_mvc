@@ -43,3 +43,5 @@ class Categoria(Base):
                 return categoria_existe
             except Exception as e:
                 raise e
+            
+    #-----------

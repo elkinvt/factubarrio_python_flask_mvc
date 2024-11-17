@@ -42,6 +42,7 @@ class Vendedores(Base):
             session.add(vendedor)
             session.commit()  # Confirma los cambios
             return vendedor
+        
     #------------------
     
     # Método estático para buscar un vendedor usando una sesión existente
@@ -70,6 +71,7 @@ class Vendedores(Base):
 
             session.commit()  # Confirma los cambios en la base de datos
             return vendedor
+        
     #--------------
 
     #Metodo estatico para buscar vendedor por id

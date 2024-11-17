@@ -97,11 +97,13 @@
     <form id="toggleEstadoClienteForm" class="mt-3">
         <input type="hidden" name="numeroDocumento" value="{{ cliente['numero_documento'] }}">
         <input type="hidden" name="tipoDocumento" value="{{ cliente['tipo_documento'] }}">
-        <button type="submit" class="btn btn-warning mb-2"> {% if cliente['is_active'] %}
-            Desactivar cliente
-        {% else %}
-            Activar cliente
-        {% endif %}</button>
+        <button type="submit" class="btn btn-warning mb-2"> 
+            {% if cliente['is_active'] %}
+                Desactivar cliente
+            {% else %}
+                Activar cliente
+            {% endif %}
+        </button>
     </form>
     <div id="toggleEstadoClienteMensaje" class="mt-2"></div>
 

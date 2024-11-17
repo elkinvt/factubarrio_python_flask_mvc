@@ -97,7 +97,6 @@ class Vendedores_Controller(FlaskController):
     
     #------------
 
-   
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
     def vendedores_editar():
@@ -188,11 +187,9 @@ class Vendedores_Controller(FlaskController):
             return jsonify({'success': True, 'message': 'vendedor actualizado con éxito'}), 200
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error al actualizar vendedor: {str(e)}'}), 500
-
-        
+  
     #------------------
     
-   
     # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
     def eliminar_vendedor():
@@ -228,8 +225,7 @@ class Vendedores_Controller(FlaskController):
                 return jsonify({'success': False, 'message': 'vendedor no encontrado o ya eliminado.'}), 404
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error al eliminar el vendedor: {str(e)}'}), 500
-
-        
+  
     #-----------
 
     #Ruta para validar los datos de un vendedor

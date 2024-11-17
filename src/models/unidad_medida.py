@@ -35,11 +35,10 @@ class UnidadMedida(Base):
             except Exception as e:
                 print(f"Error en obtener_todas_con_subunidades: {e}")
                 return [], []
-                
-            
-           
+                     
     #------------------
 
+    # Método para verificar unidad existe del producto
     @staticmethod
     def existe_unidad(id_unidad):
         with db_session_manager() as session:
@@ -49,3 +48,5 @@ class UnidadMedida(Base):
                 return unidad_existe
             except Exception as e:
                 raise e
+    
+    #----------

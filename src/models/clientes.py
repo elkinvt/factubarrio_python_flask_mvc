@@ -60,7 +60,6 @@ class Clientes(Base):
 
     #---------
 
-
     # Método estático para actualizar un cliente     
     @staticmethod
     def actualizar_cliente(cliente_id, datos_actualizados):
@@ -143,7 +142,6 @@ class Clientes(Base):
                     errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
 
             return errores
-
-
+        
         #--------
 

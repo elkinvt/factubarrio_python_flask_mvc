@@ -113,7 +113,6 @@ class Facturas_Controller(FlaskController):
     #--------------------------
 
     #Ruta para consultar las facturas
-
     @app.route('/facturas_por_fecha', methods=['GET'])
     def obtener_facturas_por_fecha():
         fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL

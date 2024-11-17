@@ -111,7 +111,6 @@
                     error: function (xhr) {
                         const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
 
-
                         // Limpiar mensajes de error previos
                         $('#nombreVendedorError').text('');
                         $('#numeroDocumentoError').text('');
@@ -207,10 +206,7 @@
             });
         });
     </script>
-
-    
-
-    
+   
 </div>
 {% endif %}
 

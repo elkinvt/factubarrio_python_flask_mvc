@@ -141,7 +141,6 @@ class Clientes_Controller(FlaskController):
         email = request.form['emailCliente']
         is_active = request.form['estadoCliente'].lower() == 'activo'
 
-
         # Diccionario de errores específicos por campo
         errores = {}
 
@@ -193,8 +192,7 @@ class Clientes_Controller(FlaskController):
             return jsonify({'success': True, 'message': 'Cliente actualizado con éxito'}), 200
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}), 500
-
-        
+  
     #--------------------
 
     
@@ -238,7 +236,6 @@ class Clientes_Controller(FlaskController):
         except Exception as e:
             return jsonify({'success': False, 'message': f'Ocurrió un error al intentar cambiar el estado del cliente: {str(e)}'}), 500
 
-
     #----------
 
     # Ruta para eliminar cliente (lógica)
@@ -279,14 +276,31 @@ class Clientes_Controller(FlaskController):
 
     #-----------
 
-
     # Ruta para buscar cliente por numero de documento
     @app.route('/buscar_clientes_por_numero_documento')
     def buscar_clientes_por_numero_documento():
-        query = request.args.get('q', '')
-        clientes_data = Clientes.buscar_por_numero_documento(query)
-        return jsonify(clientes_data)
-
+        query = request.args.get('q', '').strip()
+        
+        # Validar que el query no esté vacío
+        if not query:
+            return jsonify({'error': 'El número de documento es obligatorio.'}), 400
+        
+        # Validar el formato del query (solo números y longitud específica, por ejemplo)
+        if not query.isdigit() or len(query) < 5 or len(query) > 15:
+            return jsonify({'error': 'El número de documento debe contener entre 5 y 15 dígitos.'}), 400
+        
+        try:
+            # Buscar clientes en la base de datos
+            clientes_data = Clientes.buscar_por_numero_documento(query)
+            if not clientes_data:
+                return jsonify({'message': 'No se encontraron clientes con ese número de documento.'}), 404
+            
+            return jsonify(clientes_data)
+        
+        except Exception as e:
+            # Manejar errores internos
+            return jsonify({'error': f'Ocurrió un error: {str(e)}'}), 500
+        
     #------------------
 
     # Ruta para validar los datos de un cliente

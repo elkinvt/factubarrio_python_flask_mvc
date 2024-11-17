@@ -125,7 +125,7 @@
     </form>
 
     <!-- Activar/Desactivar Producto -->
-    <form action="/productos_toggle_estado" method="POST" class="mt-3">
+    <form id="toggleEstadoProductoForm" class="mt-3">
         <input type="hidden" name="idproducto" value="{{ producto.idproductos }}">
         <button type="submit" class="btn btn-warning mb-2">
             {% if producto['is_active'] %}
@@ -135,12 +135,14 @@
             {% endif %}
         </button>
     </form>
+    <div id="toggleEstadoProductoMensaje" class="mt-2"></div>
 
     <!-- Eliminar Producto -->
-    <form id="eliminarProductoForm" action="/productos_eliminar" method="POST" class="mt-2">
+    <form id="eliminarProductoForm"  class="mt-2">
         <input type="hidden" name="idProducto" value="{{ producto['idproductos'] }}">
-        <button type="button" class="btn btn-danger" onclick="confirmarEliminarProducto()">Eliminar Producto</button>
+        <button type="submit" class="btn btn-danger">Eliminar Producto</button>
     </form>
+    <div id="eliminarProductoMensaje" class="mt-2"></div>
 
     <script>
         $(document).ready(function () {
@@ -219,21 +221,131 @@
             });
         });
     </script>
-        
 
     <script>
-        function confirmarEliminarProducto() {
-            // Mostrar la alerta de confirmación
-            var confirmacion = confirm("¿Estás seguro de que deseas eliminar este producto?");
-            
-            // Si el usuario confirma, enviar el formulario
-            if (confirmacion) {
-                document.getElementById("eliminarProductoForm").submit();
-            }
-        }
+        $(document).ready(function() {
+            $('#toggleEstadoProductoForm').on('submit', function(event) {
+                event.preventDefault(); // Evitar la recarga de la página
+
+                // Obtener el formulario y sus datos
+                const form = $(this);
+                const formData = form.serialize(); // Serializar los datos del formulario
+
+                // Limpiar mensajes previos
+                $('#toggleEstadoProductoMensaje').html('');
+
+                $.ajax({
+                    type: 'POST', // Método HTTP
+                    url: '/productos_toggle_estado', // URL de la ruta en Flask
+                    data: formData, // Datos del formulario
+                    dataType: 'json', // Esperar respuesta JSON
+                    success: function(response) {
+                        if (response.success) {
+                            // Mostrar mensaje de éxito
+                            $('#toggleEstadoProductoMensaje').html(
+                                `<p class="text-success">${response.message}</p>`
+                            );
+
+                            // Cambiar el texto del botón según el nuevo estado
+                            const button = form.find('button');
+                            if (button.text().trim() === 'Desactivar Producto') {
+                                button.text('Activar Producto');
+                            } else {
+                                button.text('Desactivar Producto');
+                            }
+                        } else {
+                            // Mostrar mensaje de error
+                            $('#toggleEstadoProductoMensaje').html(
+                                `<p class="text-success"">${response.message}</p>`
+                            );
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 400) {
+                            // Mostrar errores de validación
+                            const errores = xhr.responseJSON.errores;
+                            let mensajeErrores = '<p class="text-success""><ul>';
+                            for (const campo in errores) {
+                                mensajeErrores += `<li>${errores[campo]}</li>`;
+                            }
+                            mensajeErrores += '</ul></p>';
+                            $('#toggleEstadoProductoMensaje').html(mensajeErrores);
+                        } else {
+                            // Mostrar error general
+                            $('#toggleEstadoProductoMensaje').html(
+                                `<p class="text-success"">Ocurrió un error inesperado. Inténtalo de nuevo.</p>`
+                            );
+                        }
+                    }
+                });
+            });
+        });
     </script>
 
+    <script>
+        $(document).ready(function() {
+            $('#eliminarProductoForm').on('submit', function(event) {
+                event.preventDefault(); // Evitar la recarga de la página
 
+                // Solicitar confirmación al usuario
+                if (!confirm("¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.")) {
+                    // Si el usuario cancela, no hace nada
+                    return;
+                }
+
+                // Obtener el formulario y sus datos
+                const form = $(this);
+                const formData = form.serialize(); // Serializar los datos del formulario
+
+                // Limpiar mensajes previos
+                $('#eliminarProductoMensaje').html('');
+
+                // Enviar datos al backend con AJAX
+                $.ajax({
+                    type: 'POST', // Método HTTP
+                    url: '/productos_eliminar', // URL de la ruta en Flask
+                    data: formData, // Datos del formulario
+                    dataType: 'json', // Esperar respuesta JSON
+                    success: function(response) {
+                        if (response.success) {
+                            // Mostrar mensaje de éxito
+                            $('#eliminarProductoMensaje').html(
+                                `<p class="text-success"">${response.message}</p>`
+                            );
+
+                            // Redirigir después de un tiempo si es necesario
+                            setTimeout(function() {
+                                window.location.href = '/productos_ver'; // Redirige a la lista de productos
+                            }, 1500);
+                        } else {
+                            // Mostrar mensaje de error
+                            $('#eliminarProductoMensaje').html(
+                                `<p class="text-success"">${response.message}</p>`
+                            );
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 400) {
+                            // Mostrar errores de validación
+                            const errores = xhr.responseJSON.errores;
+                            let mensajeErrores = '<p class="text-success""><ul>';
+                            for (const campo in errores) {
+                                mensajeErrores += `<li>${errores[campo]}</li>`;
+                            }
+                            mensajeErrores += '</ul></p>';
+                            $('#eliminarProductoMensaje').html(mensajeErrores);
+                        } else {
+                            // Mostrar error general
+                            $('#eliminarProductoMensaje').html(
+                                `<p class="text-success"">Ocurrió un error inesperado. Inténtalo de nuevo.</p>`
+                            );
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    
 </div>
 
 {% endif %}

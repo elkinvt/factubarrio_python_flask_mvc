@@ -60,7 +60,6 @@ class DetalleProducto(Base):
                 print(f"Error al agregar detalles: {str(e)}")
                 return False
            
-        
     #----------
 
    

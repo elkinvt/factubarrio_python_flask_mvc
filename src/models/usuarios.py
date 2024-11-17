@@ -82,6 +82,7 @@ class Usuarios(Base):
                 session.commit()
             return usuario.is_active
         return None
+    
     #--------
 
     # Método estático para eliminar un cliente 

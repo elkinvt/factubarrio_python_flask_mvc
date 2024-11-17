@@ -77,7 +77,6 @@
                      // Procesar errores específicos y mostrar mensajes en el HTML
                      const errores = xhr.responseJSON ? xhr.responseJSON.errores  : {};
 
-                   
                     // Limpiar mensajes de error previos
                     $('#tipoDocumentoError').text('');
                     $('#numeroDocumentoError').text('');
@@ -107,8 +106,6 @@
                         $('#emailVendedorError').text(errores.emailVendedor);
                     }
 
-                    
-
                     // Mostrar mensaje de error general si existen otros errores
                     if (Object.keys(errores).length > 0) {
                         $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
@@ -122,11 +119,6 @@
         });
     });
 </script>
-
-
-
-
-
 
 <!-- Código JavaScript para validacion de datos duplicados(numero_documento,email) del vendedor -->
 <script>

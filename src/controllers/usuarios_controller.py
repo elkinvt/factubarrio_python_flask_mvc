@@ -74,8 +74,6 @@ class Usuarios_Controller(FlaskController):
             except Exception as e:
                 return jsonify({'success': False, 'message': f'Error al crear usuario: {str(e)}'}), 500
 
-        
-    
     #-------------
 
     # Ruta para mostrar el formulario de edición de usuario (GET)
@@ -110,7 +108,6 @@ class Usuarios_Controller(FlaskController):
     @app.route('/usuarios_actualizar', methods=['POST'])
     def actualizar_usuarios():
 
-    
         usuario_id = request.form['usuarioId']
         nombre_usuario = request.form['nombreUsuario'].title()
         email = request.form['emailUsuario']
@@ -163,8 +160,7 @@ class Usuarios_Controller(FlaskController):
             return jsonify({'status': 'error', 'message': 'Usuario no encontrado.'}), 404
         except Exception as e:
             return jsonify({'status': 'error', 'message': f'Error al actualizar usuario: {str(e)}'}), 500
-
-        
+    
     #--------------------
 
     # Ruta para verificar el email del usuario
@@ -219,7 +215,7 @@ class Usuarios_Controller(FlaskController):
 
     #----------
 
-   # Ruta para eliminar usuario (lógica)
+    # Ruta para eliminar usuario (lógica)
     @app.route('/usuario_eliminar', methods=['POST'])
     def eliminar_usuario():
         nombre_usuario = request.form.get('nombreUsuario')

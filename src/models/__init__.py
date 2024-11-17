@@ -38,3 +38,5 @@ def to_dict(obj):
     except KeyError as e:
         print(f"KeyError en to_dict: {e}")
         raise
+
+#------------

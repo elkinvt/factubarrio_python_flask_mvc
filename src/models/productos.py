@@ -136,7 +136,6 @@ class Productos(Base):
             except Exception as e:
                 raise e  # Propaga la excepción para que la ruta pueda manejarla
             
-
     #--------------------
 
     # Método para eliminar(logica) el producto
@@ -221,6 +220,8 @@ class Productos(Base):
                 return producto_existe  # Retorna True si existe, False si no
             except Exception as e:
                 raise e  # Propaga la excepción para manejo externo
+            
+    #-------------
 
     
 

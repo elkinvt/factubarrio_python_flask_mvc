@@ -28,7 +28,6 @@ class Productos_Controller(FlaskController):
 
         return render_template('form_ver_producto.html', titulo_pagina="Ver Productos", productos=productos)
 
-    
     #-------------------
 
     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
@@ -289,52 +288,75 @@ class Productos_Controller(FlaskController):
         except Exception as e:
             return jsonify({'success': False, 'errors': {'general': f'Error al actualizar producto: {str(e)}'}}), 500
 
-
-    
     #---------------
 
-    # Ruta para activar o desactivar un Producto
+    # Ruta para actualizar el estado de un producto
     @app.route('/productos_toggle_estado', methods=['POST'])
     def toggle_estado_producto():
-        idproducto = request.form['idproducto']  # Recibimos el id del producto
+        id_producto = request.form.get('idproducto')  # Recibir el ID del producto desde el formulario
 
+        # Validaciones y mensajes de error
+        errores = {}
+
+        # Validación del ID del producto
+        if not id_producto:
+            errores['idproducto'] = 'El ID del producto es obligatorio.'
+        elif not id_producto.isdigit():
+            errores['idproducto'] = 'El ID del producto debe ser un número válido.'
+
+        # Si hay errores, devolvemos JSON con los errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+
+        # Intento de actualización del estado
         try:
-            # Llamamos al método del modelo para cambiar el estado del producto
-            nuevo_estado = Productos.toggle_estado(idproducto)
-            if nuevo_estado is not None:
-                
-                estado = 'activado' if nuevo_estado else 'desactivado'
-                flash(f'Producto {estado} con éxito.', 'success')
-            else:
-                flash('Producto no encontrado.', 'danger')
-        except Exception as e:
-            flash(f'Error al cambiar el estado del producto: {str(e)}', 'danger')
+            # Llamar al método del modelo para cambiar el estado
+            nuevo_estado = Productos.toggle_estado(int(id_producto))
+            
+            if nuevo_estado is None:
+                return jsonify({'success': False, 'message': 'Producto no encontrado.'}), 404
+            
+            estado_texto = 'activado' if nuevo_estado else 'desactivado'
+            return jsonify({'success': True, 'message': f'Producto {estado_texto} con éxito.'}), 200
         
-        return redirect(url_for('productos_ver'))
-    
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Ocurrió un error al intentar cambiar el estado del producto: {str(e)}'}), 500
+
     #------------------
     
-
     # Ruta para eliminar un producto (eliminación lógica)
     @app.route('/productos_eliminar', methods=['POST'])
     def eliminar_producto():
         id_producto = request.form['idProducto']  # Obtener el ID del producto desde el formulario
 
+         # Validaciones y mensajes de error
+        errores = {}
+
+        # Validación del ID del producto
+        if not id_producto:
+            errores['idproducto'] = 'El ID del producto es obligatorio.'
+        elif not id_producto.isdigit():
+            errores['idproducto'] = 'El ID del producto debe ser un número válido.'
+
+        # Si hay errores, devolvemos JSON con los errores
+        if errores:
+            return jsonify({'status': 'error', 'errores': errores}), 400
+        
+        # Intento de eliminacion logica
         try:
             # Usar el método en el modelo para obtener el producto por ID
             eliminado = Productos.eliminar_producto(id_producto)
             
             if eliminado:
-                
-                flash('Producto eliminado con éxito.', 'success')
+                # Producto eliminado con éxito
+                return jsonify({'success': True, 'message': 'Producto eliminado con éxito.'}), 200
             else:
-                flash('Producto no encontrado.', 'danger')
+                # Producto no encontrado
+                return jsonify({'success': False, 'message': 'Producto no encontrado.'}), 404
 
         except Exception as e:
-            flash(f'Error al eliminar el producto: {str(e)}', 'danger')
-
-
-        return redirect(url_for('productos_ver'))
+            # Error inesperado
+            return jsonify({'success': False, 'message': f'Error al eliminar el producto: {str(e)}'}), 500
     
     #------------------
     
