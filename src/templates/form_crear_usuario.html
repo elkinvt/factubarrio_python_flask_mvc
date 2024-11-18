@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Crear Usuario</h2>
-    <form  id = 'crear-usuario-form'>
+    <form  id = 'crear-usuario-form' action="{{ url_for('usuarios_crear') }}" method="POST">
         <div class="mb-3">
             <label for="nombre">Nombre de usuario:</label>
             <input type="text" class="form-control form-control-sm" id="nombre" name="nombre" placeholder="Ej. Juan Pérez" required>
@@ -37,65 +37,7 @@
     </form>
 </div>
 
-<script>
-    $(document).ready(function() {
-        $('#crear-usuario-form').on('submit', function(event) {
-            event.preventDefault(); // Evita el envío normal del formulario
-
-            // Limpiar mensajes de error previos
-            $('#nombreError').text('');
-            $('#emailError').text('');
-            $('#contraseñaError').text('');
-            $('#rolError').text('');
-            $('#mensajeErrorGeneral').text('');
-
-            // Serializar datos del formulario
-            var formData = $(this).serialize();
-
-            $.ajax({
-                url: "{{ url_for('usuarios_crear') }}",
-                method: "POST",
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    // Redirige o muestra un mensaje de éxito si el usuario fue creado correctamente
-                    if (response.success) {
-                        window.location.href = "{{ url_for('usuarios_ver') }}";
-                    }
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseJSON); 
-
-                    const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
-
-                    // Mostrar mensajes de error específicos para cada campo
-                    if (errores.nombre) {
-                        $('#nombreError').text(errores.nombre);
-                    }
-                    if (errores.email) {
-                        $('#emailError').text(errores.email);
-                    }
-                    if (errores.contraseña) {
-                        $('#contraseñaError').text(errores.contraseña);
-                    }
-                    if (errores.rol) {
-                        $('#rolError').text(errores.rol);
-                    }
-
-                    // Mostrar mensaje de error general si existen otros errores
-                    if (Object.keys(errores).length > 0) {
-                        $('#mensajeErrorGeneral').text("Corrige los errores en el formulario antes de guardar.");
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        $('#mensajeErrorGeneral').text(xhr.responseJSON.message);
-                    } else {
-                        $('#mensajeErrorGeneral').text('Ocurrió un error inesperado. Inténtalo nuevamente.');
-                    }
-                }
-            });
-        });
-    });
-</script>
-
+<script src="{{ url_for('static', filename='js/usuarios/Crear_usuario.js') }}"></script>
 
 {% endblock %}
 
