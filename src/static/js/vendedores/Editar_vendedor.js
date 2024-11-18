@@ -59,9 +59,7 @@ $(document).ready(function () {
     });
 });
 
-
-
-//scripts cambio de estado 
+//scripts elimiar vendedor 
 $(document).ready(function () {
     $('#eliminarVendedorForm').on('submit', function (event) {
         event.preventDefault(); // Evitar el envío estándar del formulario

@@ -108,7 +108,6 @@ $(document).ready(function () {
     });
 });
 
-
 //scripts de elimiar 
 $(document).ready(function () {
     $('#eliminarClienteForm').on('submit', function (event) {
