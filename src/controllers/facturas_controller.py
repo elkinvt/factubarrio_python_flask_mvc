@@ -1,56 +1,67 @@
+from src.app import app 
+from flask_controller import FlaskController
 from flask import request, redirect, url_for, flash, render_template
-from models.detalle_producto import DetalleProducto
 from flask import render_template, request, redirect, url_for, flash, jsonify
-from models.clientes import Clientes  # Importar la clase Clientes
-from models.vendedores import Vendedores  # Importar la clase Vendedores
-from models.productos import Productos  # Importar la clase Productos
-from models.facturas import Factura  # Importar la clase Factura
-from models.detalle_producto import DetalleProducto  # Importar DetalleProducto
-from models import SessionLocal # Importar la sesión para interactuar con la base de datos
+from src.models.vendedores import Vendedores  # Importar la clase Vendedores
+from src.models.productos import Productos  # Importar la clase Productos
+from src.models.facturas import Factura  # Importar la clase Factura
+from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
 from datetime import datetime
 import json
 
 
+class Facturas_Controller(FlaskController):
 
-def registrar_rutas(app):
+    #Ruta para cargar la vista de facturas
+    @app.route('/ver_factura')
+    def ver_factura():
+        return render_template('form_ver_factura.html', titulo_pagina = "Ver factura")
+    
+    #---------
 
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
-    def factura_crear():
-        db = SessionLocal()
-
+    def generar_factura():
         if request.method == 'POST':
             try:
-                
+
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
                 vendedores_idvendedores = request.form.get('vendedorFactura')
                 productos = json.loads(request.form.get('productosFactura'))
-                
-                # Logs para verificar los datos recibidos
-                print(f"Cliente ID: {clientes_idclientes}")
-                print(f"Vendedor ID: {vendedores_idvendedores}")
-                print(f"Productos: {productos}")
+
+                # Validación del cliente y vendedor
+                if not clientes_idclientes:
+                    return jsonify({"error": "Debe seleccionar un cliente válido."}), 400
+                if not vendedores_idvendedores:
+                    return jsonify({"error": "Debe seleccionar un vendedor válido."}), 400
+
+                # Validación de productos
+                if not productos or not isinstance(productos, list):
+                    return jsonify({"error": "Debe agregar al menos un producto a la factura."}), 400
+                for item in productos: 
+                    if 'precio' not in item or 'cantidad' not in item:
+                        return jsonify({"error": "Cada producto debe tener un precio y una cantidad."}), 400
+                    if float(item['precio']) <= 0 or float(item['precio']) > 20000000:
+                        return jsonify({"error": f"El precio de {item['producto']} debe ser mayor a cero y menor a 20,000,000."}), 400
+                    if int(item['cantidad']) <= 0:
+                        return jsonify({"error": "La cantidad de cada producto debe ser mayor a cero."}), 400
 
                 # Calcular el total de la factura
                 total_valor = sum([float(item['precio']) * int(item['cantidad']) for item in productos])
-                print(f"Total Valor: {total_valor}")  # Log del total calculado
-
                 impuesto = total_valor * 0.19  # Impuesto del 19%
-                print(f"Impuesto: {impuesto}")  # Log del impuesto calculado
-
                 descuento = float(request.form.get('descuentoFactura', 0))
-                print(f"Descuento: {descuento}")  # Log del descuento recibido
-
+                if descuento < 0 or descuento > total_valor:
+                    return jsonify({"error": "El descuento no puede ser negativo ni mayor al subtotal."}), 400
                 total_final = total_valor + impuesto - descuento
 
                 # Recibir los valores de pago y calcular el cambio
-                monto_pagado = float(request.form.get('monto_pagado'))
-                print(f"Monto Pagado: {monto_pagado}")  # Log del monto pagado recibido
-                
+                monto_pagado = float(request.form.get('monto_pagado', 0))
+                if monto_pagado <= 0:
+                    return jsonify({"error": "Debe ingresar un monto pagado mayor a cero."}), 400
                 if monto_pagado < total_final:
-                    raise ValueError("El monto pagado es insuficiente para cubrir el total de la factura.")
-                
+                    return jsonify({"error": "El monto pagado es insuficiente para cubrir el total de la factura."}), 400
+                    
                 cambio = monto_pagado - total_final
 
                 # Crear la factura usando el método del modelo
@@ -64,47 +75,33 @@ def registrar_rutas(app):
                     descuento,
                     monto_pagado,
                     cambio,
-                    db
+                    
                 )
 
                 if not nueva_factura:
-                    flash('Error al crear la factura', 'danger')
-                    return redirect(url_for('factura_crear'))
+                    return jsonify({"error": "Error al crear la factura."}), 500
+                
 
                 # Agregar detalles de los productos
-                if not DetalleProducto.agregar_detalles(nueva_factura.id, productos, db):
-                    flash('Error al agregar productos a la factura', 'danger')
-                    return redirect(url_for('factura_crear'))
+                if not DetalleProducto.agregar_detalles(nueva_factura['id'], productos):
+                    return jsonify({"error": "Error al agregar productos a la factura."}), 500
+                    
 
-                flash('Factura creada exitosamente', 'success')
-                return redirect(url_for('factura_crear'))
+                return jsonify({
+                    "success": True,
+                    "message": "Factura creada exitosamente",
+                    "cambio": cambio
+                }), 200
 
             except Exception as e:
-                db.rollback()
-                flash(f'Error al crear la factura: {str(e)}', 'danger')
+                return jsonify({"error": f"Error al crear la factura: {str(e)}"}), 500
 
-            finally:
-                db.close()
-
+          
         # GET: Cargar datos para el formulario
         try:
             vendedores = Vendedores.obtener_vendedores()
-            productos_data = Productos.obtener_productos()
-            productos = [
-                {
-                    "id": producto.Productos.idproductos,
-                    "codigo": producto.Productos.codigo,
-                    "nombre": producto.Productos.nombre,
-                    "descripcion": producto.Productos.descripcion,
-                    "categoria": producto.Categoria.nombre,
-                    "unidad_medida": producto.UnidadMedida.unidad_medida,
-                    "precio_unitario": float(producto.Productos.precio_unitario),
-                    "cantidad_stock": producto.Productos.cantidad_stock,
-                    "is_active": producto.Productos.is_active
-                }
-                for producto in productos_data
-            ]
-
+            productos = Productos.obtener_productos()
+           
         except Exception as e:
             flash(f'Error al cargar los datos: {str(e)}', 'danger')
 
@@ -113,7 +110,6 @@ def registrar_rutas(app):
     #--------------------------
 
     #Ruta para consultar las facturas
-
     @app.route('/facturas_por_fecha', methods=['GET'])
     def obtener_facturas_por_fecha():
         fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL
@@ -140,3 +136,5 @@ def registrar_rutas(app):
             return jsonify({'message': 'Factura no encontrada'}), 404
     
     #-----------------
+
+   

@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <h2>Generar Factura</h2>
-    <form id="formFactura" method="POST" action="{{ url_for('factura_crear') }}">
+    <form id="formFactura" method="POST" action="{{ url_for('generar_factura') }}">
 
         <!-- Campo oculto para almacenar productos -->
         <input type="hidden" id="productosFactura" name="productosFactura">
@@ -20,12 +20,31 @@
             <div id="listaSugerenciasClientes" class="list-group" style="position: absolute; z-index: 1000;"></div>
             <!-- Campo oculto para almacenar el ID del cliente seleccionado -->
             <input type="hidden" id="clienteId" name="clienteId">
+            <div id="clienteError" class="form-text text-danger"></div>
         </div>
 
         <!-- Campo para mostrar automáticamente el nombre del cliente -->
         <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
             <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre del cliente" readonly>
+        </div>
+
+        <!-- Campo para mostrar automáticamente el número de documento del cliente -->
+        <div class="mb-3">
+            <label for="numeroDocumentoCliente" class="form-label">Número de Documento</label>
+            <input type="text" class="form-control" id="numeroDocumentoCliente" placeholder="Número de documento del cliente" readonly>
+        </div>
+
+        <!-- Campo para mostrar automáticamente la dirección del cliente -->
+        <div class="mb-3">
+            <label for="direccionCliente" class="form-label">Dirección del Cliente</label>
+            <input type="text" class="form-control" id="direccionCliente" placeholder="Dirección del cliente" readonly>
+        </div>
+
+        <!-- Campo para mostrar automáticamente el teléfono del cliente -->
+        <div class="mb-3">
+            <label for="telefonoCliente" class="form-label">Teléfono del Cliente</label>
+            <input type="text" class="form-control" id="telefonoCliente" placeholder="Teléfono del cliente" readonly>
         </div>
         
         <!-- Seleccionar Vendedor -->
@@ -37,6 +56,7 @@
                     <option value="{{ vendedor.idvendedores }}">{{ vendedor.nombres_vendedor }}</option>
                 {% endfor %}
             </select>
+            <div id="vendedorError" class="form-text text-danger"></div>
         </div>
 
         <!-- Campo de texto para buscar productos -->
@@ -44,12 +64,15 @@
             <label for="buscarProducto" class="form-label">Buscar Producto</label>
             <input type="text" class="form-control" id="buscarProducto" placeholder="Escribe el nombre del producto" autocomplete="off">
             <div id="listaSugerenciasProducto" class="list-group" style="position: absolute; z-index: 1000;"></div>
+            <div id="productoError" class="form-text text-danger"></div>
         </div>
 
         <!-- Cantidad de Producto -->
         <div class="mb-3">
             <label for="cantidadFactura" class="form-label">Cantidad</label>
             <input type="number" class="form-control form-control-sm" id="cantidadFactura" name="cantidadFactura" placeholder="Escribe la cantidad del producto" >
+            <div id="stockStatus"></div> <!-- Muestra el estado del stock en tiempo real -->
+            <div id="cantidadError" class="form-text text-danger"></div>
         </div>
         
         
@@ -57,6 +80,7 @@
         <div class="mb-3">
             <label for="descuentoFactura" class="form-label">Descuento</label>
             <input type="number" class="form-control form-control-sm" id="descuentoFactura" name="descuentoFactura" placeholder="Escribe el descuento (opcional)" step="0.01" min="0" value="0">
+            <div id="descuentoError" class="form-text text-danger"></div>
         </div>
 
 
@@ -101,384 +125,14 @@
             <button type="submit" class="btn btn-success form-control-sm" style="margin-right: 20px;">Pagar Factura</button>
             <button type="button" class="btn btn-danger form-control-sm" onclick="anularFactura()">Anular Factura</button>
         </div>
+
+         <!-- Mensajes generales -->
+         <div id="facturaSuccess" class="text-success mt-3"></div>
+         <div id="facturaError" class="text-danger mt-3"></div>
     </form>
 </div>
 
-
-
-<!-- Función para buscar cliente desde el servidor -->
-
-<script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const inputBuscarDocumento = document.getElementById('buscarDocumento');  // Campo de número de documento
-    const listaSugerencias = document.getElementById('listaSugerenciasClientes');  // Lista de sugerencias
-    const clienteIdInput = document.getElementById('clienteId');  // Campo oculto para el ID del cliente
-    const nombreClienteInput = document.getElementById('nombreCliente');  // Campo para mostrar el nombre del cliente
-
-    // Escuchar el evento "input" en el campo de número de documento
-    inputBuscarDocumento.addEventListener('input', function () {
-        const query = this.value.trim();
-
-        // Si el valor ingresado tiene más de dos caracteres, realizamos la búsqueda
-        if (query.length > 2) {
-            fetch(`/buscar_clientes_por_numero_documento?q=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    mostrarSugerenciasClientes(data);
-                });
-        } else {
-            listaSugerencias.innerHTML = '';
-            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no hay suficiente texto
-        }
-    });
-
-
-     // Ocultar sugerencias y buscar el cliente al presionar "Enter"
-     inputBuscarDocumento.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();  // Evitar que se envíe el formulario si se presiona "Enter"
-            const numeroDocumento = this.value.trim();
-            
-            // Limpiar la lista de sugerencias
-            listaSugerencias.innerHTML = '';  
-            listaSugerencias.style.display = 'none';  
-
-            if (numeroDocumento.length > 2) {
-                // Realizar una búsqueda exacta al presionar "Enter"
-                fetch(`/verificar_cliente_inactivo?numero_documento=${numeroDocumento}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.inactivo) {
-                            alert(`El cliente con número de documento ${numeroDocumento} está inactivo.`);
-                        } else if (!data.existe) {
-                            alert('Cliente no encontrado.');
-                        } else {
-                            // Si el cliente está activo, rellenamos los campos
-                            nombreClienteInput.value = data.nombre;
-                            clienteIdInput.value = data.id;
-                        }
-                    });
-            }
-        }
-    });
-
-    
-    // Mostrar sugerencias de clientes
-    function mostrarSugerenciasClientes(clientes) {
-        listaSugerencias.innerHTML = ''; // Limpiar la lista de sugerencias
-
-        if (clientes.length > 0) {
-            clientes.forEach(cliente => {
-                const item = document.createElement('div');
-                item.className = 'list-group-item list-group-item-action';
-                item.textContent = `${cliente.numero_documento} - ${cliente.nombre}`;
-                
-                // Cuando seleccionamos un cliente de la lista de sugerencias
-                item.addEventListener('click', function () {
-                    inputBuscarDocumento.value = cliente.numero_documento;  // Rellenar el número de documento
-                    nombreClienteInput.value = cliente.nombre;  // Rellenar el nombre del cliente
-                    clienteIdInput.value = cliente.id;  // Guardar el ID del cliente
-                    listaSugerencias.innerHTML = '';  // Limpiar las sugerencias
-                });
-
-                listaSugerencias.appendChild(item);
-            });
-            listaSugerencias.style.display = 'block';
-        } else {
-            listaSugerencias.innerHTML = '<div class="list-group-item">No se encontraron clientes.</div>';
-            nombreClienteInput.value = '';  // Limpiar el campo de nombre si no se encuentran clientes
-        }
-    }
-});
-
-</script> <!--termina la busqueda del cliente-->
-
-<!-- Función para buscar el producto desde el servidor -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputBuscarProducto = document.getElementById('buscarProducto');
-        const listaSugerenciasProducto = document.getElementById('listaSugerenciasProducto');
-        const productocodigoInput = document.getElementById('productoFacturaCodigo');  // Campo oculto para el código del producto
-    
-        // Evento al escribir en el campo de búsqueda
-        inputBuscarProducto.addEventListener('input', function () {
-            const query = this.value.trim();
-    
-            if (query.length > 2) {
-                // Realiza una búsqueda en el backend
-                fetch(`/buscar_productos?q=${query}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Muestra las sugerencias con la función actualizada
-                        mostrarSugerenciasProducto(data);
-                    });
-            } else {
-                // Si no hay texto suficiente, limpia las sugerencias
-                listaSugerenciasProducto.innerHTML = '';
-            }
-        });
-    
-        // Función para mostrar las sugerencias de productos
-        function mostrarSugerenciasProducto(productos) {
-            listaSugerenciasProducto.innerHTML = ''; // Limpiamos la lista de sugerencias
-
-            if (productos.length > 0) {
-                productos.forEach(producto => {
-                    
-                    const item = document.createElement('div');
-                    item.className = 'list-group-item list-group-item-action';
-                    
-                    const nombre = producto.nombre || 'Nombre no disponible';
-                    const descripcion = producto.descripcion || 'Descripción no disponible';
-                    const precio = producto.precio_unitario || 'Precio no disponible';
-
-                    // Mostramos los detalles del producto (nombre, descripción, precio)
-                    item.textContent = `${nombre} - ${descripcion} - $${precio}`;
-
-                    // Evento cuando el usuario selecciona una sugerencia
-                    item.onclick = function () {
-                        // Colocamos el nombre del producto en el campo de búsqueda
-                        inputBuscarProducto.value = nombre;
-
-                        // Asignar el código del producto al campo oculto
-                        const codigoProducto = producto.codigo;  // Obtienes el código del producto
-                        const campoCodigo = document.getElementById('productoFacturaCodigo');  // Buscas el campo oculto por su ID
-
-                        if (campoCodigo) {
-                            campoCodigo.value = codigoProducto;  // Asignas el valor
-                        } else {
-                            console.error("Campo oculto 'productoFacturaCodigo' no encontrado");
-                        }
-
-                        // Limpiamos las sugerencias
-                        listaSugerenciasProducto.innerHTML = '';
-                    };
-
-                    // Agregamos la sugerencia a la lista de sugerencias
-                    listaSugerenciasProducto.appendChild(item);
-                });
-
-                // Mostramos la lista de sugerencias
-                listaSugerenciasProducto.style.display = 'block';
-            } else {
-                listaSugerenciasProducto.innerHTML = '<div class="list-group-item">No se encontraron productos.</div>';
-            }
-        }
-
-    });
-    </script>
-    
-
-
-
-<!-- Manejo de productos y factura -->
-<script>
-    var factura = []; // Para almacenar los productos de la factura
-    var productosDisponibles = JSON.parse('{{ productos | tojson | safe }}');  // Asegúrate de que el JSON esté bien formateado
-
-    // Los productos son enviados desde Flask como JSON
-
-   // Agregar productos a la factura
-    function agregarProductoAFactura() {
-        var productocodigo = document.getElementById('productoFacturaCodigo').value;
-        var cantidad = document.getElementById('cantidadFactura').value;
-
-        // Validar que el producto y la cantidad sean válidos
-        if (!productocodigo || !cantidad || isNaN(cantidad) || cantidad <= 0) {
-            alert("Seleccione un producto y una cantidad válida.");
-            return;
-        }
-
-        // Buscamos el producto en la lista de productos enviados desde Flask
-        var producto = productosDisponibles.find(p => p.codigo === productocodigo);
-        if (!producto) {
-            alert("Producto no encontrado.");
-            return;
-        }
-
-        // Verificar si hay suficiente stock
-        if (producto.cantidad_stock < cantidad) {
-            alert(`No hay suficiente stock para el producto ${producto.nombre}. Stock disponible: ${producto.cantidad_stock}`);
-            return;
-        }
-
-        var subtotal = producto.precio_unitario * cantidad;
-
-        // Agregar el producto a la factura
-        factura.push({
-            id: producto.id,
-            codigo: producto.codigo,
-            producto: producto.nombre,
-            cantidad: parseInt(cantidad),
-            precio: producto.precio_unitario,
-            subtotal: subtotal
-        });
-
-        // Actualizar la tabla de detalles de la factura
-        actualizarDetallesFactura();
-
-        // Limpiar los campos de búsqueda y cantidad
-        document.getElementById('buscarProducto').value = '';
-        document.getElementById('cantidadFactura').value = '';
-
-        
-        // Focalizar el campo de búsqueda para el próximo producto
-        document.getElementById('buscarProducto').focus();
-
-        // Mantener la página en la parte superior
-        window.scrollTo(0, 0);
-
-       
-    }
-
-   
-    // Actualizar detalles de la factura en la tabla
-    function actualizarDetallesFactura() {
-        var facturaBody = document.getElementById('facturaBody');
-        var facturaSubtotal = document.getElementById('facturaSubtotal');
-        var facturaImpuesto = document.getElementById('facturaImpuesto');
-        var facturaTotalConImpuesto = document.getElementById('facturaTotalConImpuesto');
-        
-        facturaBody.innerHTML = '';  // Limpiamos el contenido de la tabla antes de agregar nuevas filas
-        var subtotal = 0;
-
-        // Calcular subtotal
-        factura.forEach(function(item, index) {
-            let row = `
-                <tr>
-                    <td>${item.producto}</td>
-                    <td>${item.cantidad}</td>
-                    <td>${formatCurrency(item.precio)}</td>
-                    <td>${formatCurrency(item.subtotal)}</td>
-                    <td><button onclick="eliminarProductoDeFactura(${index})" class="btn btn-danger btn-sm">Eliminar</button></td>
-                </tr>`;
-            facturaBody.innerHTML += row;
-            subtotal += item.subtotal;
-        });
-
-        // Calcular impuesto y total con impuesto
-        var impuesto = subtotal * 0.19;
-        var totalConImpuesto = subtotal + impuesto;
-
-        // Mostrar los valores en la tabla
-        facturaSubtotal.textContent = formatCurrency(subtotal);
-        facturaImpuesto.textContent = formatCurrency(impuesto);
-        facturaTotalConImpuesto.textContent = formatCurrency(totalConImpuesto);
-    }
-
-    // Función para formatear los números como moneda
-    function formatCurrency(value) {
-        return value.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
-    }
-
-
-    // Eliminar un producto de la factura
-    function eliminarProductoDeFactura(index) {
-        factura.splice(index, 1);
-        actualizarDetallesFactura();
-    }
-
-   // Anular la factura
-    function anularFactura() {
-        if (!confirm("¿Estás seguro de que deseas anular la factura?")) {
-            return;
-        }
-
-        // Limpia el array de productos en la factura
-        factura = [];
-        actualizarDetallesFactura();
-
-        // Limpia los campos del formulario
-        document.getElementById('buscarDocumento').value = '';  // Campo de búsqueda del cliente por número de documento
-        document.getElementById('clienteId').value = '';  // Campo oculto del ID del cliente
-        document.getElementById('nombreCliente').value = '';  // Campo del nombre del cliente
-
-        document.getElementById('vendedorFactura').value = '';  // Campo del vendedor
-        document.getElementById('buscarProducto').value = '';  // Campo de búsqueda de producto
-        document.getElementById('cantidadFactura').value = '';  // Campo de cantidad
-        document.getElementById('productoFacturaCodigo').value = '';  // Campo oculto para el código del producto
-        document.getElementById('descuentoFactura').value = '';  // Campo de descuento
-
-        // También asegúrate de limpiar las sugerencias visuales
-        document.getElementById('listaSugerenciasClientes').innerHTML = '';  // Limpia sugerencias de cliente
-        document.getElementById('listaSugerenciasProducto').innerHTML = '';  // Limpia sugerencias de producto
-
-        // Si hay mensajes o alertas visibles, asegúrate de ocultarlos o restablecer el formulario completamente
-    }
-
-
-</script>
-
-<!-- Manejo de envio del formulario y pago de la factura -->
-<script>
-    document.getElementById('formFactura').addEventListener('submit', function (event) {
-        event.preventDefault();  // Evitar el envío estándar del formulario para manejarlo manualmente
-
-        // Convertir el array de productos a JSON y asignarlo al campo oculto
-        const productosInput = document.getElementById('productosFactura');
-        productosInput.value = JSON.stringify(factura);
-
-        // Asegúrate de que el cliente y el vendedor estén seleccionados
-        const clienteId = document.getElementById('clienteId').value;
-        const vendedorId = document.getElementById('vendedorFactura').value;
-
-        if (!clienteId || !vendedorId || factura.length === 0) {
-            alert("Debe seleccionar un cliente, un vendedor y agregar al menos un producto.");
-            return;
-        }
-
-        // Calcular el total de la factura
-        const total = factura.reduce((acc, item) => acc + item.subtotal, 0);
-        const impuesto = total * 0.19;
-        const totalConImpuesto = total + impuesto;
-
-        // Preguntar el monto pagado
-        const montoPagado = prompt(`El total de la factura es: $${totalConImpuesto.toLocaleString('es-CO', { minimumFractionDigits: 2 })}. Ingrese el monto con el que va a pagar:`);
-
-        if (montoPagado === null || montoPagado.trim() === "" || isNaN(montoPagado) || parseFloat(montoPagado) <= 0) {
-            alert("Debe ingresar un monto válido.");
-            return;
-        }
-
-        // Convertir a número el monto pagado
-        const montoPagadoFloat = parseFloat(montoPagado);
-
-        // Verificar si el monto pagado es suficiente para cubrir el total con impuesto
-        if (montoPagadoFloat < totalConImpuesto) {
-            alert("El monto pagado es insuficiente para cubrir el total de la factura.");
-            return;
-        }
-
-        // Asignar el monto pagado al campo oculto
-        document.getElementById('montoPagado').value = montoPagadoFloat.toFixed(2);
-
-        // Calcular el cambio
-        let cambio = montoPagadoFloat - totalConImpuesto;
-
-        function ajustarFraccion(valor) {
-            return Math.round(valor * 100) / 100; // Redondea a dos decimales
-        }
-
-
-        // Ajustar el cambio para redondear a la fracción más cercana
-        cambio = ajustarFraccion(cambio);
-
-        // Mostrar un mensaje con el cambio a devolver
-        alert(`El cambio a devolver es: $${cambio.toLocaleString('es-CO', { minimumFractionDigits: 2 })}`);
-
-        // Asignar el cambio al campo oculto para enviarlo al backend
-        const cambioInput = document.createElement('input');
-        cambioInput.type = 'hidden';
-        cambioInput.name = 'cambio';
-        cambioInput.value = cambio.toFixed(2);
-        this.appendChild(cambioInput);
-
-        // Envía el formulario manualmente después de asegurarse de que los datos sean correctos
-        this.submit();
-    });
-</script>
-
-
+<script src="{{ url_for('static', filename='js/facturas/generar_factura.js') }}"></script>
 
 {% endblock %}
 

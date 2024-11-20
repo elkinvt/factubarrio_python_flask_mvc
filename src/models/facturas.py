@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
-from datetime import datetime
-
-from . import Base, SessionLocal
+from src.models import Base, db_session_manager, to_dict
 
 class Factura(Base):
     __tablename__ = 'factura'
@@ -43,95 +41,97 @@ class Factura(Base):
         return f'<Factura {self.id}>'
     
     # Método para crear una factura
-    @classmethod
-    def crear_factura(cls, clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio , db_session):
-        try:
-            nueva_factura = cls(
-                clientes_idclientes=clientes_idclientes,
-                vendedores_idvendedores=vendedores_idvendedores,
-                fecha=fecha,
-                hora=hora,
-                total_valor=total_valor,
-                impuesto=impuesto,
-                descuento=descuento,
-                monto_pagado=monto_pagado,
-                cambio=cambio
-            )
-            db_session.add(nueva_factura)
-            db_session.commit()
-            return nueva_factura
-        except SQLAlchemyError as e:
-            db_session.rollback()
-            print(f"Error al crear la factura: {str(e)}")
-            return None
+    @staticmethod
+    def crear_factura(clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio):
+        with db_session_manager() as session:
+            try:
+                nueva_factura =Factura(
+                    clientes_idclientes=clientes_idclientes,
+                    vendedores_idvendedores=vendedores_idvendedores,
+                    fecha=fecha,
+                    hora=hora,
+                    total_valor=total_valor,
+                    impuesto=impuesto,
+                    descuento=descuento,
+                    monto_pagado=monto_pagado,
+                    cambio=cambio
+                )
+                session.add(nueva_factura)
+                session.commit()
+
+                # Refresca la instancia desde la base de datos
+                session.refresh(nueva_factura)
+
+                return to_dict(nueva_factura) if nueva_factura else None
+            except SQLAlchemyError as e:
+                print(f"Error al crear la factura: {str(e)}")
+                return None
+           
     #--------------------------
 
     #Metodo para búsqueda de facturas por fecha
     @staticmethod
     def buscar_por_fecha(fecha):
-        session = SessionLocal()
-        try:
-            # Buscar facturas por la fecha proporcionada
-            facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
+        with db_session_manager() as session:
+            try:
+                # Buscar facturas por la fecha proporcionada
+                facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
 
-            if facturas:
-
-               
-
-                # Serializar los datos de las facturas
-                facturas_data = [{
-                    'id': factura.id,
-                    'fecha': factura.fecha.strftime('%d/%m/%Y'),  # Formato amigable dd/mm/yyyy
-                    'hora': factura.hora.strftime('%H:%M:%S'),    # Formato 24 horas HH:MM:SS
-                    'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
-                    'total': float(factura.total_valor)
-                } for factura in facturas]
-                return facturas_data
-            else:
-                return None  # Si no hay facturas
-        except Exception as e:
-            print(f"Error al buscar facturas: {e}")
-            return None
-        finally:
-            session.close()
-
-    #----------------
-
-    @staticmethod
-    def obtener_detalles(id_factura):
-        session = SessionLocal()
-        try:
-            # Buscar la factura por id
-            factura = session.query(Factura).filter_by(id=id_factura).first()
-
-            if factura:
+                if facturas:
 
                 
 
-                # Serializar los datos de la factura
-                factura_data = {
-                    'id': factura.id,
-                    'fecha': factura.fecha.strftime('%d/%m/%Y'),  # Formato amigable dd/mm/yyyy
-                    'hora': factura.hora.strftime('%H:%M:%S'),    # Hora formateada
-                    'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
-                    'vendedor': factura.vendedor.nombres_vendedor, 
-                    'impuesto':float(factura.impuesto),  # Asegúrate de que este campo exista
-                    'total': float(factura.total_valor),
-                    'montoPagado': float(factura.monto_pagado),
-                    'cambio': float(factura.cambio),
-                    'items': [{
-                        'producto': item.producto.nombre,  # Asegúrate de que este campo exista en la relación Producto
-                        'cantidad': item.cantidad,
-                        'precioUnitario': item.precio_unitario,
-                        'subtotal': item.total_precio
-                    } for item in factura.detalles]
-                }
-                return factura_data
-            else:
-                return None  # Si no se encuentra la factura
-        except Exception as e:
-            print(f"Error al obtener detalles de la factura: {e}")
-            return None
-        finally:
-            session.close()
+                    # Serializar los datos de las facturas
+                    facturas_data = [{
+                        'id': factura.id,
+                        'fecha': factura.fecha.strftime('%d/%m/%Y'),  # Formato amigable dd/mm/yyyy
+                        'hora': factura.hora.strftime('%H:%M:%S'),    # Formato 24 horas HH:MM:SS
+                        'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
+                        'total': float(factura.total_valor)
+                    } for factura in facturas]
+                    return facturas_data
+                else:
+                    return None  # Si no hay facturas
+            except Exception as e:
+                print(f"Error al buscar facturas: {e}")
+                return None
+
+    #----------------
+
+    #Metodo para obtener los detalles de la factura
+    @staticmethod
+    def obtener_detalles(id_factura):
+        with db_session_manager() as session:
+            try:
+                # Buscar la factura por id
+                factura = session.query(Factura).filter_by(id=id_factura).first()
+
+                if factura:
+
+                    # Serializar los datos de la factura
+                    factura_data = {
+                        'id': factura.id,
+                        'fecha': factura.fecha.strftime('%d/%m/%Y'),  # Formato amigable dd/mm/yyyy
+                        'hora': factura.hora.strftime('%H:%M:%S'),    # Hora formateada
+                        'cliente': factura.cliente.nombres_cliente,  # Asegúrate de que este campo exista
+                        'vendedor': factura.vendedor.nombres_vendedor, 
+                        'impuesto':float(factura.impuesto),  # Asegúrate de que este campo exista
+                        'total': float(factura.total_valor),
+                        'montoPagado': float(factura.monto_pagado),
+                        'cambio': float(factura.cambio),
+                        'items': [{
+                            'producto': item.producto.nombre,  # Asegúrate de que este campo exista en la relación Producto
+                            'cantidad': item.cantidad,
+                            'precioUnitario': float(item.precio_unitario),
+                            'subtotal': float ( item.total_precio)
+                        } for item in factura.detalles]
+                    }
+                    return factura_data
+                else:
+                    return None  # Si no se encuentra la factura
+            except Exception as e:
+                print(f"Error al obtener detalles de la factura: {e}")
+                return None
+    
+    #------------------
      
