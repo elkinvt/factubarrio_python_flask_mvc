@@ -108,21 +108,35 @@ class Clientes(Base):
 
     # Método estático para buscar el cliente en la factura
     @staticmethod
-    def buscar_por_numero_documento(query):
-        """Búsqueda parcial por número de documento"""
+    def buscar_clientes(query, incluir_inactivos=False, incluir_eliminados=False):
+        """Buscar clientes según filtros dinámicos"""
         with db_session_manager() as session:
-            return [{
+            # Condiciones base para la consulta
+            condiciones = [Clientes.numero_documento.ilike(f"%{query}%")]
+            
+            if not incluir_inactivos:
+                condiciones.append(Clientes.is_active == True)
+            
+            if not incluir_eliminados:
+                condiciones.append(Clientes.is_deleted == False)
+            
+            return [
+            {
                 'id': cliente.idclientes,
-                'nombre': cliente.nombres_cliente,
+                'tipo_documento': cliente.tipo_documento,
                 'numero_documento': cliente.numero_documento,
-                'direccion': cliente.direccion,
+                'nombres_cliente': cliente.nombres_cliente,
                 'telefono': cliente.telefono,
-                'is_active': cliente.is_active
-            } for cliente in session.query(Clientes)
-                .filter(Clientes.numero_documento.ilike(f"%{query}%"))
-                .all()]
-        
-    #-----------
+                'direccion': cliente.direccion,
+                'email': cliente.email,
+                'is_active': cliente.is_active,
+                'is_deleted': cliente.is_deleted
+            }
+            for cliente in session.query(Clientes).filter(*condiciones).all()
+
+        ]
+    #---------------------------
+
 
     # Método estático para validar duplicaciones del cliente
     @staticmethod

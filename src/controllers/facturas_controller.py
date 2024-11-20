@@ -25,9 +25,6 @@ class Facturas_Controller(FlaskController):
         if request.method == 'POST':
             try:
 
-                # Depuración: Imprimir todos los datos recibidos desde el formulario
-                print("Datos recibidos desde el formulario:", request.form)
-                
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
                 vendedores_idvendedores = request.form.get('vendedorFactura')

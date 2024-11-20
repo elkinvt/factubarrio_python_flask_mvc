@@ -290,13 +290,26 @@ class Clientes_Controller(FlaskController):
         
         try:
             # Buscar clientes en la base de datos
-            clientes_data = Clientes.buscar_por_numero_documento(query)
-            if not clientes_data:
-                return jsonify({'message': 'No se encontraron clientes con ese número de documento.'}), 404
+            clientes_activos = Clientes.buscar_clientes(query)
+            if clientes_activos:
+                return jsonify(clientes_activos)
             
-            return jsonify(clientes_data)
+            # Buscar inactivos o eliminados
+            cliente_inactivo = Clientes.buscar_clientes(query, incluir_inactivos=True, incluir_eliminados=True)
+            if cliente_inactivo:
+
+                cliente = cliente_inactivo[0]  # Asegurar que hay un cliente
+
+                if not cliente['is_active']:
+                    return jsonify({'message': 'El cliente está inactivo.'}),403
+                
+                if cliente['is_deleted']:
+                    return jsonify({'message': 'El cliente ha sido eliminado'}),403
+                
+            return jsonify({'message': 'No se encontraron  cliente con ese número de documento.'}),404
         
         except Exception as e:
+            print(f"Error al buscar clientes: {str(e)}")
             # Manejar errores internos
             return jsonify({'error': f'Ocurrió un error: {str(e)}'}), 500
         
