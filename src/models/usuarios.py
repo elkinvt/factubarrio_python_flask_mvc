@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean
 from src.models import  Base, db_session_manager, to_dict
 from sqlalchemy import func
 from src.models.vendedores import Vendedores
+from sqlalchemy.orm import relationship
 
 class Usuarios(Base):
     __tablename__ = 'usuarios'
@@ -13,6 +14,9 @@ class Usuarios(Base):
     rol = Column(String(100),nullable=False)
     is_deleted = Column(Boolean, default=False) 
     is_active = Column(Boolean, default=True)  # Campo de activación
+
+    # Relación inversa para acceder a vendedores desde un usuario
+    vendedores = relationship('Vendedores', back_populates='usuario', cascade='all')
 
     def __init__(self,nombre_usuario, email, contraseña, rol,is_active=True, is_deleted=False):
         self.nombres_usuario = nombre_usuario
@@ -101,7 +105,6 @@ class Usuarios(Base):
         
     #------------
 
-    
     # Método de validación en Usuarios
     @staticmethod
     def validar_datos(email=None, usuario_id=None):
@@ -118,3 +121,22 @@ class Usuarios(Base):
         
     #--------------
 
+    # Método de para obtener usuarios en vendedores
+    @staticmethod
+    def obtener_usuarios_vendedores():
+        with db_session_manager() as session:  # Usando tu manejo de sesión
+            usuarios = session.query(Usuarios).filter(
+                Usuarios.rol == 'vendedor',
+                Usuarios.is_deleted == False
+            ).all()  
+             # Método de para obtener usuarios en vendedores
+    @staticmethod
+    def obtener_usuarios_vendedores():
+        with db_session_manager() as session:  # Usando tu manejo de sesión
+            usuarios = session.query(Usuarios).filter(
+                Usuarios.rol == 'vendedor',
+                Usuarios.is_deleted == False
+            ).all()  
+            usuarios_dict = [to_dict(usuario) for usuario in usuarios]  
+        return usuarios_dict  # Retornar los datos ya procesados
+       

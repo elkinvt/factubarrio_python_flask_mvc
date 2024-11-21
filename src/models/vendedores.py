@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from src.models import Base, db_session_manager, to_dict
+from sqlalchemy.orm import relationship
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
@@ -12,14 +13,19 @@ class Vendedores(Base):
     direccion = Column(String(255))  
     email = Column(String(100))
     is_deleted = Column(Boolean, default=False)  # Campo de eliminación lógica
+    usuario_id = Column(Integer, ForeignKey('usuarios.id_usuario'), nullable=False)  # Clave foránea para asociar al usuario
 
-    def __init__(self, tipo_documento, numero_documento, nombres_vendedor, telefono, direccion, email, is_deleted=False):
+    # Relación para acceder al usuario desde un vendedor
+    usuario = relationship('Usuarios', back_populates='vendedores')
+
+    def __init__(self, tipo_documento, numero_documento, nombres_vendedor, telefono, direccion, email, usuario_id, is_deleted=False):
         self.tipo_documento = tipo_documento
         self.numero_documento = numero_documento
         self.nombres_vendedor = nombres_vendedor
         self.telefono = telefono
         self.direccion = direccion
         self.email = email
+        self.usuario_id = usuario_id
         self.is_deleted = is_deleted  # Ahora acepta is_deleted
 
     def __repr__(self):

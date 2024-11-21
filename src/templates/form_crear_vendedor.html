@@ -47,6 +47,16 @@
         <div id="emailVendedorError" class="text-danger"></div> <!-- Error en tiempo real -->
     </div>
 
+    <div class="mb-3">
+        <label for="usuario" class="form-label">Usuario:</label>
+        <select class="form-control form-control-sm" id="usuario" name="usuario_id" required>
+            <option value="" disabled selected>Selecciona un usuario</option>
+            {% for usuario in usuarios %}
+                <option value="{{ usuario.id_usuario }}">{{ usuario['nombres_usuario'] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <button type="submit" class="btn btn-primary form-control-sm">Guardar vendedor</button>
     </form>
 </div>

@@ -1,7 +1,9 @@
 from src.app import app 
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
+from flask import request,flash, render_template, jsonify
 from src.models.vendedores import Vendedores
+from src.models.usuarios import Usuarios
+from src.models import to_dict
 
 class Vendedores_Controller(FlaskController):
 
@@ -17,7 +19,10 @@ class Vendedores_Controller(FlaskController):
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
     def vendedores_crear():
         if request.method == 'GET':
-            return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
+            # Obtener la lista de usuarios disponibles para vincular
+            usuarios = Usuarios.obtener_usuarios_vendedores()
+            return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor", usuarios=usuarios)
+            
 
         if request.method == 'POST':
             tipo_documento = request.form['tipoDocumento']
@@ -26,6 +31,7 @@ class Vendedores_Controller(FlaskController):
             telefono = request.form['telefonoVendedor']
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
+            usuario_id = request.form['usuario_id'] 
 
             # Validaciones y mensajes de error
             errores = {}
@@ -86,7 +92,8 @@ class Vendedores_Controller(FlaskController):
                 nombres_vendedor=nombre_completo,  # Insertamos el nombre completo
                 telefono=telefono,
                 direccion=direccion,
-                email=email
+                email=email,
+                usuario_id=usuario_id 
             )
 
             try:
