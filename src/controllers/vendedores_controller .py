@@ -3,7 +3,7 @@ from flask_controller import FlaskController
 from flask import request,flash, render_template, jsonify
 from src.models.vendedores import Vendedores
 from src.models.usuarios import Usuarios
-from src.models import to_dict
+
 
 class Vendedores_Controller(FlaskController):
 

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from src.models import Base, db_session_manager, to_dict
 from sqlalchemy.orm import relationship
+from src.models.usuarios import Usuarios
 
 class Vendedores(Base):
     __tablename__ = 'vendedores'
@@ -36,8 +37,17 @@ class Vendedores(Base):
     @staticmethod
     def obtener_vendedores():
         with db_session_manager() as session:
-            vendedores = session.query(Vendedores).filter_by(is_deleted=False).all()
-            return [to_dict(vendedor) for vendedor in vendedores]
+            vendedores = session.query(Vendedores, Usuarios).join(
+                Usuarios, Vendedores.usuario_id  == Usuarios.id_usuario).filter(Vendedores.is_deleted==False).all()
+            
+            vendedores_dict =[
+                {
+                    'vendedor': to_dict(vendedor),
+                    'usuario': to_dict(usuario)
+                }
+                for vendedor, usuario in vendedores
+            ]
+            return vendedores_dict
 
     #------------     
 

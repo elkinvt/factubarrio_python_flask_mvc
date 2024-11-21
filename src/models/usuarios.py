@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from src.models import  Base, db_session_manager, to_dict
 from sqlalchemy import func
-from src.models.vendedores import Vendedores
 from sqlalchemy.orm import relationship
 
 class Usuarios(Base):
