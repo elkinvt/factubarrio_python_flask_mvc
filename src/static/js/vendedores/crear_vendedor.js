@@ -67,27 +67,38 @@ $(document).ready(function () {
 //Código JavaScript para validacion de datos duplicados(numero_documento,email) del vendedor 
 
 // Asignar la validación solo a los campos específicos
+
+// Asignar validación a los campos específicos
 $('#numeroDocumentoVendedor').on('blur', function () {
+    console.log('Blur en número de documento');
     validarVendedor('numeroDocumento');
 });
 
 $('#emailVendedor').on('blur', function () {
+    console.log('Blur en email');
     validarVendedor('emailVendedor');
 });
+
 
 function validarVendedor(campo) {
     // Recopilar los valores de los campos
     const numeroDocumento = $('#numeroDocumentoVendedor').val().trim();
-    const emailVendedor = $('#emailVendedor').val().trim();
+    //console.log('Número de Documento:', numeroDocumento);
+    const emailVendedor = $('#emailVendedor').val();
 
     // Crear un objeto de datos para enviar solo los campos que deben validarse
     const datos = {};
-    if (campo === 'numeroDocumento' && numeroDocumento !== '') {
-        datos.numeroDocumento = numeroDocumento;
+    if (campo === 'numeroDocumento') {
+        const numeroDocumento = $('#numeroDocumentoVendedor').val()?.trim();
+        if (numeroDocumento !== '') {
+            datos.numero_documento = numeroDocumento;
+        }
     }
     if (campo === 'emailVendedor' && emailVendedor !== '') {
-        datos.emailVendedor = emailVendedor;
+        datos.email = emailVendedor;
     }
+
+    //console.log('Cuerpo enviado en blur:', JSON.stringify(datos));
 
     // Si no hay datos que validar, salir de la función
     if (Object.keys(datos).length === 0) return;
@@ -99,6 +110,7 @@ function validarVendedor(campo) {
         contentType: 'application/json',
         data: JSON.stringify(datos),
         success: function (response) {
+            //console.log('Validación exitosa:', response);
             // Limpiar mensajes de error para los campos que se están validando
             if (campo === 'numeroDocumento') {
                 $('#numeroDocumentoError').text('');

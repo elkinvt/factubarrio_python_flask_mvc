@@ -33,7 +33,7 @@ class Vendedores(Base):
         return f'<Vendedor {self.nombres_vendedor}>'
     
     
-   # Método para obtener los vendedores no eliminados
+    # Método para obtener los vendedores no eliminados
     @staticmethod
     def obtener_vendedores():
         with db_session_manager() as session:
@@ -116,9 +116,12 @@ class Vendedores(Base):
         with db_session_manager() as session:
             errores = {}
 
+            #print(f'Validando: numero_documento={numero_documento}, email={email}, vendedor_id={vendedor_id}')
+
             # Validar duplicado de número de documento, excluyendo el vendedor actual si vendedor_id está presente
             if numero_documento:
                 vendedor_doc= session.query(Vendedores).filter_by(numero_documento=numero_documento).first()
+                #print(f'Vendedor encontrado por número de documento: {vendedor_doc}')
                 if vendedor_doc and (vendedor_id is None or vendedor_doc.idvendedores != int(vendedor_id)):
                     errores['numeroDocumento'] = 'Este número de documento ya está registrado.'
 
@@ -126,9 +129,11 @@ class Vendedores(Base):
             # Validar duplicado de email, excluyendo el vendedor actual si vendedor_id está presente   
             if email:
                 vendedor_email = session.query(Vendedores).filter_by(email=email).first()
+                #print(f'Vendedor encontrado por email: {vendedor_email}')
                 if vendedor_email and (vendedor_id is None or vendedor_email.idvendedores != int(vendedor_id)):
                     errores['emailVendedor'] = 'Este correo electrónico ya está registrado.'
-                    
+
+            #print(f'Errores detectados: {errores}')      
             return errores
 
     #---------

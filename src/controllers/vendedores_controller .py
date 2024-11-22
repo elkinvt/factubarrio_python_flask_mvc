@@ -71,6 +71,7 @@ class Vendedores_Controller(FlaskController):
                 errores['direccionVendedor'] = 'Debe tener al menos 10 caracteres.'
 
             # Validación del email
+            print(email) 
             if not email:
                 errores['emailVendedor'] = 'El email es obligatorio.'
             elif "@" not in email or "." not in email.split("@")[-1]:
@@ -239,13 +240,14 @@ class Vendedores_Controller(FlaskController):
     @app.route('/validar_vendedor', methods=['POST'])
     def validar_vendedor():
         data = request.get_json()
+        #print('Datos recibidos:', data)
         
         # Llamada al método de validación en el modelo Vendedores
         errores = Vendedores.validar_datos(
-            numero_documento=data.get('numeroDocumento'),
-            email=data.get('emailVendedor')
+            numero_documento=data.get('numero_documento'),
+            email=data.get('email')
         )
-
+        #print('Errores detectados:', errores)
         # Si hay errores, retornar con código 400
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400

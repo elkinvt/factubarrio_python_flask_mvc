@@ -128,14 +128,6 @@ class Usuarios(Base):
                 Usuarios.rol == 'vendedor',
                 Usuarios.is_deleted == False
             ).all()  
-             # Método de para obtener usuarios en vendedores
-    @staticmethod
-    def obtener_usuarios_vendedores():
-        with db_session_manager() as session:  # Usando tu manejo de sesión
-            usuarios = session.query(Usuarios).filter(
-                Usuarios.rol == 'vendedor',
-                Usuarios.is_deleted == False
-            ).all()  
             usuarios_dict = [to_dict(usuario) for usuario in usuarios]  
         return usuarios_dict  # Retornar los datos ya procesados
        
