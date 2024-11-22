@@ -25,9 +25,19 @@ class Facturas_Controller(FlaskController):
         if request.method == 'POST':
             try:
 
+                # Obtén el usuario logueado (puede ser de `session` o algún middleware)
+                usuario_id = request.form.get('usuario_id')
+
+                # Obtener el vendedor asociado al usuario
+                vendedor = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+                if not vendedor:
+                    return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
+                
+                vendedores_idvendedores = vendedor.id  # Usaremos este vendedor para la factura
+
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
-                vendedores_idvendedores = request.form.get('vendedorFactura')
+                
                 productos = json.loads(request.form.get('productosFactura'))
 
                 # Validación del cliente y vendedor
@@ -99,13 +109,19 @@ class Facturas_Controller(FlaskController):
           
         # GET: Cargar datos para el formulario
         try:
-            vendedores = Vendedores.obtener_vendedores()
+            # Obtener el usuario logueado
+            usuario_id = request.form.get('usuario_id')
+            # Obtener el vendedor asociado al usuario
+            vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+            if not vendedor_actual:
+                return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
+            
             productos = Productos.obtener_productos()
            
         except Exception as e:
             flash(f'Error al cargar los datos: {str(e)}', 'danger')
 
-        return render_template('form_generacion_factura.html', vendedores=vendedores, productos=productos, titulo_pagina="Generar factura")
+        return render_template('form_generacion_factura.html', vendedor_actual=vendedor_actual, productos=productos, titulo_pagina="Generar factura")
 
     #--------------------------
 

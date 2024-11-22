@@ -17,7 +17,7 @@ class Vendedores(Base):
     usuario_id = Column(Integer, ForeignKey('usuarios.id_usuario'), nullable=False)  # Clave foránea para asociar al usuario
 
     # Relación para acceder al usuario desde un vendedor
-    usuario = relationship('Usuarios', back_populates='vendedores')
+    usuario = relationship('Usuarios', backref='vendedores')
 
     def __init__(self, tipo_documento, numero_documento, nombres_vendedor, telefono, direccion, email, usuario_id, is_deleted=False):
         self.tipo_documento = tipo_documento
@@ -138,5 +138,14 @@ class Vendedores(Base):
 
     #---------
 
+    #Metodo estatico para acceder al vendedodor por id de usuario
+    @staticmethod
+    def obtener_vendedor_por_usuario(usuario_id):
+        """Obtiene el vendedor asociado a un usuario dado."""
+        with db_session_manager() as session:
+            vendedor = session.query(Vendedores).filter_by(usuario_id=usuario_id).first()
+            if not vendedor:
+                raise ValueError('No se encontró un vendedor asociado al usuario.')
+            return vendedor
     
 

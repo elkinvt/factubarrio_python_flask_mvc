@@ -14,9 +14,7 @@ class Usuarios(Base):
     is_deleted = Column(Boolean, default=False) 
     is_active = Column(Boolean, default=True)  # Campo de activación
 
-    # Relación inversa para acceder a vendedores desde un usuario
-    vendedores = relationship('Vendedores', back_populates='usuario', cascade='all')
-
+    
     def __init__(self,nombre_usuario, email, contraseña, rol,is_active=True, is_deleted=False):
         self.nombres_usuario = nombre_usuario
         self.email = email
