@@ -1,5 +1,5 @@
 from src.app import app 
-from flask import render_template, request, url_for, flash,redirect, jsonify
+from flask import render_template, request, flash,jsonify
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios  
 import re

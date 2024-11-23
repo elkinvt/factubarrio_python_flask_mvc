@@ -1,5 +1,5 @@
 from src.app import app 
-from flask import render_template, request, redirect, url_for,flash
+from flask import render_template, request, redirect, url_for,flash, session
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios
 from flask_login import login_user
@@ -18,6 +18,8 @@ class LoginController(FlaskController):
             if usuario_valido:
                 print(f"Usuario válido: {usuario_valido.nombres_usuario}")
                 login_user(usuario_valido)
+                # Guardar el ID del usuario en la sesión
+                session['usuario_id'] = usuario_valido.id_usuario  # Asegúrate de que `id_usuario` es el campo correcto
                 return redirect(url_for('Index'))
             else:
                 flash('Nombre de usuario o contraseña incorrectos',  'danger')

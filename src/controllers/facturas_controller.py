@@ -1,6 +1,6 @@
 from src.app import app 
 from flask_controller import FlaskController
-from flask import render_template, request, redirect, url_for, flash, jsonify, session
+from flask import render_template, request, flash, jsonify, session
 from src.models.vendedores import Vendedores  # Importar la clase Vendedores
 from src.models.productos import Productos  # Importar la clase Productos
 from src.models.facturas import Factura  # Importar la clase Factura
@@ -26,6 +26,7 @@ class Facturas_Controller(FlaskController):
 
                 # Obtén el usuario logueado (puede ser de `session` o algún middleware)
                 usuario_id = session.get('usuario_id')
+                print(f"Usuario ID en sesión: {usuario_id}")
 
                 # Obtener el vendedor asociado al usuario
                 vendedor = Vendedores.obtener_vendedor_por_usuario(usuario_id)

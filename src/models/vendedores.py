@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from src.models import Base, db_session_manager, to_dict
+from src.models import Base, db_session_manager, to_dict, SessionLocal
 from sqlalchemy.orm import relationship
 from src.models.usuarios import Usuarios
 
@@ -142,10 +142,13 @@ class Vendedores(Base):
     @staticmethod
     def obtener_vendedor_por_usuario(usuario_id):
         """Obtiene el vendedor asociado a un usuario dado."""
-        with db_session_manager() as session:
-            vendedor = session.query(Vendedores).filter_by(usuario_id=usuario_id).first()
+        session = SessionLocal()
+        try:
+            vendedor = session.query(Vendedores).filter_by(usuario_id=usuario_id, is_deleted=False).first()
             if not vendedor:
                 raise ValueError('No se encontró un vendedor asociado al usuario.')
             return vendedor
+        finally:
+            session.close()
     
 
