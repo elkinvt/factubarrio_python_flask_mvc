@@ -5,4 +5,4 @@ from flask_controller import FlaskController
 class Index_Controller(FlaskController):
     @app.route('/Index')
     def Index():
-        return render_template('index.html', titulo_pagina ="INDEX")
+        return render_template('index.html', titulo_pagina ="Inicio")

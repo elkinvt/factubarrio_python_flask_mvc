@@ -1,7 +1,6 @@
 from src.app import app 
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from src.models.vendedores import Vendedores  # Importar la clase Vendedores
 from src.models.productos import Productos  # Importar la clase Productos
 from src.models.facturas import Factura  # Importar la clase Factura
@@ -26,7 +25,7 @@ class Facturas_Controller(FlaskController):
             try:
 
                 # Obtén el usuario logueado (puede ser de `session` o algún middleware)
-                usuario_id = request.form.get('usuario_id')
+                usuario_id = session.get('usuario_id')
 
                 # Obtener el vendedor asociado al usuario
                 vendedor = Vendedores.obtener_vendedor_por_usuario(usuario_id)
@@ -110,9 +109,16 @@ class Facturas_Controller(FlaskController):
         # GET: Cargar datos para el formulario
         try:
             # Obtener el usuario logueado
-            usuario_id = request.form.get('usuario_id')
+            usuario_id = session.get('usuario_id')
+
+            # Inicializar vendedor_actual en None para manejar el caso en que no se encuentre un vendedor
+            vendedor_actual = None
+
             # Obtener el vendedor asociado al usuario
-            vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+            try:
+                vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+            except ValueError as e:
+                flash(f"Error: {str(e)}", "danger")
             if not vendedor_actual:
                 return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
             

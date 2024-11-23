@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import  Base, db_session_manager, to_dict
+from src.models import  Base, db_session_manager, to_dict, SessionLocal  # Importa tu sesión principal de SQLAlchemy
 from sqlalchemy import func
-from sqlalchemy.orm import relationship
+from flask_login import UserMixin
 
-class Usuarios(Base):
+class Usuarios(Base, UserMixin):
     __tablename__ = 'usuarios'
 
     id_usuario = Column(Integer, primary_key=True, autoincrement=True)
@@ -25,6 +25,14 @@ class Usuarios(Base):
 
     def __repr__(self):
             return f'<Usuario {self.nombres_usuario}>'
+    
+    @property
+    def is_active(self):
+        return not self.is_deleted
+
+    def get_id(self):
+        """Método requerido por Flask-Login para obtener el identificador único del usuario."""
+        return str(self.id_usuario)
     
     # Método para obtener los usuarios no eliminados
     @staticmethod
@@ -128,4 +136,30 @@ class Usuarios(Base):
             ).all()  
             usuarios_dict = [to_dict(usuario) for usuario in usuarios]  
         return usuarios_dict  # Retornar los datos ya procesados
-       
+    
+    #--------------------
+
+    #Metodo estatico para validar usuario en el login
+    
+
+    @staticmethod
+    def validar_usuario_login(nombre_usuario, contraseña):
+        # Crea una sesión de base de datos explícita
+        session = SessionLocal()
+        try:
+            usuario_valido = session.query(Usuarios).filter_by(nombres_usuario=nombre_usuario).first()
+            if usuario_valido and usuario_valido.contraseña == contraseña:
+                return usuario_valido  # Devuelve el objeto completo y conectado a la sesión
+            return None
+        finally:
+            session.close()  # Cierra la sesión al finalizar
+
+    #--------------
+
+    
+    # Método estático para obtener un usuario por ID
+    @staticmethod
+    def obtener_usuario_por_id(id_usuario):
+        with db_session_manager() as session:
+            return session.query(Usuarios).get(int(id_usuario))
+  

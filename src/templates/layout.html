@@ -9,7 +9,7 @@
         {{titulo_pagina}}
         {% endblock %}
     </title>
-    
+
     <!-- Incluye jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -133,6 +133,16 @@
         factubarrio
     </div>
 
+    <div class="cerrar-sesion">
+        {% if current_user.is_authenticated %}
+            <p class="text-white">Sesión iniciada como: <strong>{{ current_user.nombres_usuario }}</strong></p>
+        {% else %}
+            <p class="text-white">No has iniciado sesión.</p>
+        {% endif %}
+    </div>
+    
+    
+
     <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm" id="pillNav2" role="tablist"
         style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);">
         <li class="nav-item dropdown">
@@ -181,19 +191,20 @@
             </ul>
         </li>
     </ul>
+    
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert alert-dismissible fade show">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+        <div class="alert alert-dismissible fade show">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
             </div>
+            {% endfor %}
+        </div>
         {% endif %}
-    {% endwith %}
-    
+        {% endwith %}
+
 
 
 
@@ -216,4 +227,3 @@
 </body>
 
 </html>
-

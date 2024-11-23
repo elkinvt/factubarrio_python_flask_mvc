@@ -1,8 +1,26 @@
 from src.app import app 
-from flask import render_template
+from flask import render_template, request, redirect, url_for,flash
 from flask_controller import FlaskController
+from src.models.usuarios import Usuarios
+from flask_login import login_user
 
-class Login_Controller(FlaskController):
-    @app.route('/')
-    def Login():
-        return render_template('login.html')
+class LoginController(FlaskController):
+    @app.route('/', methods=['GET'])
+    def home():
+        return redirect(url_for('login'))
+
+    @app.route('/login', methods=['POST','GET'])
+    def login():    
+        if request.method == 'POST':
+            nombre_usuario = request.form.get('nombre_usuario')                
+            contraseña = request.form.get('contraseña')    
+            usuario_valido = Usuarios.validar_usuario_login(nombre_usuario, contraseña)
+            if usuario_valido:
+                print(f"Usuario válido: {usuario_valido.nombres_usuario}")
+                login_user(usuario_valido)
+                return redirect(url_for('Index'))
+            else:
+                flash('Nombre de usuario o contraseña incorrectos',  'danger')
+                return redirect(url_for('login'))
+            
+        return render_template('login.html', titulo_pagina = 'Login')
