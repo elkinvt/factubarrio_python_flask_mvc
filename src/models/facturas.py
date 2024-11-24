@@ -2,8 +2,10 @@ from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
 from src.models import Base, SessionLocal, to_dict
+from src.models.mixins import RoleMixin
 
-class Factura(Base):
+
+class Factura(Base,RoleMixin):
     __tablename__ = 'factura'
     
     id = Column(Integer, primary_key=True, autoincrement=True)

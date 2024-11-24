@@ -1,9 +1,11 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from src.models import Base, SessionLocal, to_dict
 from sqlalchemy.orm import relationship
+from src.models import Base, SessionLocal, to_dict
 from src.models.usuarios import Usuarios
+from src.models.mixins import RoleMixin
 
-class Vendedores(Base):
+
+class Vendedores(Base, RoleMixin):
     __tablename__ = 'vendedores'
     
     idvendedores = Column(Integer, primary_key=True, autoincrement=True)

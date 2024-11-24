@@ -1,12 +1,16 @@
 from src.app import app
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
+from flask import request, flash, render_template, jsonify
 from src.models.clientes import Clientes
+from src.controllers.decorators import role_required
+from flask_login import current_user
+
 
 class Clientes_Controller(FlaskController):
     
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
+    @role_required(['administrador','vendedor']) 
     def clientes_ver():
         clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
@@ -15,6 +19,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para crear el cliente
     @app.route('/clientes_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def clientes_crear():
         if request.method == 'GET':
             return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")

@@ -2,8 +2,10 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
 from src.models import Base, SessionLocal, to_dict
 from src.models.categorias import Categoria
 from src.models.unidad_medida import UnidadMedida
+from src.models.mixins import RoleMixin
 
-class Productos(Base):
+
+class Productos(Base,RoleMixin):
     __tablename__ = 'productos'
     
     idproductos = Column(Integer, primary_key=True, autoincrement=True)

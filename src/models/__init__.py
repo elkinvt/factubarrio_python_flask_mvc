@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from contextlib import contextmanager
 from sqlalchemy.inspection import inspect
 
 # Creación del motor de la base de datos para conectarse con PostgreSQL
@@ -29,3 +28,4 @@ def to_dict(obj):
         raise
 
 #------------
+

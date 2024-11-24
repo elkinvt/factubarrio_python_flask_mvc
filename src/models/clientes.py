@@ -1,7 +1,10 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from src.models import Base, SessionLocal, to_dict
+from src.models.mixins import RoleMixin
 
-class Clientes(Base):
+
+
+class Clientes(Base,RoleMixin):
     __tablename__ = 'clientes'
     
     idclientes = Column(Integer, primary_key=True, autoincrement=True)
@@ -23,6 +26,8 @@ class Clientes(Base):
         self.email = email
         self.is_active = is_active  # Ahora acepta is_active
         self.is_deleted = is_deleted  # Ahora acepta is_deleted
+        
+
 
     def __repr__(self):
         return f'<Cliente {self.nombres_cliente}>'
