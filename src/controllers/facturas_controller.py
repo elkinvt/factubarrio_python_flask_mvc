@@ -6,6 +6,7 @@ from src.models.productos import Productos  # Importar la clase Productos
 from src.models.facturas import Factura  # Importar la clase Factura
 from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
 from datetime import datetime
+from src.controllers.decorators import role_required
 import json
 
 
@@ -13,6 +14,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para cargar la vista de facturas
     @app.route('/ver_factura')
+    @role_required(['administrador','vendedor']) 
     def ver_factura():
         return render_template('form_ver_factura.html', titulo_pagina = "Ver factura")
     
@@ -20,6 +22,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
+    @role_required(['vendedor'])
     def generar_factura():
         if request.method == 'POST':
             try:
@@ -131,6 +134,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para consultar las facturas
     @app.route('/facturas_por_fecha', methods=['GET'])
+    @role_required(['administrador','vendedor'])
     def obtener_facturas_por_fecha():
         fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL
         
@@ -146,6 +150,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para ver el detalle de las facturas
     @app.route('/detalles_factura/<int:id_factura>', methods=['GET'])
+    @role_required(['administrador','vendedor'])
     def obtener_detalles_factura(id_factura):
         # Llamar al método en el modelo para obtener los detalles de la factura
         factura_data = Factura.obtener_detalles(id_factura)

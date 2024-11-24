@@ -3,7 +3,7 @@ from flask_controller import FlaskController
 from flask import request, flash, render_template, jsonify
 from src.models.clientes import Clientes
 from src.controllers.decorators import role_required
-from flask_login import current_user
+
 
 
 class Clientes_Controller(FlaskController):
@@ -106,6 +106,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición (GET)  
     @app.route('/clientes_editar', methods=['GET'])
+    @role_required(['administrador'])
     def clientes_editar():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
@@ -135,6 +136,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_cliente():
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
@@ -202,6 +204,7 @@ class Clientes_Controller(FlaskController):
     
     # Ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
+    @role_required(['administrador'])
     def toggle_estado_cliente():
         tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')
@@ -244,6 +247,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_cliente():
         tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')

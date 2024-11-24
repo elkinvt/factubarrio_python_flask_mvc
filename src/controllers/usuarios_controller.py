@@ -2,24 +2,22 @@ from src.app import app
 from flask import render_template, request, flash,jsonify
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios  
-import re
+from src.controllers.decorators import role_required
 
 class Usuarios_Controller(FlaskController):
 
     # Ruta para ver todos los usuarios
     @app.route('/usuarios_ver', methods=['GET'])
+    @role_required(['administrador'])
     def usuarios_ver():
         usuarios = Usuarios.obtener_usuarios()
-        # Debug: Imprimir los valores de cada usuario
-        for usuario in usuarios:
-            print(f"Usuario: {usuario['nombres_usuario']}, is_active: {usuario['is_active']}")
-        
         return render_template('form_ver_usuario.html', titulo_pagina="Ver usurios", usuarios=usuarios)
 
     #--------------
 
     # Ruta para crear el usuario
     @app.route('/usuarios_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def usuarios_crear():
         if request.method == 'GET':
             return render_template('form_crear_usuario.html', titulo_pagina="Crear usuario")
@@ -82,6 +80,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición de usuario (GET)
     @app.route('/usuarios_editar', methods=['GET'])
+    @role_required(['administrador'])
     def usuarios_editar():
         nombre_usuario = request.args.get('nombre')  # Obtener el nombre del usuario desde los parámetros de la URL
 
@@ -110,6 +109,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para actualizar un usuario (POST)
     @app.route('/usuarios_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_usuarios():
 
         usuario_id = request.form['usuarioId']
@@ -190,6 +190,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])
+    @role_required(['administrador'])
     def toggle_estado_usuario():
         id_usuario = request.form.get('id_usuario')  # Usar el ID del usuario
 
@@ -215,6 +216,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para eliminar usuario (lógica)
     @app.route('/usuario_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_usuario():
         id_usuario = request.form.get('id_usuario')
 

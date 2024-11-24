@@ -16,7 +16,6 @@ class LoginController(FlaskController):
             contraseña = request.form.get('contraseña')    
             usuario_valido = Usuarios.validar_usuario_login(nombre_usuario, contraseña)
             if usuario_valido:
-                print(f"Usuario válido: {usuario_valido.nombres_usuario}")
                 login_user(usuario_valido)
                 # Guardar el ID del usuario en la sesión
                 session['usuario_id'] = usuario_valido.id_usuario  # Asegúrate de que `id_usuario` es el campo correcto

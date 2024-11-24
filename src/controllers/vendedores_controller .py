@@ -3,12 +3,13 @@ from flask_controller import FlaskController
 from flask import request,flash, render_template, jsonify
 from src.models.vendedores import Vendedores
 from src.models.usuarios import Usuarios
-
+from src.controllers.decorators import role_required
 
 class Vendedores_Controller(FlaskController):
 
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
+    @role_required(['administrador'])
     def vendedores_ver():
         vendedores = Vendedores.obtener_vendedores()
         return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
@@ -17,6 +18,7 @@ class Vendedores_Controller(FlaskController):
     
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def vendedores_crear():
         if request.method == 'GET':
             # Obtener la lista de usuarios disponibles para vincular
@@ -107,6 +109,7 @@ class Vendedores_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
+    @role_required(['administrador'])
     def vendedores_editar():
         tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
@@ -136,6 +139,7 @@ class Vendedores_Controller(FlaskController):
 
     # Actualizar vendedor
     @app.route('/vendedores_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_vendedor():
         vendedor_id = request.form['vendedorId']
         tipo_documento = request.form['tipoDocumento']
@@ -200,6 +204,7 @@ class Vendedores_Controller(FlaskController):
     
     # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_vendedor():
         tipo_documento = request.form.get('tipoDocumento')
         numero_documento = request.form.get('numeroDocumento')
