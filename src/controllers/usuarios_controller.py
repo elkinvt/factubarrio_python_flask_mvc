@@ -216,24 +216,15 @@ class Usuarios_Controller(FlaskController):
     # Ruta para eliminar usuario (lógica)
     @app.route('/usuario_eliminar', methods=['POST'])
     def eliminar_usuario():
-        nombre_usuario = request.form.get('nombreUsuario')
+        id_usuario = request.form.get('id_usuario')
 
-        # Validaciones y mensajes de error
-        errores = {}
-
-        # Validación del nombre de usuario
-        if not nombre_usuario:
-            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
-        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
-            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
-
-        # Si hay errores, devolvemos JSON con errores
-        if errores:
-            return jsonify({'status': 'error', 'errores': errores}), 400
+        # Validar que se reciba un ID válido
+        if not id_usuario:
+            return jsonify({'status': 'error', 'message': 'ID de usuario es obligatorio.'}), 400
 
         # Intento de eliminación lógica del usuario
         try:
-            eliminado = Usuarios.eliminar_usuario_logicamente(nombre_usuario)
+            eliminado = Usuarios.eliminar_usuario_logicamente(id_usuario)
             
             if not eliminado:
                 return jsonify({'success': False, 'message': 'Usuario no encontrado o ya eliminado.'}), 404

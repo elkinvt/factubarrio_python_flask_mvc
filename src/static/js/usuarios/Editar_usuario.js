@@ -162,19 +162,20 @@ $(document).ready(function () {
                 }, 1500);
             },
             error: function (xhr) {
-                const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+                const responseJSON = xhr.responseJSON;
+                const errores = responseJSON ? responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.nombreUsuario) {
-                    $('#EliminarUsuarioMensaje').append(`<p class="text-danger">${errores.nombreUsuario}</p>`);
+                if (errores.id_usuario) {
+                    $('#EliminarUsuarioMensaje').append(`<p class="text-danger">${errores.id_usuario}</p>`);
                 }
-
-                // Mostrar mensaje de error general si no hay errores específicos
-                if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
-                    $('#EliminarUsuarioMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);
-                } else if (Object.keys(errores).length === 0) {
+                // Mostrar mensaje de error general
+                if (!errores.id_usuario && responseJSON && responseJSON.message) {
+                    $('#EliminarUsuarioMensaje').html(`<p class="text-danger">${responseJSON.message}</p>`);
+                } else if (!responseJSON) {
                     $('#EliminarUsuarioMensaje').html('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
                 }
+
             }
         });
     });
