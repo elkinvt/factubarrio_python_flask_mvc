@@ -72,7 +72,8 @@ class Usuarios(Base, UserMixin):
     # Método estático para actualizar un usuario     
     @staticmethod
     def actualizar_usuario(usuario_id, datos_actualizados):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
 
             usuario = session.query(Usuarios).filter_by(id_usuario=usuario_id).first()
             if not usuario:
@@ -84,6 +85,8 @@ class Usuarios(Base, UserMixin):
 
             session.commit()  # Confirma los cambios en la base de datos
             return usuario
+        finally:
+            session.close()
     #--------------
 
     # Método estático para actualizar estado del usuario

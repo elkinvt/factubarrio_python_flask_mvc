@@ -50,7 +50,7 @@
             <label for="rol">Rol:</label>
             <select id="rol" name="rolUsuario" class="form-control form-control-sm" required>
                 <option value="">Seleccione un rol</option>
-                <option value="admin" {%if usuario['rol'] == 'admin' %} selected{% endif %}>Admin</option>
+                <option value="administrador" {%if usuario['rol'] == 'administrador' %} selected{% endif %}>Administrador</option>
                 <option value="vendedor" {%if usuario['rol'] == 'vendedor' %} selected{% endif %}>Vendedor</option>
             </select>
             <div class="text-danger" id="rolUsuarioError"></div>

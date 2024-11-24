@@ -157,6 +157,10 @@ class Usuarios_Controller(FlaskController):
             'is_active': is_active
         }
 
+        # Agregar la contraseña solo si se proporciona
+        if nueva_contraseña:
+            datos_actualizados['contraseña'] = nueva_contraseña
+
         try:
             Usuarios.actualizar_usuario(usuario_id, datos_actualizados)
             return jsonify({'status': 'success', 'message': 'Usuario actualizado con éxito'}), 200
