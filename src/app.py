@@ -28,6 +28,8 @@ def load_user(id_usuario):
         session.close()
 
 
+
+
 # Punto de entrada de la aplicación
 if __name__ == '__main__':
     app.run(debug=True)

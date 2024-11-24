@@ -71,7 +71,8 @@
 
     <!-- Bloquear/Desbloquear Usuario -->
     <form id="toggleEstadoUsuarioForm" class="mt-3">
-        <input type="hidden" name="nombreUsuario" value="{{ usuario['nombres_usuario'] }}">
+        
+        <input type="hidden" name="id_usuario" id="id_usuario" value="{{ usuario['id_usuario'] }}">
         <button type="submit" class="btn btn-warning mb-2">
             {% if usuario['is_active'] %}
                 Desactivar usuario

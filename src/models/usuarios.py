@@ -27,8 +27,14 @@ class Usuarios(Base, UserMixin):
             return f'<Usuario {self.nombres_usuario}>'
     
     @property
-    def is_active(self):
-        return not self.is_deleted
+    def can_login(self):
+        """Permitir inicio de sesión solo si está activo y no eliminado."""
+        return self.is_active and not self.is_deleted
+
+    def flask_is_active(self):
+        """Método usado por Flask-Login para validar si el usuario está activo."""
+        return self.can_login
+
 
     def get_id(self):
         """Método requerido por Flask-Login para obtener el identificador único del usuario."""
@@ -37,10 +43,12 @@ class Usuarios(Base, UserMixin):
     # Método para obtener los usuarios no eliminados
     @staticmethod
     def obtener_usuarios():
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             usuarios = session.query(Usuarios).filter_by(is_deleted=False).all()
             return [to_dict(usuario) for usuario in usuarios]
-
+        finally:
+            session.close()
     #------------ 
 
     # Método estático para agregar un usuario      
@@ -80,10 +88,10 @@ class Usuarios(Base, UserMixin):
 
     # Método estático para actualizar estado del usuario
     @staticmethod
-    def actualizar_estado(nombres_usuario):
+    def actualizar_estado(id_usuario):
         """Toggle de estado de usuario"""
         with db_session_manager() as session:
-            usuario = session.query(Usuarios).filter_by(nombres_usuario=nombres_usuario).first()
+            usuario = session.query(Usuarios).filter_by(id_usuario=id_usuario).first()
             
             if usuario:
                  # Cambiar el estado activo/inactivo

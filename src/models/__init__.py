@@ -33,6 +33,10 @@ def to_dict(obj):
     """Convierte cualquier objeto SQLAlchemy en un diccionario."""
     try:
         result = {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+
+        # Incluir propiedades adicionales (como propiedades calculadas)
+        if hasattr(obj, 'is_active'):  # Verifica si el objeto tiene la propiedad
+            result['is_active'] = obj.is_active
         #print("Resultado de to_dict:", result)  # Imprime el resultado de cada conversión
         return result
     except KeyError as e:

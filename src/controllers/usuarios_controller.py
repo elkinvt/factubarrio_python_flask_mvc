@@ -10,6 +10,10 @@ class Usuarios_Controller(FlaskController):
     @app.route('/usuarios_ver', methods=['GET'])
     def usuarios_ver():
         usuarios = Usuarios.obtener_usuarios()
+        # Debug: Imprimir los valores de cada usuario
+        for usuario in usuarios:
+            print(f"Usuario: {usuario['nombres_usuario']}, is_active: {usuario['is_active']}")
+        
         return render_template('form_ver_usuario.html', titulo_pagina="Ver usurios", usuarios=usuarios)
 
     #--------------
@@ -183,26 +187,16 @@ class Usuarios_Controller(FlaskController):
     # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])
     def toggle_estado_usuario():
-        nombre_usuario = request.form.get('nombreUsuario')
-        #print("Nombre de usuario recibido:", nombre_usuario)
+        id_usuario = request.form.get('id_usuario')  # Usar el ID del usuario
 
-        # Validaciones y mensajes de error
-        errores = {}
+        # Validar que se reciba un ID válido
+        if not id_usuario:
+            return jsonify({'status': 'error', 'message': 'ID de usuario es obligatorio.'}), 400
 
-        # Validación del nombre de usuario
-        if not nombre_usuario:
-            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
-        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
-            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
-
-
-        # Si hay errores, devolvemos JSON con errores
-        if errores:
-            return jsonify({'status': 'error', 'errores': errores}), 400
-
+        
         # Intento de actualización del estado
         try:
-            nuevo_estado = Usuarios.actualizar_estado(nombre_usuario)
+            nuevo_estado = Usuarios.actualizar_estado(id_usuario)
             
             if nuevo_estado is None:
                 return jsonify({'success': False, 'message': 'Usuario no encontrado.'}), 404
