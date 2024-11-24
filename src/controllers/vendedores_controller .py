@@ -111,17 +111,17 @@ class Vendedores_Controller(FlaskController):
     @app.route('/vendedores_editar', methods=['GET'])
     @role_required(['administrador'])
     def vendedores_editar():
-        tipo_documento = request.args.get('tipoDocumento')
+        
         numero_documento = request.args.get('numeroDocumento')
 
         # Verificar si se ingresan ambos campos
-        if not tipo_documento or not numero_documento:
-            flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
+        if not  numero_documento:
+            flash('Por favor, ingrese número de Documento.', 'warning')
             return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
 
         try:
             # Llamar al método del modelo para buscar el vendedor sin manejar la sesión
-            vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
+            vendedor = Vendedores.buscar_vendedor_por_documento(numero_documento)
             
             if vendedor:
                 if vendedor['is_deleted']:
@@ -206,33 +206,24 @@ class Vendedores_Controller(FlaskController):
     @app.route('/vendedores_eliminar', methods=['POST'])
     @role_required(['administrador'])
     def eliminar_vendedor():
-        tipo_documento = request.form.get('tipoDocumento')
-        numero_documento = request.form.get('numeroDocumento')
+        vendedor_id = request.form.get('idvendedores')
         
          # Validaciones y mensajes de error
         errores = {}
 
-         # Validación del tipo de documento
-        if not tipo_documento:
-            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
-        elif not tipo_documento.isalpha():
-            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
-
-        # Validación del número de documento
-        if not numero_documento:
-            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
-        elif not numero_documento.isdigit():
-            errores['numeroDocumento'] = 'Debe contener solo números.'
-        elif len(numero_documento) < 6 or len(numero_documento) > 12:
-            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
-
+        # Validación del ID del cliente
+        if not vendedor_id:
+            errores['idvendedores'] = 'El ID del vendedor es obligatorio.'
+        elif not vendedor_id.isdigit():
+            errores['idvendedores'] = 'El ID del vendedor debe ser un número válido.'
         # Si hay errores, devolvemos JSON con errores
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400
 
         # Intento de eliminación del vendedor
         try:
-            if Vendedores.eliminar_vendedor_logicamente(tipo_documento, numero_documento):
+            vendedor_id = int(vendedor_id)
+            if Vendedores.eliminar_vendedor_logicamente(vendedor_id):
                  return jsonify({'success': True, 'message': 'vendedor eliminado correctamente.'}), 200
             else:
                 return jsonify({'success': False, 'message': 'vendedor no encontrado o ya eliminado.'}), 404

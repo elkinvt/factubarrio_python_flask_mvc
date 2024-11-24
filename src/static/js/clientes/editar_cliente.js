@@ -90,11 +90,8 @@ $(document).ready(function () {
                 const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.tipoDocumento) {
-                    $('#toggleEstadoClienteMensaje').append(`<p class="text-danger">${errores.tipoDocumento}</p>`);
-                }
-                if (errores.numeroDocumento) {
-                    $('#toggleEstadoClienteMensaje').append(`<p class="text-danger">${errores.numeroDocumento}</p>`);
+                if (errores.idclientes) {
+                    $('#toggleEstadoClienteMensaje').append(`<p class="text-danger">${errores.idclientes}</p>`);
                 }
 
                 // Mostrar mensaje de error general si no hay errores específicos
@@ -144,11 +141,8 @@ $(document).ready(function () {
                 const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.tipoDocumento) {
-                    $('#eliminarClienteMensaje').append(`<p class="text-danger">${errores.tipoDocumento}</p>`);
-                }
-                if (errores.numeroDocumento) {
-                    $('#eliminarClienteMensaje').append(`<p class="text-danger">${errores.numeroDocumento}</p>`);
+                if (errores.idclientes) {
+                    $('#eliminarClienteMensaje').append(`<p class="text-danger">${errores.idclientes}</p>`);
                 }
 
                 // Mostrar mensaje de error general si no hay errores específicos

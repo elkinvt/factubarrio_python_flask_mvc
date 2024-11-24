@@ -71,11 +71,11 @@ class Vendedores(Base, RoleMixin):
     
     # Método estático para buscar un vendedor usando una sesión existente
     @staticmethod
-    def buscar_vendedor_por_documento(tipo_documento, numero_documento):
+    def buscar_vendedor_por_documento(numero_documento):
         session = SessionLocal()
         try:
             vendedor = session.query(Vendedores).filter_by(
-            tipo_documento=tipo_documento, numero_documento=numero_documento).first()
+            numero_documento=numero_documento).first()
 
             return to_dict(vendedor) if vendedor else None
         finally:
@@ -117,10 +117,10 @@ class Vendedores(Base, RoleMixin):
     
     # Método estático para eliminar un vendedor 
     @staticmethod
-    def eliminar_vendedor_logicamente(tipo_documento, numero_documento):
+    def eliminar_vendedor_logicamente(vendedor_id):
         session = SessionLocal()
         try:
-            vendedor = session.query(Vendedores).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento). first()
+            vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id). first()
             vendedor.is_deleted = True  # Marcamos el vendedor como eliminado
             session.commit()  # Guardamos los cambios en la base de datos
             return True

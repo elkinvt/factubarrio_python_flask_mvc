@@ -4,18 +4,7 @@
     {% if not vendedor %}
         <h2>Buscar Vendedor</h2>
         <form action="/vendedores_editar" method="GET">
-            <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
-            <select class="form-control form-control-sm" id="buscarTipoDocumento" name="tipoDocumento">
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC">Cédula de Ciudadanía</option>
-                <option value="TI">Tarjeta de Identidad</option>
-                <option value="CE">Cédula de Extranjería</option>
-                <option value="PA">Pasaporte</option>
-                <option value="RC">Registro Civil</option>
-                <option value="NIT">NIT</option>
-            </select>
-
-            <label for="buscarCedula" class="form-label">Número de Documento:</label>
+            <label for="buscardocumento" class="form-label">Número de Documento:</label>
             <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm" name="numeroDocumento">
 
             <button type="submit" class="btn btn-primary mt-2 form-control-sm">Buscar Vendedor</button>
@@ -31,15 +20,12 @@
 
         <div class="mb-3">
             <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
-            <select class="form-control form-control-sm" name="tipoDocumento" disabled>
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC" {% if vendedor.tipo_documento == 'CC' %} selected {% endif %}>Cédula de Ciudadanía</option>
-                <option value="TI" {% if vendedor.tipo_documento == 'TI' %} selected {% endif %}>Tarjeta de Identidad</option>
-                <option value="CE" {% if vendedor.tipo_documento == 'CE' %} selected {% endif %}>Cédula de Extranjería</option>
-                <option value="PA" {% if vendedor.tipo_documento == 'PA' %} selected {% endif %}>Pasaporte</option>
-                <option value="RC" {% if vendedor.tipo_documento == 'RC' %} selected {% endif %}>Registro Civil</option>
-                <option value="NIT" {% if vendedor.tipo_documento == 'NIT' %} selected {% endif %}>NIT</option>
-            </select>
+            <input 
+            type="text" 
+            class="form-control form-control-sm" 
+            id="tipoDocumentoEditar" 
+            value="{{ vendedor.tipo_documento }}" 
+            readonly>
             <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
             <div id="tipoDocumentoError" class="text-danger"></div>
         </div>
@@ -82,8 +68,7 @@
 
     <!-- Eliminar Vendedor -->
     <form id="eliminarVendedorForm"  class="mt-2">
-        <input type="hidden" name="tipoDocumento" value="{{ vendedor.tipo_documento }}">
-        <input type="hidden" name="numeroDocumento" value="{{ vendedor.numero_documento }}">
+        <input type="hidden" name="idvendedores" value="{{ vendedor['idvendedores']  }}">
         <button type="submit" class="btn btn-danger">Eliminar Vendedor</button>
     
     </form>

@@ -5,17 +5,6 @@
     {% if not cliente %}
         <h2>Buscar Cliente</h2>
         <form action="/clientes_editar" method="GET">
-            <label for="buscarTipoDocumento" class="form-label">Tipo de Documento:</label>
-            <select class="form-control form-control-sm" id="buscarTipoDocumento" name="tipoDocumento">
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC">Cédula de Ciudadanía</option>
-                <option value="TI">Tarjeta de Identidad</option>
-                <option value="CE">Cédula de Extranjería</option>
-                <option value="PA">Pasaporte</option>
-                <option value="RC">Registro Civil</option>
-                <option value="NIT">NIT</option>
-            </select>
-
             <label for="buscarCedula" class="form-label">Número de Documento:</label>
             <input type="text" placeholder="Ingrese número del documento para buscar" class="form-control form-control-sm"
                 name="numeroDocumento">
@@ -34,18 +23,16 @@
 
         <div class="mb-3">
             <label for="tipoDocumentoEditar" class="form-label">Tipo de Documento</label>
-            <select class="form-control form-control-sm" id="tipoDocumentoEditar" name="tipoDocumento" disabled>
-                <option value="">Seleccione tipo de documento</option>
-                <option value="CC" {% if cliente['tipo_documento'] == 'CC' %} selected {% endif %}>Cédula de Ciudadanía</option>
-                <option value="TI" {% if cliente['tipo_documento'] == 'TI' %} selected {% endif %}>Tarjeta de Identidad</option>
-                <option value="CE" {% if cliente['tipo_documento'] == 'CE' %} selected {% endif %}>Cédula de Extranjería</option>
-                <option value="PA" {% if cliente['tipo_documento'] == 'PA' %} selected {% endif %}>Pasaporte</option>
-                <option value="RC" {% if cliente['tipo_documento'] == 'RC' %} selected {% endif %}>Registro Civil</option>
-                <option value="NIT" {% if cliente['tipo_documento'] == 'NIT' %} selected {% endif %}>NIT</option>
-            </select>
+            <input 
+                type="text" 
+                class="form-control form-control-sm" 
+                id="tipoDocumentoEditar" 
+                value="{{ cliente['tipo_documento'] }}" 
+                readonly>
             <input type="hidden" name="tipoDocumento" value="{{ cliente['tipo_documento'] }}">
             <div id="tipoDocumentoError" class="text-danger"></div>
         </div>
+        
 
         <div class="mb-3">
             <label for="cedulaCliente" class="form-label">Número de Documento</label>
@@ -95,8 +82,7 @@
 
     <!-- Bloquear/Desbloquear Cliente -->
     <form id="toggleEstadoClienteForm" class="mt-3">
-        <input type="hidden" name="numeroDocumento" value="{{ cliente['numero_documento'] }}">
-        <input type="hidden" name="tipoDocumento" value="{{ cliente['tipo_documento'] }}">
+        <input type="hidden" name="idclientes" value="{{ cliente['idclientes'] }}">
         <button type="submit" class="btn btn-warning mb-2"> 
             {% if cliente['is_active'] %}
                 Desactivar cliente
@@ -109,8 +95,7 @@
 
     <!-- Eliminar Cliente -->
     <form id="eliminarClienteForm"  class="mt-2">
-        <input type="hidden" name="numeroDocumento" value="{{ cliente['numero_documento'] }}">
-        <input type="hidden" name="tipoDocumento" value="{{ cliente['tipo_documento'] }}">
+        <input type="hidden" name="idclientes" value="{{ cliente['idclientes'] }}">
         <button type="submit" class="btn btn-danger">Eliminar Cliente</button>
     </form>
     <div id="eliminarClienteMensaje" class="mt-2"></div>

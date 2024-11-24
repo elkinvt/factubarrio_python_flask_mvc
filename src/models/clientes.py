@@ -62,11 +62,11 @@ class Clientes(Base,RoleMixin):
 
     # Método estático para buscar un cliente usando una sesión existente
     @staticmethod
-    def buscar_cliente_por_documento(tipo_documento, numero_documento):
+    def buscar_cliente_por_documento(numero_documento):
         session = SessionLocal()
         try:
             cliente = session.query(Clientes).filter_by(
-                tipo_documento = tipo_documento, numero_documento = numero_documento).first()
+                 numero_documento = numero_documento).first()
             
             return to_dict(cliente) if cliente else None
         finally:
@@ -96,11 +96,11 @@ class Clientes(Base,RoleMixin):
 
     # Método estático para actualizar estado del cliente 
     @staticmethod
-    def actualizar_estado(tipo_documento, numero_documento):
+    def actualizar_estado(cliente_id):
         """Toggle de estado de cliente"""
         session = SessionLocal()
         try:
-            cliente = session.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
+            cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
             
             if cliente:
                  # Cambiar el estado activo/inactivo
@@ -114,10 +114,10 @@ class Clientes(Base,RoleMixin):
 
     # Método estático para eliminar un cliente 
     @staticmethod
-    def eliminar_cliente_logicamente(tipo_documento, numero_documento):
+    def eliminar_cliente_logicamente(cliente_id):
         session = SessionLocal()
         try:
-            cliente = session.query(Clientes).filter_by(tipo_documento= tipo_documento, numero_documento= numero_documento).first()
+            cliente = session.query(Clientes).filter_by(idclientes= cliente_id).first()
 
             if cliente and not cliente.is_deleted:
                 cliente.is_deleted = True
@@ -187,5 +187,5 @@ class Clientes(Base,RoleMixin):
         finally:
             session.close()
         
-        #--------
+    #--------
 
