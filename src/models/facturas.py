@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
-from src.models import Base, db_session_manager, to_dict
+from src.models import Base, SessionLocal, to_dict
 
 class Factura(Base):
     __tablename__ = 'factura'
@@ -43,7 +43,8 @@ class Factura(Base):
     # Método para crear una factura
     @staticmethod
     def crear_factura(clientes_idclientes, vendedores_idvendedores, fecha, hora, total_valor, impuesto, descuento, monto_pagado, cambio):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 nueva_factura =Factura(
                     clientes_idclientes=clientes_idclientes,
@@ -66,13 +67,16 @@ class Factura(Base):
             except SQLAlchemyError as e:
                 print(f"Error al crear la factura: {str(e)}")
                 return None
+        finally:
+            session.close()
            
     #--------------------------
 
     #Metodo para búsqueda de facturas por fecha
     @staticmethod
     def buscar_por_fecha(fecha):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Buscar facturas por la fecha proporcionada
                 facturas = session.query(Factura).filter(Factura.fecha == fecha).all()
@@ -95,13 +99,16 @@ class Factura(Base):
             except Exception as e:
                 print(f"Error al buscar facturas: {e}")
                 return None
+        finally:
+            session.close()
 
     #----------------
 
     #Metodo para obtener los detalles de la factura
     @staticmethod
     def obtener_detalles(id_factura):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Buscar la factura por id
                 factura = session.query(Factura).filter_by(id=id_factura).first()
@@ -132,6 +139,8 @@ class Factura(Base):
             except Exception as e:
                 print(f"Error al obtener detalles de la factura: {e}")
                 return None
+        finally:
+            session.close()
     
     #------------------
      

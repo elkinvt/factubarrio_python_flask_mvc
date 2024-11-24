@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from src.models import Base, db_session_manager, to_dict
+from src.models import Base, SessionLocal, to_dict
 
 class Clientes(Base):
     __tablename__ = 'clientes'
@@ -32,38 +32,48 @@ class Clientes(Base):
     @staticmethod
     def obtener_clientes():
         """Obtener todos los clientes no eliminados."""
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             clientes = session.query(Clientes).filter_by(is_deleted=False).all()
 
             return [to_dict(cliente) for cliente in clientes] 
+        finally:
+            session.close()
     
     #--------
 
     # Método estático para agregar un cliente      
     @staticmethod
     def agregar_cliente(cliente):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             session.add(cliente)
             session.commit()  # Confirma los cambios
             return cliente
+        finally:
+            session.close()
     
     #----------
 
     # Método estático para buscar un cliente usando una sesión existente
     @staticmethod
     def buscar_cliente_por_documento(tipo_documento, numero_documento):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             cliente = session.query(Clientes).filter_by(
                 tipo_documento = tipo_documento, numero_documento = numero_documento).first()
             
-            return to_dict(cliente) if cliente else None 
+            return to_dict(cliente) if cliente else None
+        finally:
+            session.close()
 
     #---------
 
     # Método estático para actualizar un cliente     
     @staticmethod
     def actualizar_cliente(cliente_id, datos_actualizados):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             cliente = session.query(Clientes).filter_by(idclientes=cliente_id).first()
 
             if not cliente:
@@ -75,27 +85,33 @@ class Clientes(Base):
 
             session.commit()  # Confirma los cambios en la base de datos
             return cliente
+        finally:
+            session.close()
     #--------------
 
     # Método estático para actualizar estado del cliente 
     @staticmethod
     def actualizar_estado(tipo_documento, numero_documento):
         """Toggle de estado de cliente"""
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             cliente = session.query(Clientes).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento).first()
             
             if cliente:
                  # Cambiar el estado activo/inactivo
                 cliente.is_active = not cliente.is_active
                 session.commit()
-            return cliente.is_active
-        return None
+                return cliente.is_active
+            return None
+        finally:
+            session.close()
     #--------
 
     # Método estático para eliminar un cliente 
     @staticmethod
     def eliminar_cliente_logicamente(tipo_documento, numero_documento):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             cliente = session.query(Clientes).filter_by(tipo_documento= tipo_documento, numero_documento= numero_documento).first()
 
             if cliente and not cliente.is_deleted:
@@ -103,6 +119,8 @@ class Clientes(Base):
                 session.commit()
                 return True
             return False
+        finally:
+            session.close()
         
     #------------
 
@@ -110,7 +128,8 @@ class Clientes(Base):
     @staticmethod
     def buscar_clientes(query, incluir_inactivos=False, incluir_eliminados=False):
         """Buscar clientes según filtros dinámicos"""
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             # Condiciones base para la consulta
             condiciones = [Clientes.numero_documento.ilike(f"%{query}%")]
             
@@ -125,7 +144,7 @@ class Clientes(Base):
                 'id': cliente.idclientes,
                 'tipo_documento': cliente.tipo_documento,
                 'numero_documento': cliente.numero_documento,
-                'nombres_cliente': cliente.nombres_cliente,
+                'nombre': cliente.nombres_cliente,
                 'telefono': cliente.telefono,
                 'direccion': cliente.direccion,
                 'email': cliente.email,
@@ -135,13 +154,16 @@ class Clientes(Base):
             for cliente in session.query(Clientes).filter(*condiciones).all()
 
         ]
+        finally:
+            session.close()
     #---------------------------
 
 
     # Método estático para validar duplicaciones del cliente
     @staticmethod
     def validar_datos(numero_documento=None, email=None, cliente_id=None):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             errores = {}
             
             # Validar duplicado de número de documento, excluyendo el cliente actual si cliente_id está presente
@@ -157,6 +179,8 @@ class Clientes(Base):
                     errores['emailCliente'] = 'Este correo electrónico ya está registrado.'
 
             return errores
+        finally:
+            session.close()
         
         #--------
 

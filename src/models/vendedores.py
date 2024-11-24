@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from src.models import Base, db_session_manager, to_dict, SessionLocal
+from src.models import Base, SessionLocal, to_dict
 from sqlalchemy.orm import relationship
 from src.models.usuarios import Usuarios
 
@@ -36,7 +36,8 @@ class Vendedores(Base):
     # Método para obtener los vendedores no eliminados
     @staticmethod
     def obtener_vendedores():
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try: 
             vendedores = session.query(Vendedores, Usuarios).join(
                 Usuarios, Vendedores.usuario_id  == Usuarios.id_usuario).filter(Vendedores.is_deleted==False).all()
             
@@ -48,34 +49,43 @@ class Vendedores(Base):
                 for vendedor, usuario in vendedores
             ]
             return vendedores_dict
+        finally:
+            session.close()
 
     #------------     
 
     # Método estático para agregar un vendedor      
     @staticmethod
     def agregar_vendedor(vendedor):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             session.add(vendedor)
             session.commit()  # Confirma los cambios
             return vendedor
+        finally:
+            session.close()
         
     #------------------
     
     # Método estático para buscar un vendedor usando una sesión existente
     @staticmethod
     def buscar_vendedor_por_documento(tipo_documento, numero_documento):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             vendedor = session.query(Vendedores).filter_by(
             tipo_documento=tipo_documento, numero_documento=numero_documento).first()
 
             return to_dict(vendedor) if vendedor else None
+        finally:
+            session.close()
 
     #---------
     
     # Método estático para actualizar un vendedor     
     @staticmethod
     def actualizar_vendedor(vendedor_id, datos_actualizados):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             vendedor = session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
 
             if not vendedor:
@@ -87,33 +97,41 @@ class Vendedores(Base):
 
             session.commit()  # Confirma los cambios en la base de datos
             return vendedor
+        finally:
+            session.close()
         
     #--------------
 
     #Metodo estatico para buscar vendedor por id
     @staticmethod
     def buscar_vendedor_por_id(vendedor_id):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             return session.query(Vendedores).filter_by(idvendedores=vendedor_id).first()
+        finally:
+            session.close()
     
     #-----------------
     
     # Método estático para eliminar un vendedor 
     @staticmethod
     def eliminar_vendedor_logicamente(tipo_documento, numero_documento):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             vendedor = session.query(Vendedores).filter_by(tipo_documento=tipo_documento, numero_documento=numero_documento). first()
             vendedor.is_deleted = True  # Marcamos el vendedor como eliminado
             session.commit()  # Guardamos los cambios en la base de datos
             return True
-        return False
+        finally:
+            session.close()
 
     #------------    
 
     # Método de validación en Vendedores
     @staticmethod
     def validar_datos(numero_documento=None, email=None,vendedor_id=None):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             errores = {}
 
             #print(f'Validando: numero_documento={numero_documento}, email={email}, vendedor_id={vendedor_id}')
@@ -135,6 +153,8 @@ class Vendedores(Base):
 
             #print(f'Errores detectados: {errores}')      
             return errores
+        finally:
+            session.close()
 
     #---------
 
@@ -150,5 +170,7 @@ class Vendedores(Base):
             return vendedor
         finally:
             session.close()
+            
+    #-----------------
     
 

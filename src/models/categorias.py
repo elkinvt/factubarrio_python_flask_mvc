@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from src.models import Base, db_session_manager, to_dict
+from src.models import Base, SessionLocal, to_dict
 
 class Categoria(Base):
     __tablename__ = 'categoria'
@@ -17,7 +17,8 @@ class Categoria(Base):
     #Metodo estatico para obtener las categorias
     @staticmethod
     def obtener_todas():
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 categorias = session.query(Categoria).all()
                 # Convertimos cada categoría en un diccionario para no depender de la sesión
@@ -29,6 +30,8 @@ class Categoria(Base):
             except Exception as e:
                 print(f"Error en obtener_todas: {e}")  # Log de error para depuración
                 return []  # Retorna una lista vacía en caso de error
+        finally:
+            session.close()
            
             
     #-------------------
@@ -36,12 +39,15 @@ class Categoria(Base):
     # Método para verificar categoria existe del producto
     @staticmethod
     def existe_categoria(id_categoria):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Verifica si la categoría existe en la base de datos
                 categoria_existe = session.query(Categoria).filter_by(idcategoria=id_categoria).first() is not None
                 return categoria_existe
             except Exception as e:
                 raise e
+        finally:
+            session.close()
             
     #-----------

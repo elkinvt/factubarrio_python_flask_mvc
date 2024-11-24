@@ -13,21 +13,6 @@ Base = declarative_base()
 # Crear una sesión para interactuar con la base de datos
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Contexto de sesión para gestionar apertura y cierre automáticamente
-@contextmanager
-def db_session_manager():
-    session = SessionLocal()
-    try:
-        yield session
-        session.commit()
-    except Exception as e:
-        session.rollback()
-        raise e
-    finally:
-        session.close()
-        
-#-------------
-
 #Convierte cualquier objeto SQLAlchemy en un diccionario.
 def to_dict(obj):
     """Convierte cualquier objeto SQLAlchemy en un diccionario."""

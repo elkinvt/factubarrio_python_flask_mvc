@@ -33,7 +33,7 @@ class Facturas_Controller(FlaskController):
                 if not vendedor:
                     return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
                 
-                vendedores_idvendedores = vendedor.id  # Usaremos este vendedor para la factura
+                vendedores_idvendedores = vendedor.idvendedores  # Usaremos este vendedor para la factura
 
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')

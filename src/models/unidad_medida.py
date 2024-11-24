@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from src.models import Base, db_session_manager, to_dict
+from src.models import Base, SessionLocal, to_dict
 
 class UnidadMedida(Base):
     __tablename__ = 'unidad_medida'
@@ -23,7 +23,8 @@ class UnidadMedida(Base):
     #Metodo estatico para obtener las unidades de medida
     @staticmethod
     def obtener_todas_con_subunidades():
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 unidades_padre = session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id == None).all()
                 subunidades = session.query(UnidadMedida).filter(UnidadMedida.unidad_padre_id != None).all()
@@ -35,18 +36,23 @@ class UnidadMedida(Base):
             except Exception as e:
                 print(f"Error en obtener_todas_con_subunidades: {e}")
                 return [], []
+        finally:
+            session.close()
                      
     #------------------
 
     # Método para verificar unidad existe del producto
     @staticmethod
     def existe_unidad(id_unidad):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Verifica si la unidad de medida existe en la base de datos
                 unidad_existe = session.query(UnidadMedida).filter_by(idunidad_medida=id_unidad).first() is not None
                 return unidad_existe
             except Exception as e:
                 raise e
+        finally:
+            session.close()
     
     #----------
