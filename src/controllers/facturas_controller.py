@@ -31,13 +31,13 @@ class Facturas_Controller(FlaskController):
                 # Obtener el vendedor asociado al usuario
                 vendedor = Vendedores.obtener_vendedor_por_usuario(usuario_id)
                 if not vendedor:
-                    return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
+                    error_message = "No se encontró un vendedor asociado al usuario actual."
+                    return render_template('form_error.html', error=error_message), 400
                 
                 vendedores_idvendedores = vendedor.idvendedores  # Usaremos este vendedor para la factura
 
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
-                
                 productos = json.loads(request.form.get('productosFactura'))
 
                 # Validación del cliente y vendedor
@@ -112,23 +112,20 @@ class Facturas_Controller(FlaskController):
             # Obtener el usuario logueado
             usuario_id = session.get('usuario_id')
 
-            # Inicializar vendedor_actual en None para manejar el caso en que no se encuentre un vendedor
-            vendedor_actual = None
-
-            # Obtener el vendedor asociado al usuario
-            try:
-                vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
-            except ValueError as e:
-                flash(f"Error: {str(e)}", "danger")
+            vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+            
             if not vendedor_actual:
-                return jsonify({"error": "No se encontró un vendedor asociado al usuario actual."}), 400
+                error_message = "No se encontró un vendedor asociado al usuario actual."
+                return render_template('form_error.html', error=error_message), 400
+
             
             productos = Productos.obtener_productos()
+            return render_template('form_generacion_factura.html', vendedor_actual=vendedor_actual, productos=productos, titulo_pagina="Generar factura")
            
         except Exception as e:
-            flash(f'Error al cargar los datos: {str(e)}', 'danger')
-
-        return render_template('form_generacion_factura.html', vendedor_actual=vendedor_actual, productos=productos, titulo_pagina="Generar factura")
+            error_message = f"Error al cargar los datos: {str(e)}"
+            return render_template('form_error.html', error=error_message,titulo_pagina="vendedor no asociado"), 500
+        
 
     #--------------------------
 
