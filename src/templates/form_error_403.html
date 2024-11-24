@@ -1,21 +1,13 @@
 {% extends 'layout.html' %}
+
 {% block content %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Error 403 - Acceso Denegado</title>
-</head>
-<body>
+<div class="container mt-5">
     <h1>Error 403</h1>
     <p>{{ message }}</p>
-    <p>Esta es la plantilla de error 403 personalizada.</p>
     <a href="{{ url_for('home') }}">Volver al inicio</a>
-</body>
-</html>
 
+</div>
 {% endblock %}
-
 
 
     
