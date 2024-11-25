@@ -76,7 +76,7 @@ class Usuarios(Base, UserMixin,RoleMixin):
             session.close()
 
     #-----------------
-
+    
     # Método estático para actualizar un usuario     
     @staticmethod
     def actualizar_usuario(usuario_id, datos_actualizados):
@@ -197,4 +197,6 @@ class Usuarios(Base, UserMixin,RoleMixin):
             return session.query(Usuarios).get(int(id_usuario))
         finally:
             session.close()
+            
+    #----------
   

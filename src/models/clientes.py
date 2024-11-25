@@ -1,9 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from src.models import Base, SessionLocal, to_dict
 from src.models.mixins import RoleMixin
-
-
-
 class Clientes(Base,RoleMixin):
     __tablename__ = 'clientes'
     
@@ -27,12 +24,9 @@ class Clientes(Base,RoleMixin):
         self.is_active = is_active  # Ahora acepta is_active
         self.is_deleted = is_deleted  # Ahora acepta is_deleted
         
-
-
     def __repr__(self):
         return f'<Cliente {self.nombres_cliente}>'
     
-
     # Método para obtener los clientes no eliminados
     @staticmethod
     def obtener_clientes():
@@ -162,7 +156,6 @@ class Clientes(Base,RoleMixin):
         finally:
             session.close()
     #---------------------------
-
 
     # Método estático para validar duplicaciones del cliente
     @staticmethod

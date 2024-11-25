@@ -3,7 +3,6 @@ from flask import render_template, request, flash,jsonify
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios  
 from src.controllers.decorators import role_required
-
 class Usuarios_Controller(FlaskController):
 
     # Ruta para ver todos los usuarios

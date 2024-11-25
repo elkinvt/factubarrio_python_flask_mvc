@@ -3,7 +3,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 from src.models import Base,SessionLocal
 from src.models.productos import Productos
-
 class DetalleProducto(Base):
     __tablename__ = 'detalle_producto'
     

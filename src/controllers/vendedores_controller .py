@@ -4,7 +4,6 @@ from flask import request,flash, render_template, jsonify
 from src.models.vendedores import Vendedores
 from src.models.usuarios import Usuarios
 from src.controllers.decorators import role_required
-
 class Vendedores_Controller(FlaskController):
 
     # Ruta para ver todos los vendedores

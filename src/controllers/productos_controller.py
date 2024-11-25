@@ -5,7 +5,6 @@ from src.models.productos import Productos  # Importa el modelo de Productos
 from src.models.categorias import Categoria #Importar el modelo de categorias
 from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
 from src.controllers.decorators import role_required
-
 class Productos_Controller(FlaskController):
 
     # Ruta para ver productos

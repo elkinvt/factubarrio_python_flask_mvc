@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String
 from src.models import Base, SessionLocal, to_dict
-
 class Categoria(Base):
     __tablename__ = 'categoria'
     
@@ -32,10 +31,9 @@ class Categoria(Base):
                 return []  # Retorna una lista vacía en caso de error
         finally:
             session.close()
-           
-            
+                   
     #-------------------
-
+    
     # Método para verificar categoria existe del producto
     @staticmethod
     def existe_categoria(id_categoria):

@@ -4,8 +4,6 @@ from flask import request, flash, render_template, jsonify
 from src.models.clientes import Clientes
 from src.controllers.decorators import role_required
 
-
-
 class Clientes_Controller(FlaskController):
     
     # Ruta para ver todos los clientes
@@ -199,7 +197,6 @@ class Clientes_Controller(FlaskController):
             return jsonify({'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}), 500
   
     #--------------------
-
     
     # Ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])

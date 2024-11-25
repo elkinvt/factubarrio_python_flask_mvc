@@ -3,8 +3,6 @@ from src.models import Base, SessionLocal, to_dict
 from src.models.categorias import Categoria
 from src.models.unidad_medida import UnidadMedida
 from src.models.mixins import RoleMixin
-
-
 class Productos(Base,RoleMixin):
     __tablename__ = 'productos'
     
@@ -179,8 +177,7 @@ class Productos(Base,RoleMixin):
             session.close()
         
     #-----------------
-
-
+    
     # Método para buscar producto por nombre en la factura
     @staticmethod
     def buscar_productos_por_nombre(query):

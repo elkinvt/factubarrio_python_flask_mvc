@@ -3,7 +3,6 @@ from flask import render_template, request, redirect, url_for,flash, session
 from flask_controller import FlaskController
 from src.models.usuarios import Usuarios
 from flask_login import login_user
-
 class LoginController(FlaskController):
     @app.route('/', methods=['GET'])
     def home():

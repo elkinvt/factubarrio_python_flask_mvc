@@ -5,7 +5,6 @@ from flask_login import LoginManager
 from src.models.usuarios import Usuarios
 from src.controllers.error_handlers import Errores_Controller
 
-
 app = Flask(__name__)
 
 app.secret_key = 'supersecreta'  # Necesaria para manejar los mensajes flash
@@ -30,7 +29,6 @@ def load_user(id_usuario):
         
 # Registrar los manejadores de errores personalizados
 Errores_Controller.register_error_handlers(app)
-
 
 # Punto de entrada de la aplicación
 if __name__ == '__main__':

@@ -8,8 +8,6 @@ from src.models.detalle_producto import DetalleProducto  # Importar DetalleProdu
 from datetime import datetime
 from src.controllers.decorators import role_required
 import json
-
-
 class Facturas_Controller(FlaskController):
 
     #Ruta para cargar la vista de facturas
@@ -129,7 +127,6 @@ class Facturas_Controller(FlaskController):
             error_message = f"Error al cargar los datos: {str(e)}"
             return render_template('form_error.html', error=error_message,titulo_pagina="vendedor no asociado"), 500
         
-
     #--------------------------
 
     #Ruta para consultar las facturas
