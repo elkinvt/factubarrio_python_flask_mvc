@@ -83,6 +83,8 @@ $(document).ready(function () {
 
         // Serializar datos del formulario
         var formData = $(this).serialize();
+        //console.log(formData);
+
 
         // Limpiar mensajes de error previos
         $('#toggleEstadoUsuarioMensaje').empty();
@@ -106,20 +108,23 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
+                const response = xhr.responseJSON; // Extraer la respuesta del servidor
                 const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.nombreUsuario) {
-                    $('#toggleEstadoUsuarioMensaje').append(`<p class="text-danger">${errores.nombreUsuario}</p>`);
+                if (errores && errores.id_usuario) {
+                    // Mostrar mensaje de error específico para id_usuario
+                    $('#toggleEstadoUsuarioMensaje').append(`<p class="text-danger">${errores.id_usuario}</p>`);
                 }
 
-                // Mostrar mensaje de error general si no hay errores específicos
-                if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
-                    $('#toggleEstadoUsuarioMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);
-                } else if (Object.keys(errores).length === 0) {
-                    $('#toggleEstadoUsuarioMensaje').html('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
+                // Mostrar mensaje general de error si no hay errores específicos
+                    if (response && response.message) {
+                        $('#toggleEstadoUsuarioMensaje').append(`<p class="text-danger">${response.message}</p>`);
+                    } else if (!errores) {
+                        $('#toggleEstadoUsuarioMensaje').append('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
+                    }
                 }
-            }
+            
         });
     });
 });
@@ -157,19 +162,20 @@ $(document).ready(function () {
                 }, 1500);
             },
             error: function (xhr) {
-                const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
+                const responseJSON = xhr.responseJSON;
+                const errores = responseJSON ? responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.nombreUsuario) {
-                    $('#EliminarUsuarioMensaje').append(`<p class="text-danger">${errores.nombreUsuario}</p>`);
+                if (errores.id_usuario) {
+                    $('#EliminarUsuarioMensaje').append(`<p class="text-danger">${errores.id_usuario}</p>`);
                 }
-
-                // Mostrar mensaje de error general si no hay errores específicos
-                if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
-                    $('#EliminarUsuarioMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);
-                } else if (Object.keys(errores).length === 0) {
+                // Mostrar mensaje de error general
+                if (!errores.id_usuario && responseJSON && responseJSON.message) {
+                    $('#EliminarUsuarioMensaje').html(`<p class="text-danger">${responseJSON.message}</p>`);
+                } else if (!responseJSON) {
                     $('#EliminarUsuarioMensaje').html('<p class="text-danger">Ocurrió un error inesperado. Inténtalo nuevamente.</p>');
                 }
+
             }
         });
     });

@@ -47,17 +47,13 @@
             <input type="text" class="form-control" id="telefonoCliente" placeholder="Teléfono del cliente" readonly>
         </div>
         
-        <!-- Seleccionar Vendedor -->
+        <!-- Mostrar el nombre del vendedor asociado al usuario logueado -->
         <div class="mb-3">
-            <label for="vendedorFactura" class="form-label">Vendedor</label>
-            <select class="form-control form-control-sm" id="vendedorFactura" name="vendedorFactura" required>
-                <option value="">Seleccione un vendedor</option>
-                {% for vendedor in vendedores %}
-                    <option value="{{ vendedor.idvendedores }}">{{ vendedor.nombres_vendedor }}</option>
-                {% endfor %}
-            </select>
+            <label for="vendedorNombre" class="form-label">Vendedor</label>
+            <input type="text" class="form-control form-control-sm" id="vendedorNombre" name="vendedorNombre" value="{{ vendedor_actual.nombres_vendedor }}" readonly>
             <div id="vendedorError" class="form-text text-danger"></div>
         </div>
+
 
         <!-- Campo de texto para buscar productos -->
         <div class="mb-3">

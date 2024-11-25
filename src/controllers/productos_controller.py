@@ -1,14 +1,17 @@
-from src.app import app 
+from flask import flash, redirect, request, render_template , url_for, jsonify
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
-from src.models.productos import Productos  # Importa el modelo de Productos
+
+from src.app import app
+from src.controllers.decorators import role_required
 from src.models.categorias import Categoria #Importar el modelo de categorias
+from src.models.productos import Productos  # Importa el modelo de Productos
 from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
 
 class Productos_Controller(FlaskController):
 
     # Ruta para ver productos
     @app.route('/productos_ver', methods=['GET'])
+    @role_required(['administrador','vendedor'])
     def productos_ver():
         try:
             # Usar el método que obtienes con el JOIN de productos, categorías y unidades de medida
@@ -32,6 +35,7 @@ class Productos_Controller(FlaskController):
 
     # Ruta para crear un producto (GET para mostrar formulario, POST para recibir datos)
     @app.route('/productos_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def productos_crear():
         
         if request.method == 'POST':
@@ -135,6 +139,7 @@ class Productos_Controller(FlaskController):
     
     # Ruta para buscar o seleccionar el producto
     @app.route('/productos_editar', methods=['GET'])
+    @role_required(['administrador'])
     def productos_editar():
         
         # Obtener el término de búsqueda (si existe)
@@ -202,6 +207,7 @@ class Productos_Controller(FlaskController):
 
     # Ruta para actualizar el producto (POST) usando AJAX
     @app.route('/productos_actualizar/<int:id>', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_producto(id):
 
         errores = {}  # Diccionario para almacenar errores específicos de cada campo
@@ -292,6 +298,7 @@ class Productos_Controller(FlaskController):
 
     # Ruta para actualizar el estado de un producto
     @app.route('/productos_toggle_estado', methods=['POST'])
+    @role_required(['administrador'])
     def toggle_estado_producto():
         id_producto = request.form.get('idproducto')  # Recibir el ID del producto desde el formulario
 
@@ -326,6 +333,7 @@ class Productos_Controller(FlaskController):
     
     # Ruta para eliminar un producto (eliminación lógica)
     @app.route('/productos_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_producto():
         id_producto = request.form['idProducto']  # Obtener el ID del producto desde el formulario
 

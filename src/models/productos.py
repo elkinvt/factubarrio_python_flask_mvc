@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
-from src.models import Base, db_session_manager, to_dict
+from sqlalchemy import Boolean, Column, Float,ForeignKey, Integer, String
+
+from src.models import Base, SessionLocal, to_dict
 from src.models.categorias import Categoria
+from src.models.mixins import RoleMixin
 from src.models.unidad_medida import UnidadMedida
 
-class Productos(Base):
+class Productos(Base,RoleMixin):
     __tablename__ = 'productos'
     
     idproductos = Column(Integer, primary_key=True, autoincrement=True)
@@ -35,7 +37,8 @@ class Productos(Base):
     # Método estático para obtener los productos no eliminados con JOIN a categorías y unidades de medida
     @staticmethod
     def obtener_productos():
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try: 
             # Realizamos el join entre productos, categorías y unidades de medida
             productos = session.query(Productos, Categoria, UnidadMedida).join(
                 Categoria, Productos.categoria_idcategoria == Categoria.idcategoria  # Join con Categorías
@@ -53,13 +56,16 @@ class Productos(Base):
                 for producto, categoria, unidad_medida in productos
             ]
             return productos_dict  # Retornamos la lista de productos con las relaciones
+        finally:
+            session.close()
        
     #------------
     
     # Método estático para agregar un producto
     @staticmethod
     def agregar_producto(producto):
-        with db_session_manager() as session:    
+        session = SessionLocal()
+        try:    
             try:
                 session.add(producto)
                 session.commit()
@@ -67,13 +73,16 @@ class Productos(Base):
             except Exception as e:
                 session.rollback()
                 raise e
+        finally:
+            session.close()
             
     #--------
 
     # Método para buscar productos por código o nombre
     @staticmethod
     def buscar_por_codigo_o_nombre(termino):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 productos = session.query(Productos).filter(
                     (Productos.codigo.ilike(f'%{termino}%')) |
@@ -85,26 +94,31 @@ class Productos(Base):
                 return productos_dict
             except Exception as e:
                 raise e
+        finally:
+            session.close()
            
     #---------
     
     # Método para obtener un producto por su ID
     @staticmethod
     def obtener_por_id(id):
-       with db_session_manager()as session:
+       session = SessionLocal()
+       try:
             try:
                 producto = session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
                 return to_dict(producto) if producto else None
             except Exception as e:
                 raise e
-            
+       finally:
+            session.close()
         
     #-----------
     
     # Método para actualizar los datos de un producto
     @staticmethod
     def actualizar_producto(id, datos_actualizados):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 producto = session.query(Productos).get(id)
                 if producto:
@@ -116,13 +130,16 @@ class Productos(Base):
                     return None  # Retorna None si el producto no se encontró
             except Exception as e:
                 raise e
+        finally:
+            session.close()
             
     #-------------
     
     # Método para actualizar el estado de un producto
     @staticmethod
     def toggle_estado(id):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Buscar el producto por ID
                 producto = session.query(Productos).filter_by(idproductos=id).first()
@@ -135,13 +152,16 @@ class Productos(Base):
                     return None  # Retornar None si el producto no se encuentra
             except Exception as e:
                 raise e  # Propaga la excepción para que la ruta pueda manejarla
+        finally:
+            session.close()
             
     #--------------------
 
     # Método para eliminar(logica) el producto
     @staticmethod
     def eliminar_producto(id):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Obtener el producto por su ID
                 producto = session.query(Productos).filter_by(idproductos=id, is_deleted=False).first()
@@ -155,14 +175,16 @@ class Productos(Base):
             except Exception as e:
                 raise e  # Propaga la excepción para que la ruta pueda manejarla
             
-
+        finally:
+            session.close()
+        
     #-----------------
-
-
+    
     # Método para buscar producto por nombre en la factura
     @staticmethod
     def buscar_productos_por_nombre(query):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 productos = session.query(Productos).filter(
                     Productos.nombre.ilike(f'%{query}%'),
@@ -181,13 +203,15 @@ class Productos(Base):
                 ]
             except Exception as e:
                 raise e 
-            
+        finally:
+            session.close()
     #---------------------
 
     # Método para verificar la cantidad de un producto
     @staticmethod
     def verificar_stock_producto(codigo, cantidad):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Busca el producto por su código
                 producto = session.query(Productos).filter_by(codigo=codigo).first()
@@ -207,19 +231,24 @@ class Productos(Base):
                     }
             
             except Exception as e:
-                raise e 
+                raise e
+        finally:
+            session.close()
     #-----------------
 
     # Método para verificar codigo existe del producto
     @staticmethod
     def existe_codigo(codigo):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 # Realiza la consulta para verificar si el código existe
                 producto_existe = session.query(Productos).filter_by(codigo=codigo).first() is not None
                 return producto_existe  # Retorna True si existe, False si no
             except Exception as e:
                 raise e  # Propaga la excepción para manejo externo
+        finally:
+            session.close()
             
     #-------------
 

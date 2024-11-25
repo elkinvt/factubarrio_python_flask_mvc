@@ -1,13 +1,15 @@
-from src.app import app 
-from flask import render_template, request, url_for, flash,redirect, jsonify
+from flask import flash, render_template, request, jsonify
 from flask_controller import FlaskController
+
+from src.app import app
+from src.controllers.decorators import role_required
 from src.models.usuarios import Usuarios  
-import re
 
 class Usuarios_Controller(FlaskController):
 
     # Ruta para ver todos los usuarios
     @app.route('/usuarios_ver', methods=['GET'])
+    @role_required(['administrador'])
     def usuarios_ver():
         usuarios = Usuarios.obtener_usuarios()
         return render_template('form_ver_usuario.html', titulo_pagina="Ver usurios", usuarios=usuarios)
@@ -16,6 +18,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para crear el usuario
     @app.route('/usuarios_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def usuarios_crear():
         if request.method == 'GET':
             return render_template('form_crear_usuario.html', titulo_pagina="Crear usuario")
@@ -78,6 +81,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición de usuario (GET)
     @app.route('/usuarios_editar', methods=['GET'])
+    @role_required(['administrador'])
     def usuarios_editar():
         nombre_usuario = request.args.get('nombre')  # Obtener el nombre del usuario desde los parámetros de la URL
 
@@ -106,6 +110,7 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para actualizar un usuario (POST)
     @app.route('/usuarios_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_usuarios():
 
         usuario_id = request.form['usuarioId']
@@ -153,6 +158,10 @@ class Usuarios_Controller(FlaskController):
             'is_active': is_active
         }
 
+        # Agregar la contraseña solo si se proporciona
+        if nueva_contraseña:
+            datos_actualizados['contraseña'] = nueva_contraseña
+
         try:
             Usuarios.actualizar_usuario(usuario_id, datos_actualizados)
             return jsonify({'status': 'success', 'message': 'Usuario actualizado con éxito'}), 200
@@ -182,27 +191,18 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para actualizar el estado de un usuario
     @app.route('/usuario_toggle_estado', methods=['POST'])
+    @role_required(['administrador'])
     def toggle_estado_usuario():
-        nombre_usuario = request.form.get('nombreUsuario')
-        #print("Nombre de usuario recibido:", nombre_usuario)
+        id_usuario = request.form.get('id_usuario')  # Usar el ID del usuario
 
-        # Validaciones y mensajes de error
-        errores = {}
+        # Validar que se reciba un ID válido
+        if not id_usuario:
+            return jsonify({'status': 'error', 'message': 'ID de usuario es obligatorio.'}), 400
 
-        # Validación del nombre de usuario
-        if not nombre_usuario:
-            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
-        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
-            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
-
-
-        # Si hay errores, devolvemos JSON con errores
-        if errores:
-            return jsonify({'status': 'error', 'errores': errores}), 400
-
+        
         # Intento de actualización del estado
         try:
-            nuevo_estado = Usuarios.actualizar_estado(nombre_usuario)
+            nuevo_estado = Usuarios.actualizar_estado(id_usuario)
             
             if nuevo_estado is None:
                 return jsonify({'success': False, 'message': 'Usuario no encontrado.'}), 404
@@ -217,25 +217,17 @@ class Usuarios_Controller(FlaskController):
 
     # Ruta para eliminar usuario (lógica)
     @app.route('/usuario_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_usuario():
-        nombre_usuario = request.form.get('nombreUsuario')
+        id_usuario = request.form.get('id_usuario')
 
-        # Validaciones y mensajes de error
-        errores = {}
-
-        # Validación del nombre de usuario
-        if not nombre_usuario:
-            errores['nombreUsuario'] = 'El nombre de usuario es obligatorio.'
-        elif not re.match("^[A-Za-z ]+$", nombre_usuario):
-            errores['nombreUsuario'] = 'El nombre de usuario debe contener solo letras y espacios.'
-
-        # Si hay errores, devolvemos JSON con errores
-        if errores:
-            return jsonify({'status': 'error', 'errores': errores}), 400
+        # Validar que se reciba un ID válido
+        if not id_usuario:
+            return jsonify({'status': 'error', 'message': 'ID de usuario es obligatorio.'}), 400
 
         # Intento de eliminación lógica del usuario
         try:
-            eliminado = Usuarios.eliminar_usuario_logicamente(nombre_usuario)
+            eliminado = Usuarios.eliminar_usuario_logicamente(id_usuario)
             
             if not eliminado:
                 return jsonify({'success': False, 'message': 'Usuario no encontrado o ya eliminado.'}), 404

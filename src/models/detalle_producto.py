@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, ForeignKey, Numeric
+from sqlalchemy import Column,ForeignKey, Integer, Numeric
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
-from src.models import Base,db_session_manager
-from src.models.productos import Productos
 
+from src.models import Base,SessionLocal
+from src.models.productos import Productos
 class DetalleProducto(Base):
     __tablename__ = 'detalle_producto'
     
@@ -29,7 +29,8 @@ class DetalleProducto(Base):
     # Método estático para agregar productos al detalle de la factura
     @staticmethod
     def agregar_detalles(factura_id, productos):
-        with db_session_manager() as session:
+        session = SessionLocal()
+        try:
             try:
                 for producto in productos:
                     # Verificar que el producto existe y tiene suficiente stock
@@ -59,6 +60,8 @@ class DetalleProducto(Base):
             except (SQLAlchemyError, ValueError) as e:
                 print(f"Error al agregar detalles: {str(e)}")
                 return False
+        finally:
+            session.close()
            
     #----------
 

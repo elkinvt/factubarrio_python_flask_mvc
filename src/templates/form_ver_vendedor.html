@@ -15,18 +15,21 @@
                     <th>Teléfono</th>
                     <th>Dirección</th>
                     <th>Email</th>
+                    <th>Usuario</th>
+
                 </tr>
             </thead>
             <tbody>
-                {% for vendedor in vendedores %}
+                {% for item in vendedores %}
                 <tr>
-                    <td>{{ vendedor.idvendedores }}</td> 
-                    <td>{{ vendedor.tipo_documento }}</td>
-                    <td>{{ vendedor.numero_documento }}</td>
-                    <td>{{ vendedor.nombres_vendedor }}</td>
-                    <td>{{ vendedor.telefono }}</td>
-                    <td>{{ vendedor.direccion }}</td>
-                    <td>{{ vendedor.email }}</td>
+                    <td>{{ item['vendedor']['idvendedores'] }}</td>
+                    <td>{{ item['vendedor']['tipo_documento'] }}</td>
+                    <td>{{ item['vendedor']['numero_documento'] }}</td>
+                    <td>{{ item['vendedor']['nombres_vendedor'] }}</td>
+                    <td>{{ item['vendedor']['telefono'] }}</td>
+                    <td>{{ item['vendedor']['direccion'] }}</td>
+                    <td>{{ item['vendedor']['email'] }}</td>
+                    <td>{{ item['usuario']['nombres_usuario'] }}</td>
                 </tr>
                 {% else %}
                 <tr>
@@ -34,6 +37,8 @@
                 </tr>
                 {% endfor %}
             </tbody>
+            
+            
         </table>
     </div>
 

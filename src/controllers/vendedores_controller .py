@@ -1,12 +1,16 @@
-from src.app import app 
+from flask import flash, jsonify, render_template, request
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
+
+from src.app import app
+from src.controllers.decorators import role_required
+from src.models.usuarios import Usuarios
 from src.models.vendedores import Vendedores
 
 class Vendedores_Controller(FlaskController):
 
     # Ruta para ver todos los vendedores
     @app.route('/vendedores_ver', methods=['GET'])
+    @role_required(['administrador'])
     def vendedores_ver():
         vendedores = Vendedores.obtener_vendedores()
         return render_template('form_ver_vendedor.html', titulo_pagina="Ver Vendedores", vendedores=vendedores)
@@ -15,9 +19,13 @@ class Vendedores_Controller(FlaskController):
     
     # Crear vendedor
     @app.route('/vendedores_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def vendedores_crear():
         if request.method == 'GET':
-            return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor")
+            # Obtener la lista de usuarios disponibles para vincular
+            usuarios = Usuarios.obtener_usuarios_vendedores()
+            return render_template('form_crear_vendedor.html', titulo_pagina="Crear vendedor", usuarios=usuarios)
+            
 
         if request.method == 'POST':
             tipo_documento = request.form['tipoDocumento']
@@ -26,6 +34,7 @@ class Vendedores_Controller(FlaskController):
             telefono = request.form['telefonoVendedor']
             direccion = request.form['direccionVendedor']
             email = request.form['emailVendedor']
+            usuario_id = request.form['usuario_id'] 
 
             # Validaciones y mensajes de error
             errores = {}
@@ -65,6 +74,7 @@ class Vendedores_Controller(FlaskController):
                 errores['direccionVendedor'] = 'Debe tener al menos 10 caracteres.'
 
             # Validación del email
+            print(email) 
             if not email:
                 errores['emailVendedor'] = 'El email es obligatorio.'
             elif "@" not in email or "." not in email.split("@")[-1]:
@@ -86,7 +96,8 @@ class Vendedores_Controller(FlaskController):
                 nombres_vendedor=nombre_completo,  # Insertamos el nombre completo
                 telefono=telefono,
                 direccion=direccion,
-                email=email
+                email=email,
+                usuario_id=usuario_id 
             )
 
             try:
@@ -99,18 +110,19 @@ class Vendedores_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición (GET)
     @app.route('/vendedores_editar', methods=['GET'])
+    @role_required(['administrador'])
     def vendedores_editar():
-        tipo_documento = request.args.get('tipoDocumento')
+        
         numero_documento = request.args.get('numeroDocumento')
 
         # Verificar si se ingresan ambos campos
-        if not tipo_documento or not numero_documento:
-            flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
+        if not  numero_documento:
+            flash('Por favor, ingrese número de Documento.', 'warning')
             return render_template('form_editar_vendedor.html', vendedor=None, titulo_pagina="Editar Vendedor")
 
         try:
             # Llamar al método del modelo para buscar el vendedor sin manejar la sesión
-            vendedor = Vendedores.buscar_vendedor_por_documento(tipo_documento, numero_documento)
+            vendedor = Vendedores.buscar_vendedor_por_documento(numero_documento)
             
             if vendedor:
                 if vendedor['is_deleted']:
@@ -128,6 +140,7 @@ class Vendedores_Controller(FlaskController):
 
     # Actualizar vendedor
     @app.route('/vendedores_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_vendedor():
         vendedor_id = request.form['vendedorId']
         tipo_documento = request.form['tipoDocumento']
@@ -192,34 +205,26 @@ class Vendedores_Controller(FlaskController):
     
     # Ruta para eliminar vendedor (lógica)
     @app.route('/vendedores_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_vendedor():
-        tipo_documento = request.form.get('tipoDocumento')
-        numero_documento = request.form.get('numeroDocumento')
+        vendedor_id = request.form.get('idvendedores')
         
          # Validaciones y mensajes de error
         errores = {}
 
-         # Validación del tipo de documento
-        if not tipo_documento:
-            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
-        elif not tipo_documento.isalpha():
-            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
-
-        # Validación del número de documento
-        if not numero_documento:
-            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
-        elif not numero_documento.isdigit():
-            errores['numeroDocumento'] = 'Debe contener solo números.'
-        elif len(numero_documento) < 6 or len(numero_documento) > 12:
-            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
-
+        # Validación del ID del cliente
+        if not vendedor_id:
+            errores['idvendedores'] = 'El ID del vendedor es obligatorio.'
+        elif not vendedor_id.isdigit():
+            errores['idvendedores'] = 'El ID del vendedor debe ser un número válido.'
         # Si hay errores, devolvemos JSON con errores
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400
 
         # Intento de eliminación del vendedor
         try:
-            if Vendedores.eliminar_vendedor_logicamente(tipo_documento, numero_documento):
+            vendedor_id = int(vendedor_id)
+            if Vendedores.eliminar_vendedor_logicamente(vendedor_id):
                  return jsonify({'success': True, 'message': 'vendedor eliminado correctamente.'}), 200
             else:
                 return jsonify({'success': False, 'message': 'vendedor no encontrado o ya eliminado.'}), 404
@@ -232,13 +237,14 @@ class Vendedores_Controller(FlaskController):
     @app.route('/validar_vendedor', methods=['POST'])
     def validar_vendedor():
         data = request.get_json()
+        #print('Datos recibidos:', data)
         
         # Llamada al método de validación en el modelo Vendedores
         errores = Vendedores.validar_datos(
-            numero_documento=data.get('numeroDocumento'),
-            email=data.get('emailVendedor')
+            numero_documento=data.get('numero_documento'),
+            email=data.get('email')
         )
-
+        #print('Errores detectados:', errores)
         # Si hay errores, retornar con código 400
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400

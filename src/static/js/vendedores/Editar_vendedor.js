@@ -95,13 +95,10 @@ $(document).ready(function () {
                 const errores = xhr.responseJSON ? xhr.responseJSON.errores : {};
 
                 // Mostrar mensajes de error específicos
-                if (errores.tipoDocumento) {
-                    $('#eliminarvendedorMensaje').append(`<p class="text-danger">${errores.tipoDocumento}</p>`);
+                if (errores.idvendedores) {
+                    $('#eliminarvendedorMensaje').append(`<p class="text-danger">${errores.idvendedores}</p>`);
                 }
-                if (errores.numeroDocumento) {
-                    $('#eliminarvendedorMensaje').append(`<p class="text-danger">${errores.numeroDocumento}</p>`);
-                }
-
+                
                 // Mostrar mensaje de error general si no hay errores específicos
                 if (Object.keys(errores).length === 0 && xhr.responseJSON && xhr.responseJSON.message) {
                     $('#eliminarvendedorMensaje').html(`<p class="text-danger">${xhr.responseJSON.message}</p>`);

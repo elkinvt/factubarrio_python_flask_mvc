@@ -1,12 +1,15 @@
-from src.app import app
+from flask import flash, jsonify, request, render_template
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
+
+from src.app import app
 from src.models.clientes import Clientes
+from src.controllers.decorators import role_required
 
 class Clientes_Controller(FlaskController):
     
     # Ruta para ver todos los clientes
     @app.route('/clientes_ver', methods=['GET'])
+    @role_required(['administrador','vendedor']) 
     def clientes_ver():
         clientes = Clientes.obtener_clientes()
         return render_template('form_ver_cliente.html', titulo_pagina="Ver Clientes", clientes=clientes)
@@ -15,6 +18,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para crear el cliente
     @app.route('/clientes_crear', methods=['GET', 'POST'])
+    @role_required(['administrador'])
     def clientes_crear():
         if request.method == 'GET':
             return render_template('form_crear_cliente.html', titulo_pagina="Crear Cliente")
@@ -101,17 +105,17 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para mostrar el formulario de edición (GET)  
     @app.route('/clientes_editar', methods=['GET'])
+    @role_required(['administrador'])
     def clientes_editar():
-        tipo_documento = request.args.get('tipoDocumento')
         numero_documento = request.args.get('numeroDocumento')
 
-        if not tipo_documento or not numero_documento:
-            flash('Por favor, ingrese ambos campos: Tipo de Documento y Número de Documento.', 'warning')
+        if  not numero_documento:
+            flash('Por favor, ingrese número de Documento.', 'warning')
             return render_template('form_editar_cliente.html', cliente=None, titulo_pagina="Editar Cliente")
 
         try:
             # Llamar al método del modelo para buscar el cliente sin manejar la sesión
-            cliente = Clientes.buscar_cliente_por_documento(tipo_documento, numero_documento)
+            cliente = Clientes.buscar_cliente_por_documento(numero_documento)
             
             if cliente:
                 if cliente['is_deleted']:
@@ -130,6 +134,7 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para actualizar un cliente (POST)
     @app.route('/clientes_actualizar', methods=['POST'])
+    @role_required(['administrador'])
     def actualizar_cliente():
         cliente_id = request.form['clienteId']
         tipo_documento = request.form['tipoDocumento']
@@ -193,38 +198,30 @@ class Clientes_Controller(FlaskController):
             return jsonify({'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}), 500
   
     #--------------------
-
     
     # Ruta para actualizar el estado de un cliente
     @app.route('/clientes_toggle_estado', methods=['POST'])
+    @role_required(['administrador'])
     def toggle_estado_cliente():
-        tipo_documento = request.form.get('tipoDocumento')
-        numero_documento = request.form.get('numeroDocumento')
-
+        cliente_id = request.form.get('idclientes')
+        
         # Validaciones y mensajes de error
         errores = {}
 
-        # Validación del tipo de documento
-        if not tipo_documento:
-            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
-        elif not tipo_documento.isalpha():
-            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
-
-        # Validación del número de documento
-        if not numero_documento:
-            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
-        elif not numero_documento.isdigit():
-            errores['numeroDocumento'] = 'Debe contener solo números.'
-        elif len(numero_documento) < 6 or len(numero_documento) > 12:
-            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
-
+        # Validación del ID del cliente
+        if not cliente_id:
+            errores['idclientes'] = 'El ID del cliente es obligatorio.'
+        elif not cliente_id.isdigit():
+            errores['idclientes'] = 'El ID del cliente debe ser un número válido.'
+        
         # Si hay errores, devolvemos JSON con errores
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400
 
         # Intento de actualización del estado
         try:
-            nuevo_estado = Clientes.actualizar_estado(tipo_documento, numero_documento)
+            cliente_id = int(cliente_id)
+            nuevo_estado = Clientes.actualizar_estado(cliente_id)
             
             if nuevo_estado is None:
                 return jsonify({'success': False, 'message': 'Cliente no encontrado.'}), 404
@@ -239,34 +236,27 @@ class Clientes_Controller(FlaskController):
 
     # Ruta para eliminar cliente (lógica)
     @app.route('/clientes_eliminar', methods=['POST'])
+    @role_required(['administrador'])
     def eliminar_cliente():
-        tipo_documento = request.form.get('tipoDocumento')
-        numero_documento = request.form.get('numeroDocumento')
+        cliente_id = request.form.get('idclientes')
 
         # Validaciones y mensajes de error
         errores = {}
 
-        # Validación del tipo de documento
-        if not tipo_documento:
-            errores['tipoDocumento'] = 'El tipo de documento es obligatorio.'
-        elif not tipo_documento.isalpha():
-            errores['tipoDocumento'] = 'El tipo de documento debe contener solo letras.'
-
-        # Validación del número de documento
-        if not numero_documento:
-            errores['numeroDocumento'] = 'El número de documento es obligatorio.'
-        elif not numero_documento.isdigit():
-            errores['numeroDocumento'] = 'Debe contener solo números.'
-        elif len(numero_documento) < 6 or len(numero_documento) > 12:
-            errores['numeroDocumento'] = 'Debe tener entre 6 y 12 dígitos.'
-
+        # Validación del ID del cliente
+        if not cliente_id:
+            errores['idclientes'] = 'El ID del cliente es obligatorio.'
+        elif not cliente_id.isdigit():
+            errores['idclientes'] = 'El ID del cliente debe ser un número válido.'
+        
         # Si hay errores, devolvemos JSON con errores
         if errores:
             return jsonify({'status': 'error', 'errores': errores}), 400
 
         # Intento de eliminación del cliente
         try:
-            if Clientes.eliminar_cliente_logicamente(tipo_documento, numero_documento):
+            cliente_id = int(cliente_id)
+            if Clientes.eliminar_cliente_logicamente(cliente_id):
                 return jsonify({'success': True, 'message': 'Cliente eliminado correctamente.'}), 200
             else:
                 return jsonify({'success': False, 'message': 'Cliente no encontrado o ya eliminado.'}), 404

@@ -50,7 +50,7 @@
             <label for="rol">Rol:</label>
             <select id="rol" name="rolUsuario" class="form-control form-control-sm" required>
                 <option value="">Seleccione un rol</option>
-                <option value="admin" {%if usuario['rol'] == 'admin' %} selected{% endif %}>Admin</option>
+                <option value="administrador" {%if usuario['rol'] == 'administrador' %} selected{% endif %}>Administrador</option>
                 <option value="vendedor" {%if usuario['rol'] == 'vendedor' %} selected{% endif %}>Vendedor</option>
             </select>
             <div class="text-danger" id="rolUsuarioError"></div>
@@ -71,7 +71,8 @@
 
     <!-- Bloquear/Desbloquear Usuario -->
     <form id="toggleEstadoUsuarioForm" class="mt-3">
-        <input type="hidden" name="nombreUsuario" value="{{ usuario['nombres_usuario'] }}">
+        
+        <input type="hidden" name="id_usuario" id="id_usuario" value="{{ usuario['id_usuario'] }}">
         <button type="submit" class="btn btn-warning mb-2">
             {% if usuario['is_active'] %}
                 Desactivar usuario
@@ -84,7 +85,8 @@
 
    <!-- Eliminar usuario -->
     <form id="eliminarUsuarioForm"  class="mt-2">
-        <input type="hidden" name="nombreUsuario" value="{{ usuario['nombres_usuario'] }}">
+        <!--<input type="hidden" name="nombreUsuario" value="{{ usuario['nombres_usuario'] }}">-->
+        <input type="hidden" name="id_usuario" id="id_usuario_eliminar" value="{{ usuario['id_usuario'] }}">
         <button type="submit" class="btn btn-danger">Eliminar usuario</button>
     </form>
     <div id="EliminarUsuarioMensaje" class="mt-2"></div>

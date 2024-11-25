@@ -1,19 +1,21 @@
-from src.app import app 
-from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template
-from flask import render_template, request, redirect, url_for, flash, jsonify
-from src.models.vendedores import Vendedores  # Importar la clase Vendedores
-from src.models.productos import Productos  # Importar la clase Productos
-from src.models.facturas import Factura  # Importar la clase Factura
-from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
 from datetime import datetime
 import json
 
+from flask import jsonify, render_template, request,   session
+from flask_controller import FlaskController
 
+
+from src.app import app
+from src.models.facturas import Factura  # Importar la clase Factura
+from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
+from src.models.productos import Productos  # Importar la clase Productos
+from src.models.vendedores import Vendedores  # Importar la clase Vendedores
+from src.controllers.decorators import role_required
 class Facturas_Controller(FlaskController):
 
     #Ruta para cargar la vista de facturas
     @app.route('/ver_factura')
+    @role_required(['administrador','vendedor']) 
     def ver_factura():
         return render_template('form_ver_factura.html', titulo_pagina = "Ver factura")
     
@@ -21,13 +23,25 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para generar la factura
     @app.route('/generar_factura', methods=['GET', 'POST'])
+    @role_required(['vendedor'])
     def generar_factura():
         if request.method == 'POST':
             try:
 
+                # Obtén el usuario logueado (puede ser de `session` o algún middleware)
+                usuario_id = session.get('usuario_id')
+                print(f"Usuario ID en sesión: {usuario_id}")
+
+                # Obtener el vendedor asociado al usuario
+                vendedor = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+                if not vendedor:
+                    error_message = "No se encontró un vendedor asociado al usuario actual."
+                    return render_template('form_error.html', error=error_message), 400
+                
+                vendedores_idvendedores = vendedor.idvendedores  # Usaremos este vendedor para la factura
+
                 # Recibe los datos del formulario
                 clientes_idclientes = request.form.get('clienteId')
-                vendedores_idvendedores = request.form.get('vendedorFactura')
                 productos = json.loads(request.form.get('productosFactura'))
 
                 # Validación del cliente y vendedor
@@ -99,18 +113,28 @@ class Facturas_Controller(FlaskController):
           
         # GET: Cargar datos para el formulario
         try:
-            vendedores = Vendedores.obtener_vendedores()
+            # Obtener el usuario logueado
+            usuario_id = session.get('usuario_id')
+
+            vendedor_actual = Vendedores.obtener_vendedor_por_usuario(usuario_id)
+            
+            if not vendedor_actual:
+                error_message = "No se encontró un vendedor asociado al usuario actual."
+                return render_template('form_error.html', error=error_message), 400
+
+            
             productos = Productos.obtener_productos()
+            return render_template('form_generacion_factura.html', vendedor_actual=vendedor_actual, productos=productos, titulo_pagina="Generar factura")
            
         except Exception as e:
-            flash(f'Error al cargar los datos: {str(e)}', 'danger')
-
-        return render_template('form_generacion_factura.html', vendedores=vendedores, productos=productos, titulo_pagina="Generar factura")
-
+            error_message = f"Error al cargar los datos: {str(e)}"
+            return render_template('form_error.html', error=error_message,titulo_pagina="vendedor no asociado"), 500
+        
     #--------------------------
 
     #Ruta para consultar las facturas
     @app.route('/facturas_por_fecha', methods=['GET'])
+    @role_required(['administrador','vendedor'])
     def obtener_facturas_por_fecha():
         fecha = request.args.get('fecha')  # Obtener la fecha de los parámetros de la URL
         
@@ -126,6 +150,7 @@ class Facturas_Controller(FlaskController):
 
     #Ruta para ver el detalle de las facturas
     @app.route('/detalles_factura/<int:id_factura>', methods=['GET'])
+    @role_required(['administrador','vendedor'])
     def obtener_detalles_factura(id_factura):
         # Llamar al método en el modelo para obtener los detalles de la factura
         factura_data = Factura.obtener_detalles(id_factura)
