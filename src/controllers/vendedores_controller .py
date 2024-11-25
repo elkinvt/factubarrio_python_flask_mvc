@@ -1,9 +1,11 @@
-from src.app import app 
+from flask import flash, jsonify, render_template, request
 from flask_controller import FlaskController
-from flask import request,flash, render_template, jsonify
-from src.models.vendedores import Vendedores
-from src.models.usuarios import Usuarios
+
+from src.app import app
 from src.controllers.decorators import role_required
+from src.models.usuarios import Usuarios
+from src.models.vendedores import Vendedores
+
 class Vendedores_Controller(FlaskController):
 
     # Ruta para ver todos los vendedores

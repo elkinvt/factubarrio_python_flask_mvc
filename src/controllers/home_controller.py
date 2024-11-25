@@ -1,7 +1,7 @@
-from src.app import app 
-from flask import render_template, flash,redirect,url_for,session
+from flask import  flash, render_template, redirect, url_for, session
 from flask_controller import FlaskController
 
+from src.app import app 
 class Index_Controller(FlaskController):
     @app.route('/Index')
     def Index():

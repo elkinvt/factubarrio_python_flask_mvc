@@ -1,13 +1,16 @@
-from src.app import app 
+from datetime import datetime
+import json
+
+from flask import jsonify, render_template, request,   session
 from flask_controller import FlaskController
-from flask import render_template, request, flash, jsonify, session
-from src.models.vendedores import Vendedores  # Importar la clase Vendedores
-from src.models.productos import Productos  # Importar la clase Productos
+
+
+from src.app import app
 from src.models.facturas import Factura  # Importar la clase Factura
 from src.models.detalle_producto import DetalleProducto  # Importar DetalleProducto
-from datetime import datetime
+from src.models.productos import Productos  # Importar la clase Productos
+from src.models.vendedores import Vendedores  # Importar la clase Vendedores
 from src.controllers.decorators import role_required
-import json
 class Facturas_Controller(FlaskController):
 
     #Ruta para cargar la vista de facturas

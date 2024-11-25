@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Boolean, Column, Integer, String
+ 
 from src.models import Base, SessionLocal, to_dict
 from src.models.mixins import RoleMixin
 class Clientes(Base,RoleMixin):

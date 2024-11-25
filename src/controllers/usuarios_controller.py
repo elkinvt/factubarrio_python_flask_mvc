@@ -1,8 +1,10 @@
-from src.app import app 
-from flask import render_template, request, flash,jsonify
+from flask import flash, render_template, request, jsonify
 from flask_controller import FlaskController
-from src.models.usuarios import Usuarios  
+
+from src.app import app
 from src.controllers.decorators import role_required
+from src.models.usuarios import Usuarios  
+
 class Usuarios_Controller(FlaskController):
 
     # Ruta para ver todos los usuarios

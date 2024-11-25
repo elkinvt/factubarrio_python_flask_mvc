@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, Numeric
+from sqlalchemy import Column,ForeignKey, Integer, Numeric
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
+
 from src.models import Base,SessionLocal
 from src.models.productos import Productos
 class DetalleProducto(Base):

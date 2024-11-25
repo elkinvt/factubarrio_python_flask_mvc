@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Boolean, Column,ForeignKey, Integer, String 
 from sqlalchemy.orm import relationship
+
 from src.models import Base, SessionLocal, to_dict
-from src.models.usuarios import Usuarios
 from src.models.mixins import RoleMixin
+from src.models.usuarios import Usuarios
+
 
 
 class Vendedores(Base, RoleMixin):

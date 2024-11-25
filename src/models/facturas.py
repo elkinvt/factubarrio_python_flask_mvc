@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, Date, Time, Numeric
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Date, ForeignKey, Integer,  Numeric, Time
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
+
 from src.models import Base, SessionLocal, to_dict
 from src.models.mixins import RoleMixin
 class Factura(Base,RoleMixin):

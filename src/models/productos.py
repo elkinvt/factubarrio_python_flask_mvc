@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey
+from sqlalchemy import Boolean, Column, Float,ForeignKey, Integer, String
+
 from src.models import Base, SessionLocal, to_dict
 from src.models.categorias import Categoria
-from src.models.unidad_medida import UnidadMedida
 from src.models.mixins import RoleMixin
+from src.models.unidad_medida import UnidadMedida
+
 class Productos(Base,RoleMixin):
     __tablename__ = 'productos'
     

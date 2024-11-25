@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+
 from src.models import Base, SessionLocal, to_dict
 class Categoria(Base):
     __tablename__ = 'categoria'

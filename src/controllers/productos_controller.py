@@ -1,10 +1,12 @@
-from src.app import app 
+from flask import flash, redirect, request, render_template , url_for, jsonify
 from flask_controller import FlaskController
-from flask import request, redirect, url_for, flash, render_template, jsonify
-from src.models.productos import Productos  # Importa el modelo de Productos
-from src.models.categorias import Categoria #Importar el modelo de categorias
-from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
+
+from src.app import app
 from src.controllers.decorators import role_required
+from src.models.categorias import Categoria #Importar el modelo de categorias
+from src.models.productos import Productos  # Importa el modelo de Productos
+from src.models.unidad_medida import UnidadMedida #Importar el modelo unidad medida
+
 class Productos_Controller(FlaskController):
 
     # Ruta para ver productos

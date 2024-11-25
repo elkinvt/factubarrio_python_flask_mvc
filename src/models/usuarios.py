@@ -1,10 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from src.models import  Base, SessionLocal, to_dict
-from src.models.mixins import RoleMixin
-
-from sqlalchemy import func
+from sqlalchemy import Boolean, Column, Integer, String, func
 from flask_login import UserMixin
 
+from src.models import  Base, SessionLocal, to_dict
+from src.models.mixins import RoleMixin
 class Usuarios(Base, UserMixin,RoleMixin):
     __tablename__ = 'usuarios'
 

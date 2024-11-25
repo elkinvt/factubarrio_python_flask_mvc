@@ -1,8 +1,9 @@
-from src.app import app 
-from flask import render_template, request, redirect, url_for,flash, session
-from flask_controller import FlaskController
-from src.models.usuarios import Usuarios
+from flask import  flash, redirect, render_template, request, url_for, session
 from flask_login import login_user
+from flask_controller import FlaskController
+
+from src.app import app
+from src.models.usuarios import Usuarios
 class LoginController(FlaskController):
     @app.route('/', methods=['GET'])
     def home():

@@ -1,6 +1,7 @@
-from src.app import app
+from flask import flash, jsonify, request, render_template
 from flask_controller import FlaskController
-from flask import request, flash, render_template, jsonify
+
+from src.app import app
 from src.models.clientes import Clientes
 from src.controllers.decorators import role_required
 
