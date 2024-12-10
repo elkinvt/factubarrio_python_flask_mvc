@@ -113,11 +113,11 @@ class Usuarios_Controller(FlaskController):
     @role_required(['administrador'])
     def actualizar_usuarios():
 
-        usuario_id = request.form.get['usuarioId']
-        nombre_usuario = request.form.get['nombreUsuario'].title()
-        email = request.form.get['emailUsuario']
-        rol = request.form.get['rolUsuario']
-        is_active = request.form.get['estadousuario'].lower() == 'activo'
+        usuario_id = request.form.get('usuarioId')
+        nombre_usuario = request.form.get('nombreUsuario').title()
+        email = request.form.get('emailUsuario')
+        rol = request.form.get('rolUsuario')
+        is_active = request.form.get('estadousuario').lower() == 'activo'
         nueva_contraseña = request.form.get('nuevaContraseña')
         confirmar_contraseña = request.form.get('confirmarContraseña')
 
